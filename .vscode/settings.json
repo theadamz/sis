@@ -1,0 +1,33 @@
+{
+    "html.completion.attributeDefaultValue": "doublequotes",
+    "eslint.validate": ["javascript", "typescript", "html"],
+    "[javascript,javascriptreact,typescript,typescriptreact,json]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "javascript.preferences.quoteStyle": "double",
+        "typescript.preferences.quoteStyle": "double"
+    },
+    "[php]": {
+        "editor.defaultFormatter": "bmewburn.vscode-intelephense-client"
+    },
+    "editor.formatOnSave": true,
+    "php.executablePath": "D:\\laragon\\bin\\php\\php-8.3\\php.exe",
+    "javascript.preferences.quoteStyle": "double",
+    "typescript.preferences.quoteStyle": "double",
+    "typescriptHero.imports.stringQuoteStyle": "\"",
+    "typescriptHero.imports.disableImportRemovalOnOrganize": false,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": "always",
+        "source.removeUnusedImports": "always",
+        "source.sortImports": "always"
+    },
+    "editor.wordWrap": "off",
+    "LaravelExtraIntellisense.phpCommand": "D:\\laragon\\bin\\php\\php-8.3\\php.exe -r \"{code}\"",
+    "LaravelExtraIntellisense.modelsPaths": ["app", "app/Models", "app/Models/**/*.php"],
+    "intelephense.environment.phpVersion": "8.3",
+    "intelephense.compatibility.correctForArrayAccessArrayAndTraversableArrayUnionTypes": true,
+    "intelephense.completion.fullyQualifyGlobalConstantsAndFunctions": true,
+    "intelephense.files.associations": ["*.php", "*.phtml"],
+    "intelephense.format.enable": true,
+    "intelephense.format.braces": "per",
+    "LaravelExtraIntellisense.basePath": "${workspaceFolder}"
+}
