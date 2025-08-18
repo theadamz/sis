@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { LovEntityColumns } from '@/datatables/columns/lov-entity-columns';
 import DataTablePaginationAjax, { DataTablePaginationAjaxRef } from '@/datatables/components/data-table-pagination-ajax';
 import { refactorErrorMessage } from '@/lib/refactorMessages';
-import { type Entity, type SharedData, type Site, type Timezone } from '@/types';
+import { EntityDT, type SharedData, type SiteDT, type Timezone } from '@/types';
 import { useForm } from '@inertiajs/react';
 import axios, { HttpStatusCode } from 'axios';
 import { CheckIcon, Loader2 } from 'lucide-react';
@@ -65,7 +65,7 @@ const Edit = ({ id, timezones, onUpdated, onError }: EditProps): ReactNode => {
             return;
         }
 
-        const data: Site = response.data.data;
+        const data: SiteDT = response.data.data;
 
         setData({
             entity: data.entity_id,
@@ -109,7 +109,7 @@ const Edit = ({ id, timezones, onUpdated, onError }: EditProps): ReactNode => {
         clearErrors(); // clear errors
     };
 
-    const handleLOVRowSelected = (data: Entity): void => {
+    const handleLOVRowSelected = (data: EntityDT): void => {
         setData('entity', data.id);
         setData('entity_name', data.name);
         lovDialogEntity.current?.close();
@@ -127,6 +127,7 @@ const Edit = ({ id, timezones, onUpdated, onError }: EditProps): ReactNode => {
                                 Entity <Label className="text-red-500">*</Label>
                             </Label>
                             <InputLOV
+                                className="w-full"
                                 id="entity"
                                 type="text"
                                 autoFocus

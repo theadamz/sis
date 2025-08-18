@@ -49,16 +49,17 @@ Route::prefix("inspections")->group(function () {
 // user
 Route::middleware(['can:cfg-user', 'access:cfg-user'])->group(function () {
     Route::get('/users', [\App\Http\Controllers\Config\UserController::class, 'index'])->name('config.user.index');
+    Route::get('/users/{id}', [\App\Http\Controllers\Config\UserController::class, 'show'])->name('config.user.show');
     Route::post('/users', [\App\Http\Controllers\Config\UserController::class, 'store'])->can('cfg-user-create')->name('config.user.store');
-    Route::put('/users', [\App\Http\Controllers\Config\UserController::class, 'update'])->can('cfg-user-edit')->name('config.user.update');
+    Route::put('/users/{id}', [\App\Http\Controllers\Config\UserController::class, 'update'])->can('cfg-user-edit')->name('config.user.update');
     Route::delete('/users', [\App\Http\Controllers\Config\UserController::class, 'destroy'])->can('cfg-user-delete')->name('config.user.destroy');
 });
 
 // access
 Route::middleware(['can:cfg-user-access', 'access:cfg-user-access'])->group(function () {
     Route::get('/accesses', [\App\Http\Controllers\Config\AccessController::class, 'index'])->name('config.access.index');
-    Route::get('/accesses/{roleId}/{accessCode}', [\App\Http\Controllers\Config\AccessController::class, 'show'])->can('cfg-user-access-read')->name('config.access.read');
-    Route::get('/accesses/{roleId}', [\App\Http\Controllers\Config\AccessController::class, 'retriveRoleAccesses'])->can('cfg-user-access-read')->name('config.access.get-role-access');
+    Route::get('/accesses/{siteId}/{userId}', [\App\Http\Controllers\Config\AccessController::class, 'retriveUserAccesses'])->can('cfg-user-access-read')->name('config.access.get-user-access');
+    Route::get('/accesses/{siteId}/{userId}/{accessCode}', [\App\Http\Controllers\Config\AccessController::class, 'show'])->can('cfg-user-access-read')->name('config.access.read');
     Route::post('/accesses', [\App\Http\Controllers\Config\AccessController::class, 'store'])->can('cfg-user-access-create')->name('config.access.store');
     Route::put('/accesses', [\App\Http\Controllers\Config\AccessController::class, 'update'])->can('cfg-user-access-edit')->name('config.access.update');
     Route::delete('/accesses', [\App\Http\Controllers\Config\AccessController::class, 'destroy'])->can('cfg-user-access-delete')->name('config.access.destroy');

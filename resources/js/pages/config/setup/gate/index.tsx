@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { GateColumns } from '@/datatables/columns/gate-columns';
 import DataTablePaginationAjax, { DataTablePaginationAjaxRef } from '@/datatables/components/data-table-pagination-ajax';
 import { refactorErrorMessage } from '@/lib/refactorMessages';
-import { type BreadcrumbItem, type Gate, type SharedData } from '@/types';
+import { type BreadcrumbItem, type GateDT, type SharedData } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 import { PlusIcon } from 'lucide-react';
 import { JSX, useRef, useState } from 'react';
@@ -41,7 +41,7 @@ const Index = (): JSX.Element => {
     const editForm = useRef<DialogSheetRef>(null);
 
     /*** events ***/
-    const handleDelete = async (data: Array<Gate>) => {
+    const handleDelete = async (data: Array<GateDT>) => {
         // confirmation
         const confirmation = await confirmDialog.YesNo({
             message: `Are you sure want to delete ${data.length} data?`,
@@ -91,14 +91,14 @@ const Index = (): JSX.Element => {
 
             {/* create */}
             {access.permissions.create && (
-                <DialogSheet title="Create Gate" ref={createForm}>
+                <DialogSheet title="Create Gate" ref={createForm} preventInteractionOutside={false}>
                     <Create onFormClosed={() => createForm.current?.close()} onCreated={() => dataTable.current?.refresh()} />
                 </DialogSheet>
             )}
 
             {/* edit */}
             {access.permissions.edit && (
-                <DialogSheet title="Edit Gate" ref={editForm}>
+                <DialogSheet title="Edit Gate" ref={editForm} preventInteractionOutside={false}>
                     <Edit id={id} onFormClosed={() => editForm.current?.close()} onUpdated={() => dataTable.current?.refresh()} />
                 </DialogSheet>
             )}

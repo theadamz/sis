@@ -112,7 +112,7 @@ const ConfirmDialogModal = (): ReactNode => {
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent>
+            <DialogContent onInteractOutside={(e) => e.preventDefault()}>
                 <DialogHeader>
                     <DialogTitle>{props.title}</DialogTitle>
                     <DialogDescription>{props.message}</DialogDescription>

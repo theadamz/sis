@@ -240,6 +240,7 @@ const DataTablePagination = <TData, TValue>(
 
     const handleClearSelectedRows = () => {
         table.resetRowSelection();
+        setSelectedRows([]);
     };
 
     const handleRowsSelected = () => {

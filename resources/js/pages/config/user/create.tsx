@@ -1,17 +1,21 @@
+import ComboBox from '@/components/combo-box';
 import { confirmDialog } from '@/components/confirm-dialog';
 import DialogContainer, { DialogContainerRef } from '@/components/dialog-container';
 import { errorDialog } from '@/components/error-dialog';
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
+import { InputLOV } from '@/components/ui/input-lov';
 import { Label } from '@/components/ui/label';
 import { LovSiteColumns } from '@/datatables/columns/lov-site-columns';
 import DataTablePaginationAjax, { DataTablePaginationAjaxRef } from '@/datatables/components/data-table-pagination-ajax';
 import { refactorErrorMessage } from '@/lib/refactorMessages';
-import { type Entity, type SharedData } from '@/types';
+import { cn } from '@/lib/utils';
+import { type Menu, type SharedData, type SiteDT } from '@/types';
 import { useForm } from '@inertiajs/react';
-import { CheckIcon, Loader2, XIcon } from 'lucide-react';
-import { FormEventHandler, ReactNode, useRef } from 'react';
+import { CheckIcon, EyeClosedIcon, EyeIcon, Loader2, XIcon } from 'lucide-react';
+import { FormEventHandler, ReactNode, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 type UserForm = {
@@ -26,12 +30,13 @@ type UserForm = {
 };
 
 interface CreateProps {
+    routes: Menu[];
     onFormClosed?: () => void;
     onCreated?: () => void;
     onError?: (data: any) => void;
 }
 
-const Create = ({ onFormClosed, onCreated, onError }: CreateProps): ReactNode => {
+const Create = ({ routes, onFormClosed, onCreated, onError }: CreateProps): ReactNode => {
     /*** inertia js ***/
     const { data, setData, post, processing, errors, reset, clearErrors } = useForm<Required<UserForm>>({
         username: '',
@@ -43,6 +48,9 @@ const Create = ({ onFormClosed, onCreated, onError }: CreateProps): ReactNode =>
         site_name: '',
         is_active: true,
     });
+
+    /*** states ***/
+    const [showPassword, setShowPassword] = useState<boolean>(false);
 
     /*** references ***/
     const lovDialog = useRef<DialogContainerRef>(null);
@@ -86,7 +94,7 @@ const Create = ({ onFormClosed, onCreated, onError }: CreateProps): ReactNode =>
         clearErrors(); // clear errors
     };
 
-    const handleLOVRowSelected = (data: Entity): void => {
+    const handleLOVRowSelected = (data: SiteDT): void => {
         setData('site', data.id);
         setData('site_name', data.name);
         lovDialog.current?.close();
@@ -121,12 +129,41 @@ const Create = ({ onFormClosed, onCreated, onError }: CreateProps): ReactNode =>
                             type="text"
                             tabIndex={2}
                             autoComplete="email"
-                            value={data.username}
+                            value={data.email}
                             onChange={(e) => setData('email', e.target.value)}
                             placeholder="Email"
                             error={errors.email}
                             maxLength={255}
                         />
+                    </div>
+                    <div className="grid gap-2">
+                        <Label htmlFor="password">
+                            Password <Label className="text-red-500">*</Label>
+                        </Label>
+                        <div className="flex w-full items-center">
+                            <Input
+                                id="password"
+                                className="w-full rounded-e-none border-e-0"
+                                type={showPassword ? 'text' : 'password'}
+                                tabIndex={2}
+                                autoComplete="Password"
+                                value={data.password}
+                                onChange={(e) => setData('password', e.target.value)}
+                                placeholder="Password"
+                                maxLength={255}
+                                error={errors.password}
+                                showErrorMessage={false}
+                            />
+                            <Button
+                                type="button"
+                                variant="outline"
+                                className={cn('rounded-s-none', errors.password ? 'border-red-500' : '')}
+                                onClick={() => setShowPassword(!showPassword)}
+                            >
+                                {showPassword ? <EyeClosedIcon /> : <EyeIcon />}
+                            </Button>
+                        </div>
+                        {errors.password && <InputError message={errors.password} />}
                     </div>
                     <div className="grid gap-2">
                         <Label htmlFor="name">
@@ -144,7 +181,34 @@ const Create = ({ onFormClosed, onCreated, onError }: CreateProps): ReactNode =>
                             maxLength={50}
                         />
                     </div>
-
+                    <div className="grid gap-2">
+                        <Label htmlFor="def_path">
+                            Default Path <Label className="text-red-500">*</Label>
+                        </Label>
+                        <ComboBox
+                            className="min-w-full"
+                            placeholder="Select"
+                            defValue={data.def_path}
+                            items={routes.map((item) => {
+                                return { value: item.path, label: `${item.name} (${item.path})` };
+                            })}
+                            onValueChange={(value) => setData('def_path', value)}
+                        />
+                    </div>
+                    <div className="grid gap-2">
+                        <Label htmlFor="site">
+                            Site <Label className="text-red-500">*</Label>
+                        </Label>
+                        <InputLOV
+                            className="w-full"
+                            id="site"
+                            type="text"
+                            valueDisplay={data.site_name}
+                            placeholder="Site"
+                            error={errors.site}
+                            onSearchClick={() => lovDialog.current?.open()}
+                        />
+                    </div>
                     <div className="grid gap-2">
                         <Label htmlFor="is_active">Active</Label>
                         <div className="flex">
@@ -161,7 +225,7 @@ const Create = ({ onFormClosed, onCreated, onError }: CreateProps): ReactNode =>
                             </Label>
                         </div>
                     </div>
-                    <div className="grid gap-2">
+                    <div className="mt-5 grid gap-2">
                         <div className="flex justify-between">
                             <Button type="button" disabled={processing} variant={'default'} onClick={() => onFormClosed && onFormClosed()}>
                                 <XIcon className="mr-2 size-4" />

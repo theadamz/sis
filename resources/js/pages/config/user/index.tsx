@@ -1,6 +1,6 @@
 import { confirmDialog } from '@/components/confirm-dialog';
 import DialogContainer, { DialogContainerRef } from '@/components/dialog-container';
-import DialogSheet, { DialogSheetRef } from '@/components/dialog-sheet';
+import { DialogSheetRef } from '@/components/dialog-sheet';
 import { errorDialog } from '@/components/error-dialog';
 import { loadingDialog } from '@/components/loading-dialog';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { UserColumns } from '@/datatables/columns/user-columns';
 import DataTablePaginationAjax, { DataTablePaginationAjaxRef } from '@/datatables/components/data-table-pagination-ajax';
 import { refactorErrorMessage } from '@/lib/refactorMessages';
-import { type BreadcrumbItem, type Gate, type SharedData } from '@/types';
+import { type BreadcrumbItem, type Menu, type SharedData, type UserDT } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 import { PlusIcon } from 'lucide-react';
 import { JSX, useRef, useState } from 'react';
@@ -26,7 +26,11 @@ const breadcrumbsData: BreadcrumbItem[] = [
     },
 ];
 
-const Index = (): JSX.Element => {
+interface IndexProps {
+    routes: Menu[];
+}
+
+const Index = ({ routes }: IndexProps): JSX.Element => {
     /*** inertia js ***/
     const { access } = usePage<SharedData>().props;
 
@@ -39,7 +43,7 @@ const Index = (): JSX.Element => {
     const editForm = useRef<DialogSheetRef>(null);
 
     /*** events ***/
-    const handleDelete = async (data: Array<Gate>) => {
+    const handleDelete = async (data: Array<UserDT>) => {
         // confirmation
         const confirmation = await confirmDialog.YesNo({
             message: `Are you sure want to delete ${data.length} data?`,
@@ -55,7 +59,7 @@ const Index = (): JSX.Element => {
         const ids = data!.map((item) => item.id);
 
         // delete
-        router.delete(route('config.setup.gate.destroy'), {
+        router.delete(route('config.user.destroy'), {
             data: { ids: ids },
             onSuccess: (response) => {
                 loadingDialog.hide();
@@ -90,15 +94,15 @@ const Index = (): JSX.Element => {
             {/* create */}
             {access.permissions.create && (
                 <DialogContainer title="Create User" ref={createForm} className="min-w-3xl">
-                    <Create onFormClosed={() => createForm.current?.close()} onCreated={() => dataTable.current?.refresh()} />
+                    <Create routes={routes} onFormClosed={() => createForm.current?.close()} onCreated={() => dataTable.current?.refresh()} />
                 </DialogContainer>
             )}
 
             {/* edit */}
             {access.permissions.edit && (
-                <DialogSheet title="Edit Gate" ref={editForm}>
-                    <Edit id={id} onFormClosed={() => editForm.current?.close()} onUpdated={() => dataTable.current?.refresh()} />
-                </DialogSheet>
+                <DialogContainer title="Edit User" ref={editForm} className="min-w-3xl">
+                    <Edit id={id} routes={routes} onFormClosed={() => editForm.current?.close()} onUpdated={() => dataTable.current?.refresh()} />
+                </DialogContainer>
             )}
 
             {/* main content */}

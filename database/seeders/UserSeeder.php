@@ -15,6 +15,15 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
+        // create dummy users
+        $this->createDefaultUsers();
+
+        // create dummy user
+        // $this->createDummyUsers();
+    }
+
+    private function createDefaultUsers(): void
+    {
         User::create([
             'id' => '00000000-0000-0000-0000-000000000000',
             'username' => 'dev',
@@ -61,6 +70,24 @@ class UserSeeder extends Seeder
                     'is_allowed' => true
                 ]);
             }
+        }
+    }
+
+    private function createDummyUsers(): void
+    {
+        for ($i = 0; $i < 30; $i++) {
+            $email = fake()->email();
+
+            User::create([
+                'username' => $email,
+                'email' => $email,
+                'name' => fake()->name(),
+                'password' => '12345678',
+                'def_path' => '/dashboard',
+                'site_id' => '00000000-0000-0000-0000-000000000000',
+                'is_active' => true,
+                'email_verified_at' => now(),
+            ]);
         }
     }
 }

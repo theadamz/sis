@@ -2,10 +2,12 @@
 
 namespace App\Helpers;
 
+use App\Enums\CacheKey;
 use Carbon\CarbonTimeZone;
 use DateTimeZone;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redis;
 use Str;
@@ -59,30 +61,99 @@ class GeneralHelper
     public static function removeCaches(string $keyword): void
     {
         // get all cache from redis
-        $keys = Redis::connection('cache')->keys('*' . Cache::getPrefix() . $keyword . '*');
+        if (config('cache.default') === 'database') {
+            $cachePrefix = Cache::getPrefix();
 
-        if (!empty($keys)) {
-            foreach ($keys as $key) {
-                // refactor key name
-                $key = Str::chopStart($key, config('database.redis.options.prefix') . Cache::getPrefix());
+            DB::table('cache')->where('key', 'like', $cachePrefix . $keyword . "%")->delete();
+        } else {
+            $keys = Redis::connection('cache')->keys('*' . Cache::getPrefix() . $keyword . '*');
 
-                Cache::forget($key);
+            if (!empty($keys)) {
+                foreach ($keys as $key) {
+                    // refactor key name
+                    $key = Str::chopStart($key, config('database.redis.options.prefix') . Cache::getPrefix());
+
+                    Cache::forget($key);
+                }
             }
         }
     }
 
     public static function getTimezones(): array
     {
+        if (Cache::has(CacheKey::TIMEZONE->value)) {
+            return Cache::get(CacheKey::TIMEZONE->value);
+        }
+
         $data = [];
         $timezones = DateTimeZone::listIdentifiers(DateTimeZone::ALL);
 
         foreach ($timezones as $timezone) {
+            $offset = round(CarbonTimeZone::create($timezone)->getOffset(now()) / 3600, 1);
+
             $data[] = [
                 'value' => $timezone,
                 'text' => '(' . CarbonTimeZone::create($timezone)->toOffsetName() . ') ' . $timezone,
+                'offset' => $offset - floor($offset) > 0 ? $offset : (int) $offset,
             ];
         }
 
+        Cache::put(CacheKey::TIMEZONE->value, $data, now()->addHours(24));
+
         return $data;
+    }
+
+    public static function getRouteList(): array
+    {
+        // to return
+        $data = collect();
+
+        // get visible access menus
+        $menus = collect(config('access.menus'))->where('visible', true);
+
+        // loop menus
+        foreach ($menus as $menu) {
+            // if path and children empty then continue
+            if (empty($menu['path']) && empty($menu['children'])) continue;
+
+            // if path not empty then push
+            if (!empty($menu['path'])) {
+                $data->push($menu);
+            }
+
+            // get children
+            if (!empty($menu['children'])) {
+                $data = $data->merge(self::getRouteChildren(collect($menu['children'])));
+            };
+        }
+
+        return $data->all();
+    }
+
+    private static function getRouteChildren(Collection $menus): array
+    {
+        // to return
+        $data = collect();
+
+        // get visible access menus
+        $menus = $menus->where('visible', true);
+
+        // loop menus
+        foreach ($menus as $menu) {
+            // if path and children empty then continue
+            if (empty($menu['path']) && empty($menu['children'])) continue;
+
+            // if path not empty then push
+            if (!empty($menu['path'])) {
+                $data->push($menu);
+            }
+
+            // get children
+            if (!empty($menu['children'])) {
+                $data = $data->merge(self::getRouteChildren(collect($menu['children'])));
+            };
+        }
+
+        return $data->all();
     }
 }

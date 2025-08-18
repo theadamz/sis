@@ -1,5 +1,5 @@
-import { Button } from '@/components//ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
     DropdownMenu,
@@ -9,86 +9,73 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Label } from '@/components/ui/label';
 import CaretColumn from '@/datatables/components/caret-column';
-import { sortHandler } from '@/lib/utils';
-import { type SharedData, type VehicleTypeDT } from '@/types';
+import { fuzzySort, sortHandler } from '@/lib/utils';
+import { type SharedData, type UserAccess } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { EllipsisVerticalIcon, PencilIcon } from 'lucide-react';
 
-export const VehicleTypeColumns: ColumnDef<VehicleTypeDT, unknown>[] = [
+type Permisisons = { [key: string]: boolean };
+
+export const AccessColumns: ColumnDef<UserAccess, unknown>[] = [
     {
-        id: 'checkbox',
+        id: 'select',
         meta: {
             headerClassName: 'w-[40px]', // fixed width
         },
         header: ({ table }) => (
             <Checkbox
                 checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
-                onCheckedChange={(value) => {
-                    table.toggleAllPageRowsSelected(!!value);
-
-                    if (table.options.meta?.onHeaderChecked) table.options.meta.onHeaderChecked(!!value);
-                }}
+                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
                 aria-label="Select all"
             />
         ),
-        cell: ({ row, table }) => (
-            <Checkbox
-                checked={row.getIsSelected()}
-                onCheckedChange={(value) => {
-                    row.toggleSelected(!!value);
-
-                    if (table.options.meta?.onChecked) table.options.meta.onChecked(row.original, !!value);
-                }}
-                aria-label="Select row"
-            />
+        cell: ({ row }) => (
+            <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} aria-label="Select row" />
         ),
         enableSorting: false,
         enableHiding: false,
     },
     {
-        accessorKey: 'code',
-        meta: {
-            columnDisplayName: 'Code',
-            headerClassName: 'w-[250px]',
-        },
-        header: ({ column }) => {
-            return (
-                <Button type="button" variant="ghost" onClick={() => column.toggleSorting(sortHandler(column.getIsSorted()))} className="p-0">
-                    Code
-                    <CaretColumn sort={column.getIsSorted()} />
-                </Button>
-            );
-        },
-    },
-    {
         accessorKey: 'name',
-        meta: {
-            columnDisplayName: 'Name',
-        },
+        enableResizing: true,
+        filterFn: 'fuzzy',
+        sortingFn: fuzzySort,
         header: ({ column }) => {
             return (
                 <Button type="button" variant="ghost" onClick={() => column.toggleSorting(sortHandler(column.getIsSorted()))} className="p-0">
-                    Name
+                    Access Name
                     <CaretColumn sort={column.getIsSorted()} />
                 </Button>
             );
         },
+        meta: {
+            columnDisplayName: 'Access Name', // Column display name
+        },
     },
     {
-        accessorKey: 'is_visible',
+        accessorKey: 'permissions',
         enableResizing: true,
+        header: 'Permissions',
+        cell: ({ row }) => {
+            const permissions: Permisisons = row.getValue('permissions');
+            return (
+                <div className="space-x-2">
+                    {Object.entries(permissions).map(([permisison, isAllowed]) => {
+                        return (
+                            <Badge key={permisison} variant={isAllowed ? 'outline' : 'destructive'}>
+                                {permisison}
+                            </Badge>
+                        );
+                    })}
+                </div>
+            );
+        },
         meta: {
-            headerClassName: 'w-[40px] text-center',
-            columnDisplayName: 'Visible', // Column display name
+            columnDisplayName: 'Permissions', // Column display name
             columnDisplay: true, // hide column after init
         },
-        header: () => {
-            return <Label>Visible</Label>;
-        },
-        cell: ({ row }) => <Badge variant={row.getValue('is_visible') ? 'outline' : 'warning'}>{row.getValue('is_visible') ? 'Yes' : 'No'}</Badge>,
     },
     {
         id: 'actions',
@@ -97,15 +84,15 @@ export const VehicleTypeColumns: ColumnDef<VehicleTypeDT, unknown>[] = [
             headerClassName: 'w-[40px]', // fixed width
         },
         cell: ({ row, table }) => {
-            const { permissions } = usePage<SharedData>().props.access;
+            const permissions = usePage<SharedData>().props.access.permissions;
             const item = row.original;
 
             return (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button type="button" variant="ghost" className="size-8 p-0">
+                        <Button type="button" variant="ghost" className="h-8 w-8 p-0">
                             <span className="sr-only">Open actions</span>
-                            <EllipsisVerticalIcon className="size-4" />
+                            <EllipsisVerticalIcon className="h-4 w-4" />
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
@@ -113,7 +100,7 @@ export const VehicleTypeColumns: ColumnDef<VehicleTypeDT, unknown>[] = [
                         <DropdownMenuSeparator />
                         {permissions.edit && (
                             <DropdownMenuItem onClick={() => table.options.meta?.onEdit && table.options.meta.onEdit(item as any)}>
-                                <PencilIcon /> Edit
+                                <PencilIcon className="mr-2" /> Edit
                             </DropdownMenuItem>
                         )}
                     </DropdownMenuContent>

@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Config\Setup;
 
 use App\Enums\CacheKey;
+use App\Enums\PagingType;
 use App\Helpers\GeneralHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Config\Setup\SiteRequest;
 use App\Http\Resources\SiteResource;
 use App\Models\Config\Setup\Site;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -103,7 +105,7 @@ class SiteController extends Controller
 
             // save
             $data = new Site($validated);
-            $data->entity_idx = $validated['entity'];
+            $data->entity_id = $validated['entity'];
             $data->save();
 
             // clear cache
@@ -203,5 +205,61 @@ class SiteController extends Controller
                 "error" => $e->getMessage(),
             ]);
         }
+    }
+
+    public function options(Request $request): JsonResponse
+    {
+        // variables
+        $pagingType = $request->has('page_type') && !empty(PagingType::tryFrom($request->get('page_type'))) ? PagingType::tryFrom($request->get('page_type')) : PagingType::PAGE; // paging type page|id|no_paging, if $usePaging = true but no PageType then page. default: no_paging
+        $perPage = $request->has('per_page') ? filter_var($request->get('per_page'), FILTER_VALIDATE_INT) : config('setting.page.default_limit', 10); // set limit, if not found then become 10
+        $page = $pagingType === PagingType::PAGE && $request->has('page') ? filter_var($request->get('page'), FILTER_VALIDATE_INT) : 1; // set page if pageType is offset
+        $lastId = $pagingType === PagingType::ID && $request->has('id') ? $request->get('id') : null;
+        $isActive = $request->has('is_active') ? filter_var($request->get('is_active'), FILTER_VALIDATE_INT) : null;
+
+        // check if cache exist
+        if (Cache::has(CacheKey::SITE->getKey())) {
+            return response()->json(['data' => Cache::get(CacheKey::SITE->getKey()), 'message' => "OK"], 200);
+        }
+
+        // query
+        $query = Site::select('id', 'entity_id', 'code', 'name')->with('entity:id,code,name')
+            ->where(function ($query) use ($request) {
+                $query->where('code', 'ilike', "%{$request->keyword}%")->orWhere('name', 'ilike', "%{$request->keyword}%");
+            })->orderBy('id');
+
+
+        // filter
+        if (!empty($isActive)) {
+            $query->where('is_active', $isActive);
+        }
+
+        ############################# START PAGING #############################
+        // paging offset
+        if ($pagingType === PagingType::PAGE) {
+            $query->skip($page === 1 ? 0 : (($page - 1) * $perPage));
+        }
+
+        // filter paging id
+        if ($pagingType === PagingType::ID) {
+            if ($lastId === null) {
+                $query->whereRaw('id IS NOT NULL');
+            } else {
+                $query->where('id', '>', $lastId);
+            }
+        }
+
+        // set limit
+        if ($pagingType->hasSize()) {
+            $query->limit($perPage);
+        }
+        ############################# END PAGING #############################
+
+        // get data
+        $query = $query->get();
+
+        // set cache
+        Cache::put(CacheKey::SITE->getKey(), $query, 30); // cache for 30 seconds
+
+        return response()->json(['data' => $query, 'message' => "OK"], 200);
     }
 }

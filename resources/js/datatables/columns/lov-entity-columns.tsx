@@ -3,11 +3,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import CaretColumn from '@/datatables/components/caret-column';
 import { sortHandler } from '@/lib/utils';
-import { type Entity } from '@/types';
+import { type EntityDT } from '@/types';
 import { ColumnDef } from '@tanstack/react-table';
 import { MousePointer2Icon } from 'lucide-react';
 
-export const LovEntityColumns: ColumnDef<Entity, unknown>[] = [
+export const LovEntityColumns: ColumnDef<EntityDT, unknown>[] = [
     {
         id: 'select', // set to checkbox for multiselect
         meta: {

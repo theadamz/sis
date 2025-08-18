@@ -10,7 +10,7 @@
         "editor.defaultFormatter": "bmewburn.vscode-intelephense-client"
     },
     "editor.formatOnSave": true,
-    "php.executablePath": "D:\\laragon\\bin\\php\\php-8.3\\php.exe",
+    "php.executablePath": "D:\\laragon\\bin\\php\\php-8.4\\php.exe",
     "javascript.preferences.quoteStyle": "double",
     "typescript.preferences.quoteStyle": "double",
     "typescriptHero.imports.stringQuoteStyle": "\"",
@@ -21,9 +21,9 @@
         "source.sortImports": "always"
     },
     "editor.wordWrap": "off",
-    "LaravelExtraIntellisense.phpCommand": "D:\\laragon\\bin\\php\\php-8.3\\php.exe -r \"{code}\"",
+    "LaravelExtraIntellisense.phpCommand": "D:\\laragon\\bin\\php\\php-8.4\\php.exe -r \"{code}\"",
     "LaravelExtraIntellisense.modelsPaths": ["app", "app/Models", "app/Models/**/*.php"],
-    "intelephense.environment.phpVersion": "8.3",
+    "intelephense.environment.phpVersion": "8.4",
     "intelephense.compatibility.correctForArrayAccessArrayAndTraversableArrayUnionTypes": true,
     "intelephense.completion.fullyQualifyGlobalConstantsAndFunctions": true,
     "intelephense.files.associations": ["*.php", "*.phtml"],

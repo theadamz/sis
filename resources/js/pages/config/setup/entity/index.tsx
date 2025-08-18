@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { EntityColumns } from '@/datatables/columns/entity-columns';
 import DataTablePagination, { DataTableRef } from '@/datatables/components/data-table-pagination';
 import { refactorErrorMessage } from '@/lib/refactorMessages';
-import { type BreadcrumbItem, type Entity, type SharedData } from '@/types';
+import { type BreadcrumbItem, type EntityDT, type SharedData } from '@/types';
 import { IDataTablePagination } from '@/types/datatables';
 import { Head, router, usePage } from '@inertiajs/react';
 import { PlusIcon } from 'lucide-react';
@@ -29,8 +29,8 @@ const breadcrumbsData: BreadcrumbItem[] = [
     },
 ];
 
-interface IEntityDataTablePagination extends Omit<IDataTablePagination<Entity>, 'data'> {
-    data: Entity[];
+interface IEntityDataTablePagination extends Omit<IDataTablePagination<EntityDT>, 'data'> {
+    data: EntityDT[];
 }
 
 interface IndexProps {
@@ -50,7 +50,7 @@ const Index = ({ datatable }: IndexProps): JSX.Element => {
     const editForm = useRef<DialogSheetRef>(null);
 
     /*** events ***/
-    const handleDelete = async (data: Array<Entity>) => {
+    const handleDelete = async (data: Array<EntityDT>) => {
         // confirmation
         const confirmation = await confirmDialog.YesNo({
             message: `Are you sure want to delete ${data.length} data?`,
@@ -98,14 +98,14 @@ const Index = ({ datatable }: IndexProps): JSX.Element => {
 
             {/* create */}
             {access.permissions.create && (
-                <DialogSheet title="Create Entity" ref={createForm}>
+                <DialogSheet title="Create Entity" ref={createForm} preventInteractionOutside={false}>
                     <Create onFormClosed={() => createForm.current?.close()} />
                 </DialogSheet>
             )}
 
             {/* edit */}
             {access.permissions.edit && (
-                <DialogSheet title="Edit Entity" ref={editForm}>
+                <DialogSheet title="Edit Entity" ref={editForm} preventInteractionOutside={false}>
                     <Edit id={id} onUpdated={() => editForm.current?.close()} />
                 </DialogSheet>
             )}

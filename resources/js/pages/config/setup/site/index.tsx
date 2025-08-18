@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { SiteColumns } from '@/datatables/columns/site-columns';
 import DataTablePagination, { DataTableRef } from '@/datatables/components/data-table-pagination';
 import { refactorErrorMessage } from '@/lib/refactorMessages';
-import { type BreadcrumbItem, type SharedData, type Site, type Timezone } from '@/types';
+import { type BreadcrumbItem, type SharedData, type SiteDT, type Timezone } from '@/types';
 import { IDataTablePagination } from '@/types/datatables';
 import { Head, router, usePage } from '@inertiajs/react';
 import { PlusIcon } from 'lucide-react';
@@ -29,12 +29,12 @@ const breadcrumbsData: BreadcrumbItem[] = [
     },
 ];
 
-interface IEntityDataTablePagination extends Omit<IDataTablePagination<Site>, 'data'> {
-    data: Site[];
+interface ISiteDataTablePagination extends Omit<IDataTablePagination<SiteDT>, 'data'> {
+    data: SiteDT[];
 }
 
 interface IndexProps {
-    datatable: IEntityDataTablePagination;
+    datatable: ISiteDataTablePagination;
     timezones: Timezone[];
 }
 
@@ -51,7 +51,7 @@ const Index = ({ datatable, timezones }: IndexProps): JSX.Element => {
     const editForm = useRef<DialogSheetRef>(null);
 
     /*** events ***/
-    const handleDelete = async (data: Array<Site>) => {
+    const handleDelete = async (data: Array<SiteDT>) => {
         // confirmation
         const confirmation = await confirmDialog.YesNo({
             message: `Are you sure want to delete ${data.length} data?`,
@@ -99,14 +99,14 @@ const Index = ({ datatable, timezones }: IndexProps): JSX.Element => {
 
             {/* create */}
             {access.permissions.create && (
-                <DialogSheet title="Create Site" ref={createForm}>
+                <DialogSheet title="Create Site" ref={createForm} preventInteractionOutside={false}>
                     <Create onFormClosed={() => createForm.current?.close()} timezones={timezones} />
                 </DialogSheet>
             )}
 
             {/* edit */}
             {access.permissions.edit && (
-                <DialogSheet title="Edit Site" ref={editForm}>
+                <DialogSheet title="Edit Site" ref={editForm} preventInteractionOutside={false}>
                     <Edit id={id} onUpdated={() => editForm.current?.close()} timezones={timezones} />
                 </DialogSheet>
             )}

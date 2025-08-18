@@ -12,12 +12,12 @@ import {
 import { Label } from '@/components/ui/label';
 import CaretColumn from '@/datatables/components/caret-column';
 import { sortHandler } from '@/lib/utils';
-import { type SharedData, type Site } from '@/types';
+import { type SharedData, type SiteDT } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { EllipsisVerticalIcon, PencilIcon } from 'lucide-react';
 
-export const SiteColumns: ColumnDef<Site, unknown>[] = [
+export const SiteColumns: ColumnDef<SiteDT, unknown>[] = [
     {
         id: 'select',
         meta: {
@@ -26,12 +26,24 @@ export const SiteColumns: ColumnDef<Site, unknown>[] = [
         header: ({ table }) => (
             <Checkbox
                 checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
-                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                onCheckedChange={(value) => {
+                    table.toggleAllPageRowsSelected(!!value);
+
+                    if (table.options.meta?.onHeaderChecked) table.options.meta.onHeaderChecked(!!value);
+                }}
                 aria-label="Select all"
             />
         ),
-        cell: ({ row }) => (
-            <Checkbox checked={row.getIsSelected()} onCheckedChange={(value) => row.toggleSelected(!!value)} aria-label="Select row" />
+        cell: ({ row, table }) => (
+            <Checkbox
+                checked={row.getIsSelected()}
+                onCheckedChange={(value) => {
+                    row.toggleSelected(!!value);
+
+                    if (table.options.meta?.onChecked) table.options.meta.onChecked(row.original, !!value);
+                }}
+                aria-label="Select row"
+            />
         ),
         enableSorting: false,
         enableHiding: false,

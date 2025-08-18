@@ -1,6 +1,6 @@
 import { Head, useForm } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
-import { FormEventHandler, JSX, ReactNode } from 'react';
+import { EyeClosedIcon, EyeIcon, LoaderCircle } from 'lucide-react';
+import { FormEventHandler, JSX, ReactNode, useState } from 'react';
 
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
@@ -23,6 +23,8 @@ interface LoginProps {
 }
 
 const Login = ({ status, canResetPassword }: LoginProps): JSX.Element => {
+    const [showPassword, setShowPassword] = useState<boolean>(false);
+
     const { data, setData, post, processing, errors, reset } = useForm<Required<LoginForm>>({
         email: '',
         password: '',
@@ -67,17 +69,28 @@ const Login = ({ status, canResetPassword }: LoginProps): JSX.Element => {
                                 </TextLink>
                             )}
                         </div>
-                        <Input
-                            id="password"
-                            type="password"
-                            required
-                            tabIndex={2}
-                            autoComplete="current-password"
-                            value={data.password}
-                            onChange={(e) => setData('password', e.target.value)}
-                            placeholder="Password"
-                            error={errors.password}
-                        />
+                        <div className="flex w-full max-w-sm items-center">
+                            <Input
+                                className="rounded-e-none border-e-0"
+                                id="password"
+                                type={showPassword ? 'text' : 'password'}
+                                required
+                                tabIndex={2}
+                                autoComplete="current-password"
+                                value={data.password}
+                                onChange={(e) => setData('password', e.target.value)}
+                                placeholder="Password"
+                                error={errors.password}
+                            />
+                            <Button
+                                type="button"
+                                variant="outline"
+                                className="rounded-s-none border-s-0"
+                                onClick={() => setShowPassword(!showPassword)}
+                            >
+                                {showPassword ? <EyeClosedIcon /> : <EyeIcon />}
+                            </Button>
+                        </div>
                     </div>
 
                     <div className="flex items-center space-x-3">

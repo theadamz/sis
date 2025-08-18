@@ -82,7 +82,7 @@ const ErrorDialogModal = (): ReactNode => {
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent className="w-1/2">
+            <DialogContent className="w-1/2" onInteractOutside={(e) => e.preventDefault()}>
                 <DialogHeader>
                     <DialogTitle>{props.title}</DialogTitle>
                     <DialogDescription>{props.description}</DialogDescription>

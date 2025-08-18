@@ -11,12 +11,13 @@ interface DialogSheetProps {
     title: string;
     description?: string;
     open?: boolean;
+    preventInteractionOutside?: boolean;
     onOpen?: () => void;
     onClose?: () => void;
 }
 
 const DialogSheet = (
-    { children, title, description, open = false, onOpen, onClose }: DialogSheetProps,
+    { children, title, description, open = false, preventInteractionOutside = true, onOpen, onClose }: DialogSheetProps,
     ref: ForwardedRef<DialogSheetRef>,
 ): ReactNode => {
     /*** componenet state ***/
@@ -41,7 +42,11 @@ const DialogSheet = (
 
     return (
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
-            <SheetContent>
+            <SheetContent
+                onInteractOutside={(e) => {
+                    if (preventInteractionOutside) e.preventDefault();
+                }}
+            >
                 <SheetHeader>
                     <SheetTitle>{title}</SheetTitle>
                     <SheetDescription>{description}</SheetDescription>

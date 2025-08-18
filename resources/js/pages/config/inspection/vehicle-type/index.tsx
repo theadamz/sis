@@ -5,14 +5,14 @@ import { loadingDialog } from '@/components/loading-dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { VehicleTypeColumns } from '@/datatables/columns/vehicle-type-columns';
-import DataTablePaginationAjax from '@/datatables/components/data-table-pagination-ajax';
+import DataTablePaginationAjax, { DataTablePaginationAjaxRef } from '@/datatables/components/data-table-pagination-ajax';
 import { refactorErrorMessage } from '@/lib/refactorMessages';
-import { type BreadcrumbItem, type Entity, type SharedData } from '@/types';
+import { type BreadcrumbItem, type SharedData, type VehicleTypeDT } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 import { PlusIcon } from 'lucide-react';
 import { JSX, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { DataTablePaginationAjaxRef } from '../../../../datatables/components/data-table-pagination-ajax';
+
 import Create from './create';
 import Edit from './edit';
 
@@ -42,7 +42,7 @@ const Index = (): JSX.Element => {
     const editForm = useRef<DialogSheetRef>(null);
 
     /*** events ***/
-    const handleDelete = async (data: Array<Entity>) => {
+    const handleDelete = async (data: Array<VehicleTypeDT>) => {
         // confirmation
         const confirmation = await confirmDialog.YesNo({
             message: `Are you sure want to delete ${data.length} data?`,
@@ -91,14 +91,14 @@ const Index = (): JSX.Element => {
 
             {/* create */}
             {access.permissions.create && (
-                <DialogSheet title="Create Vehicle Types" ref={createForm}>
+                <DialogSheet title="Create Vehicle Types" ref={createForm} preventInteractionOutside={false}>
                     <Create onFormClosed={() => createForm.current?.close()} onCreated={() => dataTable.current?.refresh()} />
                 </DialogSheet>
             )}
 
             {/* edit */}
             {access.permissions.edit && (
-                <DialogSheet title="Edit Vehicle Types" ref={editForm}>
+                <DialogSheet title="Edit Vehicle Types" ref={editForm} preventInteractionOutside={false}>
                     <Edit id={id} onFormClosed={() => editForm.current?.close()} onUpdated={() => dataTable.current?.refresh()} />
                 </DialogSheet>
             )}

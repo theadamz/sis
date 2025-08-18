@@ -114,8 +114,41 @@ export interface Timezone {
     text: string;
 }
 
-/* Config */
-export interface Entity {
+export interface Access {
+    code: string;
+    name: string;
+    permissions: string[];
+}
+
+export interface UserAccess {
+    id: string;
+    code: string;
+    name: string;
+    permision: string;
+    is_allowed: boolean;
+}
+
+export interface SiteOption {
+    id: string;
+    entity_id: string;
+    code: string;
+    name: string;
+    entity: {
+        id: string;
+        code: string;
+        name: string;
+    };
+}
+
+export interface UserOption {
+    id: string;
+    username: string;
+    name: string;
+    email: string;
+}
+
+/* Datatable */
+export interface EntityDT {
     id: string;
     code: string;
     name: string;
@@ -123,7 +156,7 @@ export interface Entity {
     is_active: boolean;
 }
 
-export interface Site {
+export interface SiteDT {
     id: string;
     entity_id: string;
     entity_name: string;
@@ -132,9 +165,10 @@ export interface Site {
     address: string;
     timezone: string;
     is_active: boolean;
+    entity?: Entity;
 }
 
-export interface Gate {
+export interface GateDT {
     id: string;
     site_id: string;
     site_name: string;
@@ -143,14 +177,14 @@ export interface Gate {
     is_active: boolean;
 }
 
-export interface VehicleType {
+export interface VehicleTypeDT {
     id: string;
     code: string;
     name: string;
     is_visible: boolean;
 }
 
-export interface User {
+export interface UserDT {
     id: string;
     username: string;
     email: string;

@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { LovSiteColumns } from '@/datatables/columns/lov-site-columns';
 import DataTablePaginationAjax, { DataTablePaginationAjaxRef } from '@/datatables/components/data-table-pagination-ajax';
 import { refactorErrorMessage } from '@/lib/refactorMessages';
-import { type Entity, type SharedData } from '@/types';
+import { type SharedData, type SiteDT } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { CheckIcon, Loader2 } from 'lucide-react';
 import { FormEventHandler, ReactNode, useRef } from 'react';
@@ -81,7 +81,7 @@ const Create = ({ onFormClosed, onCreated, onError }: CreateProps): ReactNode =>
         clearErrors(); // clear errors
     };
 
-    const handleLOVRowSelected = (data: Entity): void => {
+    const handleLOVRowSelected = (data: SiteDT): void => {
         setData('site', data.id);
         setData('site_name', data.name);
         lovDialog.current?.close();
@@ -96,6 +96,7 @@ const Create = ({ onFormClosed, onCreated, onError }: CreateProps): ReactNode =>
                             Site <Label className="text-red-500">*</Label>
                         </Label>
                         <InputLOV
+                            className="w-full"
                             id="site"
                             type="text"
                             autoFocus

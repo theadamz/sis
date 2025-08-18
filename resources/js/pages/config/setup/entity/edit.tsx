@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { refactorErrorMessage } from '@/lib/refactorMessages';
-import { type Entity, type SharedData } from '@/types';
+import { type EntityDT, type SharedData } from '@/types';
 import { useForm } from '@inertiajs/react';
 import axios, { HttpStatusCode } from 'axios';
 import { CheckIcon, Loader2 } from 'lucide-react';
@@ -49,7 +49,7 @@ const Edit = ({ id, onUpdated, onError }: EditProps): ReactNode => {
             return;
         }
 
-        const data: Entity = response.data.data;
+        const data: EntityDT = response.data.data;
 
         setData({
             code: data.code,

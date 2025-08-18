@@ -4,6 +4,7 @@ namespace App\Enums;
 
 enum CacheKey: string
 {
+    case TIMEZONE = "TIMEZONE";
     case ENTITY = 'entity';
     case SITE = 'site';
     case GATE = 'gate';

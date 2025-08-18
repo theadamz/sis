@@ -12,12 +12,13 @@ interface DialogContainerProps {
     title: string;
     description?: string;
     open?: boolean;
+    preventInteractionOutside?: boolean;
     onOpen?: () => void;
     onClose?: () => void;
 }
 
 const DialogContainer = (
-    { className, children, title, description, open = false, onOpen, onClose }: DialogContainerProps,
+    { className, children, title, description, open = false, preventInteractionOutside = true, onOpen, onClose }: DialogContainerProps,
     ref: ForwardedRef<DialogContainerRef>,
 ): ReactNode => {
     /*** componenet state ***/
@@ -42,7 +43,12 @@ const DialogContainer = (
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogContent className={className}>
+            <DialogContent
+                className={className}
+                onInteractOutside={(e) => {
+                    if (preventInteractionOutside) e.preventDefault();
+                }}
+            >
                 <DialogHeader>
                     <DialogTitle className="text-start">{title}</DialogTitle>
                     <DialogDescription className="text-start">{description}</DialogDescription>

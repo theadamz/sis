@@ -60,7 +60,7 @@ class User extends Authenticatable
     {
         return [
             'password' => 'hashed',
-            'is_active' => 'bool',
+            'is_active' => 'boolean',
             'email_verified_at' => 'datetime',
             'last_change_password_at' => 'datetime',
             'last_login_at' => 'datetime',

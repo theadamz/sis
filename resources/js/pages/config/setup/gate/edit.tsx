@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { LovSiteColumns } from '@/datatables/columns/lov-site-columns';
 import DataTablePaginationAjax, { DataTablePaginationAjaxRef } from '@/datatables/components/data-table-pagination-ajax';
 import { refactorErrorMessage } from '@/lib/refactorMessages';
-import { type Entity, type Gate, type SharedData } from '@/types';
+import { type GateDT, type SharedData, type SiteDT } from '@/types';
 import { useForm } from '@inertiajs/react';
 import axios, { HttpStatusCode } from 'axios';
 import { CheckIcon, Loader2 } from 'lucide-react';
@@ -59,7 +59,7 @@ const Edit = ({ id, onFormClosed, onUpdated, onError }: EditProps): ReactNode =>
             return;
         }
 
-        const data: Gate = response.data.data;
+        const data: GateDT = response.data.data;
 
         setData({
             site: data.site_id,
@@ -102,7 +102,7 @@ const Edit = ({ id, onFormClosed, onUpdated, onError }: EditProps): ReactNode =>
         clearErrors(); // clear errors
     };
 
-    const handleLOVRowSelected = (data: Entity): void => {
+    const handleLOVRowSelected = (data: SiteDT): void => {
         setData('site', data.id);
         setData('site_name', data.name);
         lovDialog.current?.close();
@@ -120,6 +120,7 @@ const Edit = ({ id, onFormClosed, onUpdated, onError }: EditProps): ReactNode =>
                                 Site <Label className="text-red-500">*</Label>
                             </Label>
                             <InputLOV
+                                className="w-full"
                                 id="site"
                                 type="text"
                                 autoFocus

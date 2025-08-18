@@ -11,7 +11,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { LovEntityColumns } from '@/datatables/columns/lov-entity-columns';
 import DataTablePaginationAjax, { DataTablePaginationAjaxRef } from '@/datatables/components/data-table-pagination-ajax';
 import { refactorErrorMessage } from '@/lib/refactorMessages';
-import { type Entity, type SharedData, type Timezone } from '@/types';
+import { type EntityDT, type SharedData, type Timezone } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { CheckIcon, Loader2 } from 'lucide-react';
 import { FormEventHandler, ReactNode, useRef } from 'react';
@@ -89,7 +89,7 @@ const Create = ({ timezones, onFormClosed, onCreated, onError }: CreateProps): R
         clearErrors(); // clear errors
     };
 
-    const handleLOVRowSelected = (data: Entity): void => {
+    const handleLOVRowSelected = (data: EntityDT): void => {
         setData('entity', data.id);
         setData('entity_name', data.name);
         lovDialogEntity.current?.close();
@@ -104,6 +104,7 @@ const Create = ({ timezones, onFormClosed, onCreated, onError }: CreateProps): R
                             Entity <Label className="text-red-500">*</Label>
                         </Label>
                         <InputLOV
+                            className="w-full"
                             id="entity"
                             type="text"
                             autoFocus
