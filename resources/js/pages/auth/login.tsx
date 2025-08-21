@@ -8,7 +8,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
+import { cn } from '@/lib/utils';
 import { type Quote } from '@/types';
+import InputError from '../../components/input-error';
 
 type LoginForm = {
     email: string;
@@ -71,7 +73,7 @@ const Login = ({ status, canResetPassword }: LoginProps): JSX.Element => {
                         </div>
                         <div className="flex w-full max-w-sm items-center">
                             <Input
-                                className="rounded-e-none border-e-0"
+                                className={cn('rounded-e-none border-e-0', errors.password ? 'border-red-500' : '')}
                                 id="password"
                                 type={showPassword ? 'text' : 'password'}
                                 required
@@ -80,17 +82,17 @@ const Login = ({ status, canResetPassword }: LoginProps): JSX.Element => {
                                 value={data.password}
                                 onChange={(e) => setData('password', e.target.value)}
                                 placeholder="Password"
-                                error={errors.password}
                             />
                             <Button
                                 type="button"
                                 variant="outline"
-                                className="rounded-s-none border-s-0"
+                                className={cn('rounded-s-none border-s-0', errors.password ? 'border-red-500' : '')}
                                 onClick={() => setShowPassword(!showPassword)}
                             >
                                 {showPassword ? <EyeClosedIcon /> : <EyeIcon />}
                             </Button>
                         </div>
+                        {errors.password && <InputError message={errors.password} className="mt-1" />}
                     </div>
 
                     <div className="flex items-center space-x-3">

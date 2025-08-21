@@ -35,7 +35,7 @@ const Create = ({ onFormClosed, onCreated, onError }: CreateProps): ReactNode =>
     const submitForm: FormEventHandler = async (e: React.FormEvent<Element>) => {
         e.preventDefault();
 
-        post(route('config.inspection.vehicle-type.store'), {
+        post(route('config.inspection.type.store'), {
             onSuccess: async (response) => {
                 const props = response.props as unknown as SharedData;
                 const flash = props.flash;
@@ -43,7 +43,7 @@ const Create = ({ onFormClosed, onCreated, onError }: CreateProps): ReactNode =>
                 if (onCreated) onCreated();
 
                 // confirmation create new data
-                const confirmation = await confirmDialog.YesNo({ message: 'Create new vehicle type?' });
+                const confirmation = await confirmDialog.YesNo({ message: 'Create new inspection type?' });
                 if (confirmation) {
                     resetForm();
                 } else {
@@ -68,6 +68,11 @@ const Create = ({ onFormClosed, onCreated, onError }: CreateProps): ReactNode =>
     const resetForm = () => {
         reset(); // clear form to initial values
         clearErrors(); // clear errors
+        setData({
+            code: '',
+            name: '',
+            is_visible: true,
+        });
     };
 
     return (

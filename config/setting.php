@@ -57,7 +57,7 @@ return [
     'method' => [
         'allowed' => ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
     ],
-    'cacheTime' => 60 * 2, // default cache time : 2 menit
+    'cache_time' => 60 * 2, // default cache time : 2 menit
     'regxp' => [
         'forCode' => "/^[A-Za-z0-9-+=^]*$/",
         'forUsername' => "/^[A-Za-z0-9-+=^@.]*$/",

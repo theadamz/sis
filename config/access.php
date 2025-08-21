@@ -17,7 +17,7 @@ return [
             ['group_code' => 'cfg', 'parent_menu_code' => 'cfg-stp', 'code' => 'cfg-stp-gate', 'name' => 'Gates', 'description' => 'Gate Management', 'path' => '/configs/setup/gates', 'icon' => 'door-open', 'visible' => true, 'children' => null],
         ]],
         ['group_code' => 'cfg', 'parent_menu_code' => 'cfg-ins', 'code' => 'cfg-ins', 'name' => 'Inspection', 'description' => 'Menu Parent Config > Inspection', 'path' => null, 'icon' => 'inspection-panel', 'visible' => true, 'children' => [
-            ['group_code' => 'cfg', 'parent_menu_code' => 'cfg-ins', 'code' => 'cfg-ins-vhc-type', 'name' => 'Vehicle Types', 'description' => 'Vehicle Type Management', 'path' => '/configs/inspections/vehicle-types', 'icon' => 'bus', 'visible' => true, 'children' => null],
+            ['group_code' => 'cfg', 'parent_menu_code' => 'cfg-ins', 'code' => 'cfg-ins-type', 'name' => 'Types', 'description' => 'Inspection Type Management', 'path' => '/configs/inspections/types', 'icon' => 'list', 'visible' => true, 'children' => null],
             ['group_code' => 'cfg', 'parent_menu_code' => 'cfg-ins', 'code' => 'cfg-ins-form', 'name' => 'Forms', 'description' => 'Inspection Form Management', 'path' => '/configs/inspections/forms', 'icon' => 'file-text', 'visible' => true, 'children' => null],
         ]],
         ['group_code' => 'cfg', 'parent_menu_code' => 'cfg-user', 'code' => 'cfg-user', 'name' => 'Users', 'description' => 'User Management', 'path' => '/configs/users', 'icon' => 'users', 'visible' => true, 'children' => null],
@@ -50,7 +50,7 @@ return [
 
         /* Configuration - Inspection */
         ['code' => 'cfg-ins', 'name' => 'Menu Configuration - Inspection Parent', 'permissions' => ['read']],
-        ['code' => 'cfg-ins-vhc-type', 'name' => 'Menu Configuration - Inspection - Vehicle Types', 'permissions' => ['read', 'create', 'edit', 'delete']],
+        ['code' => 'cfg-ins-type', 'name' => 'Menu Configuration - Inspection - Types', 'permissions' => ['read', 'create', 'edit', 'delete']],
         ['code' => 'cfg-ins-form', 'name' => 'Menu Configuration - Inspection - Forms', 'permissions' => ['read', 'create', 'edit', 'delete']],
 
         ['code' => 'cfg-user', 'name' => 'Menu Configuration - Users', 'permissions' => ['read', 'create', 'edit', 'delete']],

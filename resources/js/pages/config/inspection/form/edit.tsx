@@ -5,14 +5,14 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { refactorErrorMessage } from '@/lib/refactorMessages';
-import { type SharedData, type VehicleType } from '@/types';
+import { type InspectionTypeDT, type SharedData } from '@/types';
 import { useForm } from '@inertiajs/react';
 import axios, { HttpStatusCode } from 'axios';
 import { CheckIcon, Loader2 } from 'lucide-react';
 import { FormEventHandler, ReactNode, useEffect } from 'react';
 import { toast } from 'sonner';
 
-type VehicleTypeForm = {
+type InspectionTypeForm = {
     code: string;
     name: string;
     is_visible: boolean;
@@ -27,7 +27,7 @@ type EditProps = {
 
 const Edit = ({ id, onFormClosed, onUpdated, onError }: EditProps): ReactNode => {
     /*** inertia js ***/
-    const { data, setData, put, processing, errors, reset, clearErrors } = useForm<Required<VehicleTypeForm>>({
+    const { data, setData, put, processing, errors, reset, clearErrors } = useForm<Required<InspectionTypeForm>>({
         code: '',
         name: '',
         is_visible: true,
@@ -41,13 +41,13 @@ const Edit = ({ id, onFormClosed, onUpdated, onError }: EditProps): ReactNode =>
 
     /*** events ***/
     const fetchData = async () => {
-        const response = await axios.get(route('config.inspection.vehicle-type.show', { id: id }));
+        const response = await axios.get(route('config.inspection.type.show', { id: id }));
         if (![HttpStatusCode.Ok].includes(response.status)) {
             toast.warning('Warning', { description: response.data.message });
             return;
         }
 
-        const data: VehicleType = response.data.data;
+        const data: InspectionTypeDT = response.data.data;
 
         setData({
             code: data.code,
@@ -59,7 +59,7 @@ const Edit = ({ id, onFormClosed, onUpdated, onError }: EditProps): ReactNode =>
     const submitForm: FormEventHandler = (e: React.FormEvent<Element>) => {
         e.preventDefault();
 
-        put(route('config.inspection.vehicle-type.update', { id: id }), {
+        put(route('config.inspection.type.update', { id: id }), {
             onSuccess: async (response) => {
                 const props = response.props as unknown as SharedData;
                 const flash = props.flash;

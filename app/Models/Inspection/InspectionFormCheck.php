@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Models\Config\Inspection;
+namespace App\Models\Inspection;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
-class VehicleType extends Model
+class InspectionFormCheck extends Model
 {
     use HasUuids;
 
@@ -21,11 +21,11 @@ class VehicleType extends Model
     {
         parent::boot();
 
-        static::creating(function (VehicleType $model) {
+        static::creating(function (InspectionFormCheck $model) {
             $model->created_by = Auth::id();
         });
 
-        static::updating(function (VehicleType $model) {
+        static::updating(function (InspectionFormCheck $model) {
             $model->updated_by = Auth::id();
         });
     }

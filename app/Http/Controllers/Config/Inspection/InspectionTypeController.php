@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Config\Inspection;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Config\Inspection\VehicleTypeRequest;
-use App\Models\Config\Inspection\VehicleType;
+use App\Http\Requests\Config\Inspection\InspectionTypeRequest;
+use App\Models\Inspection\InspectionType;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,11 +15,11 @@ use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class VehicleTypeController extends Controller
+class InspectionTypeController extends Controller
 {
     public function index(): Response
     {
-        return Inertia::render("config/inspection/vehicle-type/index");
+        return Inertia::render("config/inspection/type/index");
     }
 
     public function datatable(): LengthAwarePaginator
@@ -42,7 +42,7 @@ class VehicleTypeController extends Controller
         }
 
         // prepare paginate and order by
-        $data = VehicleType::query()->selectRaw("id, code, name, is_visible");
+        $data = InspectionType::query()->selectRaw("id, code, name, is_visible");
 
         // filter with search
         $data->when(!empty(str($search)->trim()), function ($query) use ($search) {
@@ -70,21 +70,21 @@ class VehicleTypeController extends Controller
         return $data;
     }
 
-    public function store(VehicleTypeRequest $request): RedirectResponse
+    public function store(InspectionTypeRequest $request): RedirectResponse
     {
         // validate request
         $validated = $request->validated();
 
         try {
             // check duplicate
-            if (VehicleType::where('code', $validated['code'])->exists()) {
+            if (InspectionType::where('code', $validated['code'])->exists()) {
                 return back()->withErrors([
                     "code" => "Duplicate data",
                 ]);
             }
 
             // save
-            $data = new VehicleType($validated);
+            $data = new InspectionType($validated);
             $data->save();
 
             // set toast
@@ -102,11 +102,11 @@ class VehicleTypeController extends Controller
         }
     }
 
-    public function show(VehicleType $model, string $id): JsonResponse
+    public function show(InspectionType $model, string $id): JsonResponse
     {
         // validate query parameter
         $validated = Validator::make(['id' => $id], [
-            'id' => ['required', "uuid", "uuid", Rule::exists('vehicle_types', 'id')],
+            'id' => ['required', "uuid", "uuid", Rule::exists('inspection_types', 'id')],
         ])->validated();
 
         // get data
@@ -115,21 +115,21 @@ class VehicleTypeController extends Controller
         return response()->json(['message' => 'Ok', 'data' => $data])->setStatusCode(200);
     }
 
-    public function update(VehicleTypeRequest $request): RedirectResponse
+    public function update(InspectionTypeRequest $request): RedirectResponse
     {
         // validate request
         $validated = $request->validated();
 
         try {
             // check duplicate
-            if (VehicleType::where('code', $validated['code'])->where('id', '!=', $validated['id'])->exists()) {
+            if (InspectionType::where('code', $validated['code'])->where('id', '!=', $validated['id'])->exists()) {
                 return back()->withErrors([
                     "code" => "Duplicate data",
                 ]);
             }
 
             // save
-            $data = VehicleType::find($validated['id']);
+            $data = InspectionType::find($validated['id']);
             $data->fill($validated);
             $data->save();
 
@@ -153,13 +153,13 @@ class VehicleTypeController extends Controller
         // validate request
         $validated = Validator::make($request->post(), [
             'ids' => ['required', "array"],
-            'ids.*' => ['required', 'string', "uuid", Rule::exists('vehicle_types', 'id')],
+            'ids.*' => ['required', 'string', "uuid", Rule::exists('inspection_types', 'id')],
         ])->validated();
 
         try {
 
             // execute
-            VehicleType::whereIn('id', $validated['ids'])->delete();
+            InspectionType::whereIn('id', $validated['ids'])->delete();
 
             // set toast
             Session::flash('toast', [

@@ -4,10 +4,10 @@ import { errorDialog } from '@/components/error-dialog';
 import { loadingDialog } from '@/components/loading-dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { VehicleTypeColumns } from '@/datatables/columns/vehicle-type-columns';
+import { InspectionTypeColumns } from '@/datatables/columns/inspection-type-columns';
 import DataTablePaginationAjax, { DataTablePaginationAjaxRef } from '@/datatables/components/data-table-pagination-ajax';
 import { refactorErrorMessage } from '@/lib/refactorMessages';
-import { type BreadcrumbItem, type SharedData, type VehicleTypeDT } from '@/types';
+import { type BreadcrumbItem, type InspectionTypeDT, type SharedData } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
 import { PlusIcon } from 'lucide-react';
 import { JSX, useRef, useState } from 'react';
@@ -24,8 +24,8 @@ const breadcrumbsData: BreadcrumbItem[] = [
         title: 'Inspection',
     },
     {
-        title: 'Vehicle Types',
-        href: route('config.inspection.vehicle-type.index'),
+        title: 'Types',
+        href: route('config.inspection.type.index'),
     },
 ];
 
@@ -42,7 +42,7 @@ const Index = (): JSX.Element => {
     const editForm = useRef<DialogSheetRef>(null);
 
     /*** events ***/
-    const handleDelete = async (data: Array<VehicleTypeDT>) => {
+    const handleDelete = async (data: Array<InspectionTypeDT>) => {
         // confirmation
         const confirmation = await confirmDialog.YesNo({
             message: `Are you sure want to delete ${data.length} data?`,
@@ -57,7 +57,7 @@ const Index = (): JSX.Element => {
         const ids = data!.map((item) => item.id);
 
         // delete
-        router.delete(route('config.inspection.vehicle-type.destroy'), {
+        router.delete(route('config.inspection.type.destroy'), {
             data: { ids: ids },
             onSuccess: (response) => {
                 loadingDialog.hide();
@@ -87,18 +87,18 @@ const Index = (): JSX.Element => {
 
     return (
         <>
-            <Head title="Vehicle Types" />
+            <Head title="Inspection Types" />
 
             {/* create */}
             {access.permissions.create && (
-                <DialogSheet title="Create Vehicle Types" ref={createForm} preventInteractionOutside={false}>
+                <DialogSheet title="Create Inspection Type" ref={createForm} preventInteractionOutside={false}>
                     <Create onFormClosed={() => createForm.current?.close()} onCreated={() => dataTable.current?.refresh()} />
                 </DialogSheet>
             )}
 
             {/* edit */}
             {access.permissions.edit && (
-                <DialogSheet title="Edit Vehicle Types" ref={editForm} preventInteractionOutside={false}>
+                <DialogSheet title="Edit Inspection Type" ref={editForm} preventInteractionOutside={false}>
                     <Edit id={id} onFormClosed={() => editForm.current?.close()} onUpdated={() => dataTable.current?.refresh()} />
                 </DialogSheet>
             )}
@@ -114,9 +114,9 @@ const Index = (): JSX.Element => {
                     )}
                 </div>
                 <DataTablePaginationAjax
-                    url={route('dt.config.inspection.vehicle-type')}
+                    url={route('dt.config.inspection.form')}
                     ref={dataTable}
-                    columnDefs={VehicleTypeColumns}
+                    columnDefs={InspectionTypeColumns}
                     containerClass="rounded-sm border"
                     scrollAreaClass="h-[calc(100vh-18rem)]"
                     rowId="id"

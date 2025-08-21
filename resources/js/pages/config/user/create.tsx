@@ -92,6 +92,16 @@ const Create = ({ routes, onFormClosed, onCreated, onError }: CreateProps): Reac
     const resetForm = (): void => {
         reset(); // clear form to initial values
         clearErrors(); // clear errors
+        setData({
+            username: '',
+            email: '',
+            name: '',
+            password: '',
+            def_path: '',
+            site: '',
+            site_name: '',
+            is_active: true,
+        });
     };
 
     const handleLOVRowSelected = (data: SiteDT): void => {
@@ -193,6 +203,7 @@ const Create = ({ routes, onFormClosed, onCreated, onError }: CreateProps): Reac
                                 return { value: item.path, label: `${item.name} (${item.path})` };
                             })}
                             onValueChange={(value) => setData('def_path', value)}
+                            error={errors.def_path}
                         />
                     </div>
                     <div className="grid gap-2">

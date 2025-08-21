@@ -78,7 +78,7 @@ class GateController extends Controller
             ]);
 
         // set cache
-        Cache::put(CacheKey::SITE->getKey(), $data, config('setting.cacheTime'));
+        Cache::put(CacheKey::SITE->getKey(), $data, config('setting.cache_time'));
 
         return $data;
     }

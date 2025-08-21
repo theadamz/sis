@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
-class VehicleTypeRequest extends FormRequest
+class InspectionTypeRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -32,7 +32,7 @@ class VehicleTypeRequest extends FormRequest
         // update
         if (in_array($this->method(), ["PUT", "PATCH"])) {
             $rules = array_merge($rules, [
-                "id" => ["required", "uuid", Rule::exists("vehicle_types", "id")],
+                "id" => ["required", "uuid", Rule::exists("inspection_types", "id")],
             ]);
         }
 

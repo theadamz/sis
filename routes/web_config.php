@@ -37,12 +37,21 @@ Route::prefix("setup")->group(function () {
 // inspection
 Route::prefix("inspections")->group(function () {
     // vehicle type
-    Route::middleware(['can:cfg-ins-vhc-type', 'access:cfg-ins-vhc-type'])->group(function () {
-        Route::get('/vehicle-types', [\App\Http\Controllers\Config\Inspection\VehicleTypeController::class, 'index'])->name('config.inspection.vehicle-type.index');
-        Route::get('/vehicle-types/{id}', [\App\Http\Controllers\Config\Inspection\VehicleTypeController::class, 'show'])->name('config.inspection.vehicle-type.show');
-        Route::post('/vehicle-types', [\App\Http\Controllers\Config\Inspection\VehicleTypeController::class, 'store'])->name('config.inspection.vehicle-type.store');
-        Route::put('/vehicle-types/{id}', [\App\Http\Controllers\Config\Inspection\VehicleTypeController::class, 'update'])->name('config.inspection.vehicle-type.update');
-        Route::delete('/vehicle-types', [\App\Http\Controllers\Config\Inspection\VehicleTypeController::class, 'destroy'])->name('config.inspection.vehicle-type.destroy');
+    Route::middleware(['can:cfg-ins-type', 'access:cfg-ins-type'])->group(function () {
+        Route::get('/types', [\App\Http\Controllers\Config\Inspection\InspectionTypeController::class, 'index'])->name('config.inspection.type.index');
+        Route::get('/types/{id}', [\App\Http\Controllers\Config\Inspection\InspectionTypeController::class, 'show'])->name('config.inspection.type.show');
+        Route::post('/types', [\App\Http\Controllers\Config\Inspection\InspectionTypeController::class, 'store'])->name('config.inspection.type.store');
+        Route::put('/types/{id}', [\App\Http\Controllers\Config\Inspection\InspectionTypeController::class, 'update'])->name('config.inspection.type.update');
+        Route::delete('/types', [\App\Http\Controllers\Config\Inspection\InspectionTypeController::class, 'destroy'])->name('config.inspection.type.destroy');
+    });
+
+    // vehicle type
+    Route::middleware(['can:cfg-ins-form', 'access:cfg-ins-form'])->group(function () {
+        Route::get('/forms', [\App\Http\Controllers\Config\Inspection\InspectionFormController::class, 'index'])->name('config.inspection.form.index');
+        Route::get('/forms/{id}', [\App\Http\Controllers\Config\Inspection\InspectionFormController::class, 'show'])->name('config.inspection.form.show');
+        Route::post('/forms', [\App\Http\Controllers\Config\Inspection\InspectionFormController::class, 'store'])->name('config.inspection.form.store');
+        Route::put('/forms/{id}', [\App\Http\Controllers\Config\Inspection\InspectionFormController::class, 'update'])->name('config.inspection.form.update');
+        Route::delete('/forms', [\App\Http\Controllers\Config\Inspection\InspectionFormController::class, 'destroy'])->name('config.inspection.form.destroy');
     });
 });
 

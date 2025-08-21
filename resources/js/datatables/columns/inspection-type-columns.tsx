@@ -12,12 +12,12 @@ import {
 import { Label } from '@/components/ui/label';
 import CaretColumn from '@/datatables/components/caret-column';
 import { sortHandler } from '@/lib/utils';
-import { type SharedData, type VehicleTypeDT } from '@/types';
+import { type InspectionTypeDT, type SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { EllipsisVerticalIcon, PencilIcon } from 'lucide-react';
 
-export const VehicleTypeColumns: ColumnDef<VehicleTypeDT, unknown>[] = [
+export const InspectionTypeColumns: ColumnDef<InspectionTypeDT, unknown>[] = [
     {
         id: 'checkbox',
         meta: {

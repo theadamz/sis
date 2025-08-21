@@ -79,6 +79,13 @@ const Create = ({ onFormClosed, onCreated, onError }: CreateProps): ReactNode =>
     const resetForm = (): void => {
         reset(); // clear form to initial values
         clearErrors(); // clear errors
+        setData({
+            site: '',
+            site_name: '',
+            code: '',
+            name: '',
+            is_active: true,
+        }); // reset data
     };
 
     const handleLOVRowSelected = (data: SiteDT): void => {

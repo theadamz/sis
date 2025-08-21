@@ -24,13 +24,13 @@ class EntitySeeder extends Seeder
             'is_active' => true,
         ]);
 
-        for ($i = 1; $i <= 999; $i++) {
-            Entity::create([
-                'code' => str_pad($i, 3, '0', STR_PAD_LEFT),
-                'name' => 'Entity ' . $i,
-                'description' => 'Description Entity ' . $i,
-                'is_active' => true,
-            ]);
-        }
+        // for ($i = 1; $i <= 999; $i++) {
+        //     Entity::create([
+        //         'code' => str_pad($i, 3, '0', STR_PAD_LEFT),
+        //         'name' => 'Entity ' . $i,
+        //         'description' => 'Description Entity ' . $i,
+        //         'is_active' => true,
+        //     ]);
+        // }
     }
 }

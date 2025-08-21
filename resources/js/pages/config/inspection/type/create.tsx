@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { refactorErrorMessage } from '@/lib/refactorMessages';
 import { type SharedData } from '@/types';
 import { useForm } from '@inertiajs/react';
@@ -12,11 +11,10 @@ import { CheckIcon, Loader2 } from 'lucide-react';
 import { FormEventHandler, ReactNode } from 'react';
 import { toast } from 'sonner';
 
-type EntityForm = {
+type VehicleTypeForm = {
     code: string;
     name: string;
-    description?: string;
-    is_active: boolean;
+    is_visible: boolean;
 };
 
 interface CreateProps {
@@ -27,18 +25,17 @@ interface CreateProps {
 
 const Create = ({ onFormClosed, onCreated, onError }: CreateProps): ReactNode => {
     /*** inertia js ***/
-    const { data, setData, post, processing, errors, reset, clearErrors } = useForm<Required<EntityForm>>({
+    const { data, setData, post, processing, errors, reset, clearErrors } = useForm<Required<VehicleTypeForm>>({
         code: '',
         name: '',
-        description: '',
-        is_active: true,
+        is_visible: true,
     });
 
     /*** events ***/
     const submitForm: FormEventHandler = async (e: React.FormEvent<Element>) => {
         e.preventDefault();
 
-        post(route('config.setup.entity.store'), {
+        post(route('config.inspection.type.store'), {
             onSuccess: async (response) => {
                 const props = response.props as unknown as SharedData;
                 const flash = props.flash;
@@ -46,7 +43,7 @@ const Create = ({ onFormClosed, onCreated, onError }: CreateProps): ReactNode =>
                 if (onCreated) onCreated();
 
                 // confirmation create new data
-                const confirmation = await confirmDialog.YesNo({ message: 'Create new entity?' });
+                const confirmation = await confirmDialog.YesNo({ message: 'Create new inspection type?' });
                 if (confirmation) {
                     resetForm();
                 } else {
@@ -74,8 +71,7 @@ const Create = ({ onFormClosed, onCreated, onError }: CreateProps): ReactNode =>
         setData({
             code: '',
             name: '',
-            description: '',
-            is_active: true,
+            is_visible: true,
         });
     };
 
@@ -96,7 +92,7 @@ const Create = ({ onFormClosed, onCreated, onError }: CreateProps): ReactNode =>
                         onChange={(e) => setData('code', e.target.value)}
                         placeholder="Code"
                         error={errors.code}
-                        maxLength={3}
+                        maxLength={20}
                     />
                 </div>
                 <div className="grid gap-2">
@@ -116,30 +112,17 @@ const Create = ({ onFormClosed, onCreated, onError }: CreateProps): ReactNode =>
                     />
                 </div>
                 <div className="grid gap-2">
-                    <Label htmlFor="description">Description</Label>
-                    <Textarea
-                        id="description"
-                        tabIndex={3}
-                        autoComplete="description"
-                        value={data.description}
-                        onChange={(e) => setData('description', e.target.value)}
-                        placeholder="Description"
-                        error={errors.description}
-                        maxLength={100}
-                    />
-                </div>
-                <div className="grid gap-2">
-                    <Label htmlFor="is_active">Active</Label>
+                    <Label htmlFor="is_visible">Visible</Label>
                     <div className="flex">
                         <Checkbox
-                            id="is_active"
-                            name="is_active"
-                            tabIndex={4}
-                            defaultChecked={data.is_active}
-                            checked={data.is_active}
-                            onCheckedChange={(e) => setData('is_active', e.valueOf() as boolean)}
+                            id="is_visible"
+                            name="is_visible"
+                            tabIndex={3}
+                            defaultChecked={data.is_visible}
+                            checked={data.is_visible}
+                            onCheckedChange={(e) => setData('is_visible', e.valueOf() as boolean)}
                         />
-                        <Label htmlFor="is_active" className="ml-2">
+                        <Label htmlFor="is_visible" className="ml-2">
                             Yes
                         </Label>
                     </div>

@@ -87,6 +87,15 @@ const Create = ({ timezones, onFormClosed, onCreated, onError }: CreateProps): R
     const resetForm = (): void => {
         reset(); // clear form to initial values
         clearErrors(); // clear errors
+        setData({
+            entity: '',
+            entity_name: '',
+            code: '',
+            name: '',
+            address: null,
+            timezone: 'Asia/Jakarta', // reset to default timezone
+            is_active: true,
+        });
     };
 
     const handleLOVRowSelected = (data: EntityDT): void => {

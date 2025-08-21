@@ -12,12 +12,12 @@ import {
 import { Label } from '@/components/ui/label';
 import CaretColumn from '@/datatables/components/caret-column';
 import { sortHandler } from '@/lib/utils';
-import { type GateDT, type SharedData } from '@/types';
+import { type InspectionFormDT, type SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
 import { EllipsisVerticalIcon, PencilIcon } from 'lucide-react';
 
-export const GateColumns: ColumnDef<GateDT, unknown>[] = [
+export const InspectionFormColumns: ColumnDef<InspectionFormDT, unknown>[] = [
     {
         id: 'checkbox',
         meta: {
@@ -49,18 +49,34 @@ export const GateColumns: ColumnDef<GateDT, unknown>[] = [
         enableHiding: false,
     },
     {
-        accessorKey: 'site_name',
+        accessorKey: 'flow',
         meta: {
-            columnDisplayName: 'Site',
+            columnDisplayName: 'Flow',
+            headerClassName: 'w-[250px]',
         },
         header: ({ column }) => {
-            return <Label>Site</Label>;
+            return (
+                <Button type="button" variant="ghost" onClick={() => column.toggleSorting(sortHandler(column.getIsSorted()))} className="p-0">
+                    Flow
+                    <CaretColumn sort={column.getIsSorted()} />
+                </Button>
+            );
+        },
+    },
+    {
+        accessorKey: 'inspection_type_name',
+        meta: {
+            columnDisplayName: 'Ins. Type',
+        },
+        header: ({ column }) => {
+            return <Label>Ins. Type</Label>;
         },
     },
     {
         accessorKey: 'code',
         meta: {
             columnDisplayName: 'Code',
+            headerClassName: 'w-[250px]',
         },
         header: ({ column }) => {
             return (
@@ -86,17 +102,53 @@ export const GateColumns: ColumnDef<GateDT, unknown>[] = [
         },
     },
     {
-        accessorKey: 'is_active',
+        accessorKey: 'use_eta_dest',
         enableResizing: true,
         meta: {
             headerClassName: 'w-[40px] text-center',
-            columnDisplayName: 'Active', // Column display name
+            columnDisplayName: 'ETA Dest.', // Column display name
+            columnDisplay: true, // hide column after init
+        },
+        header: ({ column }) => {
+            <Button type="button" variant="ghost" onClick={() => column.toggleSorting(sortHandler(column.getIsSorted()))} className="p-0">
+                ETA Dest.
+                <CaretColumn sort={column.getIsSorted()} />
+            </Button>;
+        },
+        cell: ({ row }) => (
+            <Badge variant={row.getValue('use_eta_dest') ? 'outline' : 'warning'}>{row.getValue('use_eta_dest') ? 'Yes' : 'No'}</Badge>
+        ),
+    },
+    {
+        accessorKey: 'use_ata_dest',
+        enableResizing: true,
+        meta: {
+            headerClassName: 'w-[40px] text-center',
+            columnDisplayName: 'ATA Dest.', // Column display name
+            columnDisplay: true, // hide column after init
+        },
+        header: ({ column }) => {
+            <Button type="button" variant="ghost" onClick={() => column.toggleSorting(sortHandler(column.getIsSorted()))} className="p-0">
+                ATA Dest.
+                <CaretColumn sort={column.getIsSorted()} />
+            </Button>;
+        },
+        cell: ({ row }) => (
+            <Badge variant={row.getValue('use_eta_dest') ? 'outline' : 'warning'}>{row.getValue('use_eta_dest') ? 'Yes' : 'No'}</Badge>
+        ),
+    },
+    {
+        accessorKey: 'is_publish',
+        enableResizing: true,
+        meta: {
+            headerClassName: 'w-[40px] text-center',
+            columnDisplayName: 'Publish', // Column display name
             columnDisplay: true, // hide column after init
         },
         header: () => {
-            return <Label>Active</Label>;
+            return <Label>Publish</Label>;
         },
-        cell: ({ row }) => <Badge variant={row.getValue('is_active') ? 'outline' : 'warning'}>{row.getValue('is_active') ? 'Yes' : 'No'}</Badge>,
+        cell: ({ row }) => <Badge variant={row.getValue('is_publish') ? 'outline' : 'warning'}>{row.getValue('is_publish') ? 'Yes' : 'No'}</Badge>,
     },
     {
         id: 'actions',

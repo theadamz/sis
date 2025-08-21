@@ -79,7 +79,7 @@ class EntityController extends Controller
             ]);
 
         // set cache
-        Cache::put(CacheKey::ENTITY->getKey(), $data, config('setting.cacheTime'));
+        Cache::put(CacheKey::ENTITY->getKey(), $data, config('setting.cache_time'));
 
         return $data;
     }

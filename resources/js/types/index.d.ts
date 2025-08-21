@@ -128,6 +128,7 @@ export interface UserAccess {
     is_allowed: boolean;
 }
 
+/* Option */
 export interface SiteOption {
     id: string;
     entity_id: string;
@@ -177,11 +178,26 @@ export interface GateDT {
     is_active: boolean;
 }
 
-export interface VehicleTypeDT {
+export interface InspectionTypeDT {
     id: string;
     code: string;
     name: string;
     is_visible: boolean;
+}
+
+export interface InspectionFormDT {
+    id: string;
+    flow: string;
+    inspection_type_id: string;
+    inspection_type_name: string;
+    code: string;
+    name: string;
+    use_eta_dest: boolean;
+    use_ata_dest: boolean;
+    is_public: boolean;
+    required_stages: string[];
+    inspection_form_categories_count: number;
+    inspection_form_checks_count: number;
 }
 
 export interface UserDT {

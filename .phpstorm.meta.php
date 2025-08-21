@@ -1361,7 +1361,7 @@ namespace PHPSTORM_META {
             'setting.sequence.array_format.seq' => 'string',
             'setting.sequence.format_seq_default' => 'string',
             'setting.method.allowed' => 'array',
-            'setting.cacheTime' => 'integer',
+            'setting.cache_time' => 'integer',
             'setting.regxp.forCode' => 'string',
             'setting.regxp.forUsername' => 'string',
             'setting.regxp.forTransType' => 'string',
@@ -2097,7 +2097,7 @@ namespace PHPSTORM_META {
             'setting.sequence.array_format.seq' => 'string',
             'setting.sequence.format_seq_default' => 'string',
             'setting.method.allowed' => 'array',
-            'setting.cacheTime' => 'integer',
+            'setting.cache_time' => 'integer',
             'setting.regxp.forCode' => 'string',
             'setting.regxp.forUsername' => 'string',
             'setting.regxp.forTransType' => 'string',
@@ -2833,7 +2833,7 @@ namespace PHPSTORM_META {
             'setting.sequence.array_format.seq' => 'string',
             'setting.sequence.format_seq_default' => 'string',
             'setting.method.allowed' => 'array',
-            'setting.cacheTime' => 'integer',
+            'setting.cache_time' => 'integer',
             'setting.regxp.forCode' => 'string',
             'setting.regxp.forUsername' => 'string',
             'setting.regxp.forTransType' => 'string',
@@ -3047,7 +3047,7 @@ namespace PHPSTORM_META {
     override(\optional(0), type(0));
 
             registerArgumentsSet('auth', );
-        registerArgumentsSet('configs', 
+        registerArgumentsSet('configs',
 'access.userIdExceptions','access.groups.0.code','access.groups.0.name','access.groups.0.visible','access.groups.1.code',
 'access.groups.1.name','access.groups.1.visible','access.groups.2.code','access.groups.2.name','access.groups.2.visible',
 'access.groups.3.code','access.groups.3.name','access.groups.3.visible','access.groups.4.code','access.groups.4.name',
@@ -3159,7 +3159,7 @@ namespace PHPSTORM_META {
 'setting.local.backend_time_format','setting.other.max_file_attachment','setting.other.max_file_size','setting.other.file_doc_attachment_allowed','setting.other.file_img_allowed',
 'setting.other.path_to_upload','setting.other.path_to_temp','setting.page.limits','setting.page.default_limit','setting.sequence.year_format',
 'setting.sequence.month_format','setting.sequence.array_format.site_code','setting.sequence.array_format.prefix','setting.sequence.array_format.suffix','setting.sequence.array_format.year',
-'setting.sequence.array_format.month','setting.sequence.array_format.seq','setting.sequence.format_seq_default','setting.method.allowed','setting.cacheTime',
+'setting.sequence.array_format.month','setting.sequence.array_format.seq','setting.sequence.format_seq_default','setting.method.allowed','setting.cache_time',
 'setting.regxp.forCode','setting.regxp.forUsername','setting.regxp.forTransType','setting.data.test','broadcasting.default',
 'broadcasting.connections.reverb.driver','broadcasting.connections.reverb.key','broadcasting.connections.reverb.secret','broadcasting.connections.reverb.app_id','broadcasting.connections.reverb.options.host',
 'broadcasting.connections.reverb.options.port','broadcasting.connections.reverb.options.scheme','broadcasting.connections.reverb.options.useTLS','broadcasting.connections.reverb.client_options','broadcasting.connections.pusher.driver',
@@ -3195,18 +3195,18 @@ namespace PHPSTORM_META {
 'ide-helper.model_camel_case_properties','ide-helper.type_overrides.integer','ide-helper.type_overrides.boolean','ide-helper.include_class_docblocks','ide-helper.force_fqn',
 'ide-helper.use_generics_annotations','ide-helper.additional_relation_types','ide-helper.additional_relation_return_types','ide-helper.enforce_nullable_relationships','ide-helper.post_migrate',
 'ide-helper.macroable_traits','tinker.commands','tinker.alias','tinker.dont_alias',);
-        registerArgumentsSet('middleware', 
+        registerArgumentsSet('middleware',
 'web','api','auth','auth.basic','auth.session',
 'cache.headers','can','guest','password.confirm','precognitive',
 'signed','throttle','verified',);
-        registerArgumentsSet('routes', 
+        registerArgumentsSet('routes',
 'debugbar.openhandler','debugbar.clockwork','debugbar.assets.css','debugbar.assets.js','debugbar.cache.delete',
 'debugbar.queries.explain','sanctum.csrf-cookie','home',
 'dashboard','profile.edit','profile.update','profile.destroy',
 'password.edit','password.update','appearance','register',
 'login','password.request','password.email','password.reset',
 'password.store','verification.notice','verification.verify','verification.send','password.confirm','logout','storage.local',);
-        registerArgumentsSet('views', 
+        registerArgumentsSet('views',
 'app','laravel-exceptions-renderer::components.card','laravel-exceptions-renderer::components.context','laravel-exceptions-renderer::components.editor','laravel-exceptions-renderer::components.header',
 'laravel-exceptions-renderer::components.icons.chevron-down','laravel-exceptions-renderer::components.icons.chevron-up','laravel-exceptions-renderer::components.icons.computer-desktop','laravel-exceptions-renderer::components.icons.moon','laravel-exceptions-renderer::components.icons.sun',
 'laravel-exceptions-renderer::components.layout','laravel-exceptions-renderer::components.navigation','laravel-exceptions-renderer::components.theme-switcher','laravel-exceptions-renderer::components.trace','laravel-exceptions-renderer::components.trace-and-editor',
@@ -3215,7 +3215,7 @@ namespace PHPSTORM_META {
 'laravel-exceptions::minimal','notifications::email','pagination::bootstrap-4','pagination::bootstrap-5','pagination::default',
 'pagination::semantic-ui','pagination::simple-bootstrap-4','pagination::simple-bootstrap-5','pagination::simple-default','pagination::simple-tailwind',
 'pagination::tailwind',);
-        registerArgumentsSet('translations', 
+        registerArgumentsSet('translations',
 'auth.failed','auth.password','auth.throttle','pagination.previous','pagination.next',
 'passwords.reset','passwords.sent','passwords.throttled','passwords.token','passwords.user',
 'validation.accepted','validation.accepted_if','validation.active_url','validation.after','validation.after_or_equal',
@@ -3245,7 +3245,7 @@ namespace PHPSTORM_META {
 'validation.size.numeric','validation.size.string','validation.starts_with','validation.string','validation.timezone',
 'validation.unique','validation.uploaded','validation.uppercase','validation.url','validation.ulid',
 'validation.uuid','validation.custom.attribute-name.rule-name',);
-        registerArgumentsSet('env', 
+        registerArgumentsSet('env',
 'APP_NAME','APP_ENV','APP_KEY','APP_DEBUG','APP_URL',
 'APP_LOCALE','APP_FALLBACK_LOCALE','APP_FAKER_LOCALE','APP_MAINTENANCE_DRIVER','PHP_CLI_SERVER_WORKERS',
 'BCRYPT_ROUNDS','LOG_CHANNEL','LOG_STACK','LOG_DEPRECATIONS_CHANNEL','LOG_LEVEL',
@@ -3256,7 +3256,7 @@ namespace PHPSTORM_META {
 'MAIL_MAILER','MAIL_SCHEME','MAIL_HOST','MAIL_PORT','MAIL_USERNAME',
 'MAIL_PASSWORD','MAIL_FROM_ADDRESS','MAIL_FROM_NAME','AWS_ACCESS_KEY_ID','AWS_SECRET_ACCESS_KEY',
 'AWS_DEFAULT_REGION','AWS_BUCKET','AWS_USE_PATH_STYLE_ENDPOINT','VITE_APP_NAME',);
-        
+
                 expectedArguments(\Illuminate\Support\Facades\Gate::has(), 0, argumentsSet('auth'));
     expectedArguments(\Illuminate\Support\Facades\Gate::allows(), 0, argumentsSet('auth'));
     expectedArguments(\Illuminate\Support\Facades\Gate::denies(), 0, argumentsSet('auth'));
@@ -3320,5 +3320,5 @@ namespace PHPSTORM_META {
                 expectedArguments(\Illuminate\Contracts\Translation\Translator::get(), 0, argumentsSet('translations'));
                 expectedArguments(\env(), 0, argumentsSet('env'));
                 expectedArguments(\Illuminate\Support\Env::get(), 0, argumentsSet('env'));
-            
+
 }

@@ -13,7 +13,8 @@ Route::prefix("configs")->group(function () {
 
     // inspection
     Route::prefix("inspection")->group(function () {
-        Route::get('/vehicle-types', [\App\Http\Controllers\Config\Inspection\VehicleTypeController::class, 'datatable'])->name('dt.config.inspection.vehicle-type');
+        Route::get('/types', [\App\Http\Controllers\Config\Inspection\InspectionTypeController::class, 'datatable'])->name('dt.config.inspection.type');
+        Route::get('/forms', [\App\Http\Controllers\Config\Inspection\InspectionFormController::class, 'datatable'])->name('dt.config.inspection.form');
     });
 
     Route::get('/users', [\App\Http\Controllers\Config\UserController::class, 'datatable'])->name('dt.config.user');

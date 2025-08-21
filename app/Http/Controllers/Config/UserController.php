@@ -93,7 +93,7 @@ class UserController extends Controller
             ]);
 
         // set cache
-        Cache::put(CacheKey::USER->getKey(), $data, config('setting.cacheTime'));
+        Cache::put(CacheKey::USER->getKey(), $data, config('setting.cache_time'));
 
         return $data;
     }

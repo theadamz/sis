@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('vehicle_types', function (Blueprint $table) {
+        Schema::create('inspection_types', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('code', 20)->unique();
             $table->string('name', 50);
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('vehicle_types');
+        Schema::dropIfExists('inspection_types');
     }
 };

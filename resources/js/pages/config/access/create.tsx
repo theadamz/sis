@@ -78,6 +78,11 @@ const Create = ({ accesses, onFormClosed, onCreated, onError }: CreateProps): Re
         clearErrors(); // clear errors
         siteComboBoxRef.current?.clearOptions();
         userComboBoxRef.current?.clearOptions();
+        setData({
+            site: '',
+            user: '',
+            access_lists: [],
+        });
     };
 
     const handleCheckedItem = (value: string, isChecked: boolean) => {
