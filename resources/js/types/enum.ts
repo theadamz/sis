@@ -5,44 +5,44 @@ export enum DateDefault {
     DATE_TIME = 'yyyy-MM-dd HH:mm:ss',
 }
 
-export enum InspectionType {
-    LOADING = 'loading',
-    UNLOADING = 'unloading',
+export enum InspectionFlow {
+    IN = 'IN',
+    OUT = 'OUT',
 }
 
-export enum Stage {
-    CHECKED_IN = 'checkedin',
-    LOADING = 'loading',
-    CHECKED_OUT = 'checkedout',
+export enum InspectionStage {
+    CHECKED_IN = 'CHECKED_IN',
+    LOADING = 'LOADING',
+    CHECKED_OUT = 'CHECKED_OUT',
 }
 
-export enum StageVariant {
+export enum InspectionStageVariant {
     CHECKED_IN = 'info',
     LOADING = 'warning',
     CHECKED_OUT = 'default',
 }
 
-export enum StageLabel {
+export enum InspectionStageLabel {
     CHECKED_IN = 'Checked In',
     LOADING = 'Loading',
     CHECKED_OUT = 'Checked Out',
 }
 
-export const getStage = (value: string, type: 'value' | 'label' | 'variant' = 'value') => {
+export const getInspectionStage = (value: string, type: 'value' | 'label' | 'variant' = 'value') => {
     // get key stage
-    const stage = Object.keys(Stage)[Object.values(Stage).indexOf(value as Stage)];
+    const stage = Object.keys(InspectionStage)[Object.values(InspectionStage).indexOf(value as InspectionStage)];
 
     switch (type) {
         case 'variant':
-            return StageVariant[stage as keyof typeof StageVariant];
+            return InspectionStageVariant[stage as keyof typeof InspectionStageVariant];
         case 'label':
-            return StageLabel[stage as keyof typeof StageLabel];
+            return InspectionStageLabel[stage as keyof typeof InspectionStageLabel];
         default:
-            return Stage[stage as keyof typeof Stage];
+            return InspectionStage[stage as keyof typeof InspectionStage];
     }
 };
 
-export enum CheckType {
-    SELECT = 'select', // only ok/no
-    PHOTO = 'photo',
+export enum InspectionItemType {
+    SELECT = 'SELECT', // only ok/no
+    PHOTO = 'PHOTO',
 }

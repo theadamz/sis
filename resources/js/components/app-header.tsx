@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
+import { cn } from '@/lib/utils';
 import { BreadcrumbItem, type Group, type Menu, type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import axios from 'axios';
@@ -171,8 +172,8 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                 </div>
             </div>
             {/* breadcrumb */}
-            {breadcrumbs && (
-                <section className="hidden border-b bg-[#F6F8FA] px-4 md:flex dark:bg-black">
+            {breadcrumbs.length > 0 && (
+                <section className={cn('hidden border-b bg-[#F6F8FA] px-4 dark:bg-black', breadcrumbs.length > 0 ? 'md:flex' : '')}>
                     <div className="flex h-8 items-center dark:bg-black">
                         <Breadcrumbs breadcrumbs={breadcrumbs} />
                     </div>

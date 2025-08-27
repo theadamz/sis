@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\Config\Inspection;
 
+use App\Enums\InspectionFlow;
 use App\Http\Controllers\Controller;
 use App\Models\Inspection\InspectionForm;
+use App\Models\Inspection\InspectionType;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -62,5 +65,12 @@ class InspectionFormController extends Controller
             ]);
 
         return $data;
+    }
+
+    public function create(): Response
+    {
+        $inspectionTypes = InspectionType::whereIsVisible(true)->get(DB::raw("id, code, name"));
+
+        return Inertia::render("config/inspection/form/create")->with(compact('inspectionTypes'));
     }
 }

@@ -40,13 +40,13 @@ class InspectionForm extends Model
         return $this->belongsTo(InspectionType::class);
     }
 
-    public function inspection_form_categories(): HasMany
+    public function inspection_form_sections(): HasMany
     {
-        return $this->hasMany(InspectionFormCategory::class);
+        return $this->hasMany(InspectionFormSection::class);
     }
 
-    public function inspection_form_checks(): HasMany
+    public function inspection_form_items(): HasMany
     {
-        return $this->hasMany(InspectionFormCheck::class);
+        return $this->hasMany(InspectionFormItem::class);
     }
 }

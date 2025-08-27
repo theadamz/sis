@@ -1,7 +1,7 @@
 <?php
 
 use App\Enums\InspectionFlow;
-use App\Enums\Stage;
+use App\Enums\InspectionStage;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -22,7 +22,7 @@ return new class extends Migration
             $table->boolean("use_eta_dest")->default(false)->comment("Flag to show Estimatin Time Arrival datetime in form inspection");
             $table->boolean("use_ata_dest")->default(false)->comment("Flag to show Actual Time Arrival datetime in form inspection");
             $table->boolean('is_publish')->default(true);
-            $table->json("required_stages")->default(json_encode(Stage::cases()));
+            $table->json("required_stages")->default(json_encode(InspectionStage::cases()));
             $table->uuid('created_by')->nullable();
             $table->uuid('updated_by')->nullable();
             $table->timestamps();

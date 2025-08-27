@@ -48,6 +48,7 @@ Route::prefix("inspections")->group(function () {
     // vehicle type
     Route::middleware(['can:cfg-ins-form', 'access:cfg-ins-form'])->group(function () {
         Route::get('/forms', [\App\Http\Controllers\Config\Inspection\InspectionFormController::class, 'index'])->name('config.inspection.form.index');
+        Route::get('/forms/create', [\App\Http\Controllers\Config\Inspection\InspectionFormController::class, 'create'])->name('config.inspection.form.create');
         Route::get('/forms/{id}', [\App\Http\Controllers\Config\Inspection\InspectionFormController::class, 'show'])->name('config.inspection.form.show');
         Route::post('/forms', [\App\Http\Controllers\Config\Inspection\InspectionFormController::class, 'store'])->name('config.inspection.form.store');
         Route::put('/forms/{id}', [\App\Http\Controllers\Config\Inspection\InspectionFormController::class, 'update'])->name('config.inspection.form.update');

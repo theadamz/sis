@@ -1,20 +1,17 @@
 import { confirmDialog } from '@/components/confirm-dialog';
-import DialogSheet, { DialogSheetRef } from '@/components/dialog-sheet';
+import { DialogSheetRef } from '@/components/dialog-sheet';
 import { errorDialog } from '@/components/error-dialog';
 import { loadingDialog } from '@/components/loading-dialog';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { InspectionFormColumns } from '@/datatables/columns/inspection-form-columns';
 import DataTablePaginationAjax, { DataTablePaginationAjaxRef } from '@/datatables/components/data-table-pagination-ajax';
 import { refactorErrorMessage } from '@/lib/refactorMessages';
-import { type BreadcrumbItem, type InspectionTypeDT, type SharedData } from '@/types';
-import { Head, router, usePage } from '@inertiajs/react';
+import { InspectionFormDT, type BreadcrumbItem, type SharedData } from '@/types';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { PlusIcon } from 'lucide-react';
 import { JSX, useRef, useState } from 'react';
 import { toast } from 'sonner';
-
-import { InspectionFormColumns } from '@/datatables/columns/inspection-form-columns';
-import Create from './create';
-import Edit from './edit';
 
 const breadcrumbsData: BreadcrumbItem[] = [
     {
@@ -42,7 +39,7 @@ const Index = (): JSX.Element => {
     const editForm = useRef<DialogSheetRef>(null);
 
     /*** events ***/
-    const handleDelete = async (data: Array<InspectionTypeDT>) => {
+    const handleDelete = async (data: Array<InspectionFormDT>) => {
         // confirmation
         const confirmation = await confirmDialog.YesNo({
             message: `Are you sure want to delete ${data.length} data?`,
@@ -89,27 +86,15 @@ const Index = (): JSX.Element => {
         <>
             <Head title="Inspection Form" />
 
-            {/* create */}
-            {access.permissions.create && (
-                <DialogSheet title="Create Inspection Form" ref={createForm} preventInteractionOutside={false}>
-                    <Create onFormClosed={() => createForm.current?.close()} onCreated={() => dataTable.current?.refresh()} />
-                </DialogSheet>
-            )}
-
-            {/* edit */}
-            {access.permissions.edit && (
-                <DialogSheet title="Edit Inspection Form" ref={editForm} preventInteractionOutside={false}>
-                    <Edit id={id} onFormClosed={() => editForm.current?.close()} onUpdated={() => dataTable.current?.refresh()} />
-                </DialogSheet>
-            )}
-
             {/* main content */}
             <section className="mx-auto w-full max-w-7xl p-4">
                 <div className="flex items-center justify-end">
                     {access.permissions.create && (
-                        <Button type="button" variant={'outline'} onClick={() => createForm.current?.open()}>
-                            <PlusIcon />
-                            <Label className="hidden md:flex">Create</Label>
+                        <Button type="button" variant={'outline'} asChild>
+                            <Link href={route('config.inspection.form.create')}>
+                                <PlusIcon />
+                                <Label className="hidden md:flex">Create</Label>
+                            </Link>
                         </Button>
                     )}
                 </div>

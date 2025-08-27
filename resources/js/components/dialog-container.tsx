@@ -1,4 +1,4 @@
-import { ForwardedRef, forwardRef, ReactNode, useImperativeHandle, useState } from 'react';
+import { ForwardedRef, forwardRef, ReactNode, useEffect, useImperativeHandle, useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
 
 export interface DialogContainerRef {
@@ -30,15 +30,18 @@ const DialogContainer = (
         close: () => handleClose(),
     }));
 
+    useEffect(() => {
+        if (isOpen && onOpen) onOpen();
+        if (!isOpen && onClose) onClose();
+    }, [isOpen]);
+
     /*** events ***/
     const handleOpen = () => {
         setIsOpen(true);
-        if (onOpen) onOpen();
     };
 
     const handleClose = () => {
         setIsOpen(false);
-        if (onClose) onClose();
     };
 
     return (

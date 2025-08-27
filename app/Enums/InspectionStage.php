@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum Stage: string
+enum InspectionStage: string
 {
     case CHECKED_IN = 'CHECKED_IN';
     case LOADING = 'LOADING';

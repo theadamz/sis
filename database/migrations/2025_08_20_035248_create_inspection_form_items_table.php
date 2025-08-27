@@ -12,9 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('inspection_form_checks', function (Blueprint $table) {
+        Schema::create('inspection_form_items', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->uuid('inspection_form_category_id')->index();
+            $table->uuid('inspection_form_section_id')->index();
             $table->string('description', 100);
             $table->enum('type', InspectionCheckType::cases())->default("select")->comment("select (ok/no) / photo");
             $table->smallInteger("order")->default(1);
@@ -22,8 +22,11 @@ return new class extends Migration
             $table->uuid('updated_by')->nullable();
             $table->timestamps();
 
+            // indexes
+            $table->index(['inspection_form_section_id', 'type', 'order']);
+
             // FK
-            $table->foreign("inspection_form_category_id")->references("id")->on("inspection_form_categories")->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreign("inspection_form_section_id")->references("id")->on("inspection_form_sections")->cascadeOnDelete()->cascadeOnUpdate();
         });
     }
 
@@ -32,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('inspection_form_checks');
+        Schema::dropIfExists('inspection_form_items');
     }
 };

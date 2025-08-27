@@ -114,7 +114,7 @@ const Index = (): JSX.Element => {
                     )}
                 </div>
                 <DataTablePaginationAjax
-                    url={route('dt.config.inspection.form')}
+                    url={route('dt.config.inspection.type')}
                     ref={dataTable}
                     columnDefs={InspectionTypeColumns}
                     containerClass="rounded-sm border"
