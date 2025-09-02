@@ -107,17 +107,14 @@ const Create = ({ inspectionTypes }: CreateProps): ReactNode => {
     const submitForm: FormEventHandler = async (e: React.FormEvent<Element>) => {
         e.preventDefault();
 
-        console.log(data);
-        return;
-
-        post(route('config.inspection.type.store'), {
+        post(route('config.inspection.form.store'), {
             onSuccess: async (response) => {
                 const props = response.props as unknown as SharedData;
                 const flash = props.flash;
                 if (flash.toast) toast.success(flash.toast.title, { description: flash.toast.message });
 
                 // confirmation create new data
-                const confirmation = await confirmDialog.YesNo({ message: 'Create new inspection type?' });
+                const confirmation = await confirmDialog.YesNo({ message: 'Create new inspection form?' });
                 if (confirmation) {
                     resetForm();
                 }
@@ -128,7 +125,11 @@ const Create = ({ inspectionTypes }: CreateProps): ReactNode => {
                         message: errors.error,
                     });
                 } else {
-                    toast.warning('Warning', { description: refactorErrorMessage(errors) });
+                    errorDialog.show({
+                        title: 'Warning',
+                        description: 'Please fill all required input',
+                        message: refactorErrorMessage(errors),
+                    });
                 }
             },
             preserveState: true,
@@ -138,6 +139,22 @@ const Create = ({ inspectionTypes }: CreateProps): ReactNode => {
     const resetForm = () => {
         reset(); // clear form to initial values
         clearErrors(); // clear errors
+        setData({
+            flow: InspectionFlow.IN,
+            inspection_type: '',
+            code: '',
+            name: '',
+            use_eta_dest: false,
+            use_ata_dest: false,
+            is_publish: true,
+            required_stages: [InspectionStage.CHECKED_IN, InspectionStage.LOADING, InspectionStage.CHECKED_OUT],
+            inspections: [],
+        });
+        setSectionFormTitle('Create Section');
+        setSectionItemFormTitle('Create Section Item');
+        setItemCount(0);
+        setInspectionFormSectionData(undefined);
+        setInspectionFormSectionItemData(undefined);
     };
 
     const handleStageChange = (checked: boolean, value: InspectionStage) => {
@@ -182,13 +199,14 @@ const Create = ({ inspectionTypes }: CreateProps): ReactNode => {
                 // merge inspection with sort
                 return {
                     ...prevData,
-                    ...{ inspections: _.sortBy([...inspections, updatedInspection], [handleStageSort, 'order']) },
+                    ...{ inspections: _.sortBy([...inspections, updatedInspection], [handleStageSort, 'seq']) },
                 };
             });
         } else {
             const inspection: Inspection = {
                 ...inspectionFormSection,
                 id: window.crypto.randomUUID(),
+                inspection_form_id: window.crypto.randomUUID(),
                 items: [],
             };
 
@@ -196,12 +214,10 @@ const Create = ({ inspectionTypes }: CreateProps): ReactNode => {
             setData((prevData) => {
                 return {
                     ...prevData,
-                    ...{ inspections: _.sortBy([...prevData.inspections, inspection], [handleStageSort, 'order']) },
+                    ...{ inspections: _.sortBy([...prevData.inspections, inspection], [handleStageSort, 'seq']) },
                 };
             });
         }
-
-        setSectionFormTitle('Create Section');
 
         sectionForm.current?.close();
     };
@@ -234,7 +250,7 @@ const Create = ({ inspectionTypes }: CreateProps): ReactNode => {
                 ...prevData,
                 inspections: _.sortBy(
                     prevData.inspections.filter((item) => item.id !== section.id),
-                    [handleStageSort, 'order'],
+                    [handleStageSort, 'seq'],
                 ),
             };
         });
@@ -258,19 +274,19 @@ const Create = ({ inspectionTypes }: CreateProps): ReactNode => {
                 if (!prevSection) return prevData;
 
                 // get prev items without selected data
-                const prevItems = prevSection.items.find((item) => item.id !== inspectionFormSectionItem.id);
+                const prevItems = prevSection.items.filter((item) => item.id !== inspectionFormSectionItem.id);
                 if (!prevItems) return prevData;
 
                 // update inspection items by add it
                 const updatedInspection: Inspection = {
                     ...prevSection,
-                    items: prevSection.items.length <= 0 ? [inspectionFormSectionItem] : _.sortBy([prevItems, inspectionFormSectionItem], ['order']),
+                    items: prevSection.items.length <= 0 ? [inspectionFormSectionItem] : _.sortBy([...prevItems, inspectionFormSectionItem], ['seq']),
                 };
 
                 // merge inspection with sort
                 return {
                     ...prevData,
-                    ...{ inspections: _.sortBy([...sections, updatedInspection], ['order']) },
+                    ...{ inspections: _.sortBy([...sections, updatedInspection], [handleStageSort, 'seq']) },
                 };
             });
         } else {
@@ -293,18 +309,16 @@ const Create = ({ inspectionTypes }: CreateProps): ReactNode => {
                     items:
                         prevInspection.items.length <= 0
                             ? [inspectionFormSectionItem]
-                            : _.sortBy([...prevInspection.items, inspectionFormSectionItem], ['order']),
+                            : _.sortBy([...prevInspection.items, inspectionFormSectionItem], ['seq']),
                 };
 
                 // merge inspection with sort
                 return {
                     ...prevData,
-                    ...{ inspections: _.sortBy([...inspections, updatedInspection], ['order']) },
+                    ...{ inspections: _.sortBy([...inspections, updatedInspection], [handleStageSort, 'seq']) },
                 };
             });
         }
-
-        setSectionItemFormTitle('Create Section Item');
 
         sectionItemForm.current?.close();
     };
@@ -326,7 +340,7 @@ const Create = ({ inspectionTypes }: CreateProps): ReactNode => {
         setInspectionFormSectionData(section);
         setInspectionFormSectionItemData(item);
 
-        setSectionFormTitle('Edit Section Item');
+        setSectionItemFormTitle('Edit Section Item');
 
         sectionItemForm.current?.open();
     };
@@ -360,7 +374,7 @@ const Create = ({ inspectionTypes }: CreateProps): ReactNode => {
 
             return {
                 ...prevData,
-                inspections: _.sortBy([...prevInspections, newInspection], ['order']), // spread with adding new object inspection
+                inspections: _.sortBy([...prevInspections, newInspection], ['seq']), // spread with adding new object inspection
             };
         });
     };
@@ -369,8 +383,20 @@ const Create = ({ inspectionTypes }: CreateProps): ReactNode => {
         <>
             <Head title="Create Inspection Form" />
 
-            <DialogContainer title={sectionFormTitle} ref={sectionForm} className="min-w-3xl" onClose={() => setInspectionFormSectionData(undefined)}>
-                <FormSection onSubmit={handleInspectionFormSectionSubmit} inspectionFormSectionData={inspectionFormSectionData} />
+            <DialogContainer
+                title={sectionFormTitle}
+                ref={sectionForm}
+                className="min-w-3xl"
+                onClose={() => {
+                    setInspectionFormSectionData(undefined);
+                    setSectionFormTitle('Create Section');
+                }}
+            >
+                <FormSection
+                    onSubmit={handleInspectionFormSectionSubmit}
+                    inspectionFormSectionData={inspectionFormSectionData}
+                    sectionCount={data.inspections.length}
+                />
             </DialogContainer>
 
             <DialogContainer
@@ -380,12 +406,14 @@ const Create = ({ inspectionTypes }: CreateProps): ReactNode => {
                 onClose={() => {
                     setInspectionFormSectionData(undefined);
                     setInspectionFormSectionItemData(undefined);
+                    setSectionItemFormTitle('Create Section Item');
                 }}
             >
                 <FormSectionItem
                     onSubmit={handleInspectionFormSectionItemSubmit}
                     inspectionFormSectionData={inspectionFormSectionData}
                     inspectionFormSectionItemData={inspectionFormSectionItemData}
+                    itemCount={data.inspections.find((inspection) => inspection.id === inspectionFormSectionData?.id)?.items.length}
                 />
             </DialogContainer>
 
@@ -432,6 +460,7 @@ const Create = ({ inspectionTypes }: CreateProps): ReactNode => {
                             type="text"
                             placeholder="Code"
                             required
+                            maxLength={20}
                             onChange={(e) => setData('code', e.target.value)}
                             value={data.code}
                             error={errors.code}
@@ -447,6 +476,7 @@ const Create = ({ inspectionTypes }: CreateProps): ReactNode => {
                             type="text"
                             placeholder="Name"
                             required
+                            maxLength={50}
                             onChange={(e) => setData('name', e.target.value)}
                             value={data.name}
                             error={errors.name}
@@ -553,7 +583,7 @@ const Create = ({ inspectionTypes }: CreateProps): ReactNode => {
                                                             <Badge variant={getInspectionStage(section.stage, 'variant') as any}>
                                                                 {getInspectionStage(section.stage, 'label')}
                                                             </Badge>
-                                                            <Badge variant={'outline'}>{section.order}</Badge>
+                                                            <Badge variant={'outline'}>{section.seq}</Badge>
                                                             <Badge variant={'outline'}>
                                                                 {section.is_separate_page ? 'Separate Page' : 'Same Page'}
                                                             </Badge>
@@ -587,52 +617,58 @@ const Create = ({ inspectionTypes }: CreateProps): ReactNode => {
                                                         </Button>
                                                     </div>
                                                 </div>
-                                                <Table className="rounded-2xl border">
-                                                    <TableHeader>
-                                                        <TableRow>
-                                                            <TableHead className="w-auto">Description</TableHead>
-                                                            <TableHead className="w-[100px]">Type</TableHead>
-                                                            <TableHead className="w-[100px] text-center">Order</TableHead>
-                                                            <TableHead className="w-[40px]"></TableHead>
-                                                        </TableRow>
-                                                    </TableHeader>
-                                                    <TableBody>
-                                                        {section.items.length <= 0 ? (
-                                                            <TableRow className="w-full text-center">
-                                                                <TableCell colSpan={3}>Item not found.</TableCell>
-                                                            </TableRow>
-                                                        ) : (
-                                                            section.items.map((item) => (
-                                                                <TableRow key={item.id}>
-                                                                    <TableCell>{item.description}</TableCell>
-                                                                    <TableCell>{item.type}</TableCell>
-                                                                    <TableCell className="text-center">{item.order}</TableCell>
-                                                                    <TableCell className="text-right">
-                                                                        <DropdownMenu>
-                                                                            <DropdownMenuTrigger asChild>
-                                                                                <Button type="button" variant={'default'} size={'icon'}>
-                                                                                    <MenuIcon className="size-4" />
-                                                                                </Button>
-                                                                            </DropdownMenuTrigger>
-                                                                            <DropdownMenuContent>
-                                                                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                                                <DropdownMenuSeparator />
-                                                                                <DropdownMenuItem onClick={() => handleItemEdit(section.id, item.id)}>
-                                                                                    <EditIcon className="mr-2 size-4" /> Edit
-                                                                                </DropdownMenuItem>
-                                                                                <DropdownMenuItem
-                                                                                    onClick={() => handleItemRemove(section.id, item.id)}
-                                                                                >
-                                                                                    <XIcon className="mr-2 size-4" /> Remove
-                                                                                </DropdownMenuItem>
-                                                                            </DropdownMenuContent>
-                                                                        </DropdownMenu>
-                                                                    </TableCell>
+                                                <div className="rounded-sm border">
+                                                    <ScrollArea className="h-[20rem] w-full">
+                                                        <Table>
+                                                            <TableHeader className="sticky top-0 z-10 table-fixed shadow-sm backdrop-blur-sm">
+                                                                <TableRow>
+                                                                    <TableHead className="w-auto">Description</TableHead>
+                                                                    <TableHead className="w-[100px]">Type</TableHead>
+                                                                    <TableHead className="w-[100px] text-center">Seq / Order</TableHead>
+                                                                    <TableHead className="w-[40px]"></TableHead>
                                                                 </TableRow>
-                                                            ))
-                                                        )}
-                                                    </TableBody>
-                                                </Table>
+                                                            </TableHeader>
+                                                            <TableBody>
+                                                                {section.items.length <= 0 ? (
+                                                                    <TableRow className="w-full text-center">
+                                                                        <TableCell colSpan={3}>Item not found.</TableCell>
+                                                                    </TableRow>
+                                                                ) : (
+                                                                    section.items.map((item) => (
+                                                                        <TableRow key={item.id}>
+                                                                            <TableCell>{item.description}</TableCell>
+                                                                            <TableCell>{item.type}</TableCell>
+                                                                            <TableCell className="text-center">{item.seq}</TableCell>
+                                                                            <TableCell className="text-right">
+                                                                                <DropdownMenu>
+                                                                                    <DropdownMenuTrigger asChild>
+                                                                                        <Button type="button" variant={'default'} size={'icon'}>
+                                                                                            <MenuIcon className="size-4" />
+                                                                                        </Button>
+                                                                                    </DropdownMenuTrigger>
+                                                                                    <DropdownMenuContent>
+                                                                                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                                                        <DropdownMenuSeparator />
+                                                                                        <DropdownMenuItem
+                                                                                            onClick={() => handleItemEdit(section.id, item.id)}
+                                                                                        >
+                                                                                            <EditIcon className="size-4" /> Edit
+                                                                                        </DropdownMenuItem>
+                                                                                        <DropdownMenuItem
+                                                                                            onClick={() => handleItemRemove(section.id, item.id)}
+                                                                                        >
+                                                                                            <XIcon className="size-4" /> Remove
+                                                                                        </DropdownMenuItem>
+                                                                                    </DropdownMenuContent>
+                                                                                </DropdownMenu>
+                                                                            </TableCell>
+                                                                        </TableRow>
+                                                                    ))
+                                                                )}
+                                                            </TableBody>
+                                                        </Table>
+                                                    </ScrollArea>
+                                                </div>
                                             </div>
                                         </Fragment>
                                     );

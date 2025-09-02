@@ -17,14 +17,14 @@ return new class extends Migration
             $table->uuid("inspection_form_id")->index();
             $table->enum("stage", InspectionStage::cases())->default(InspectionStage::CHECKED_IN)->index()->comment("CHECKED_IN/LOADING/CHECKED_OUT");
             $table->string("description", 100);
-            $table->smallInteger("order")->default(1);
+            $table->smallInteger("seq")->default(1);
             $table->boolean("is_separate_page")->default(true)->comment("flag print in new page");
             $table->uuid('created_by')->nullable();
             $table->uuid('updated_by')->nullable();
             $table->timestamps();
 
             // indexes
-            $table->index(['inspection_form_id', 'stage', 'order']);
+            $table->index(['inspection_form_id', 'stage', 'seq']);
 
             // FK
             $table->foreign("inspection_form_id")->references("id")->on("inspection_forms")->cascadeOnDelete()->cascadeOnUpdate();

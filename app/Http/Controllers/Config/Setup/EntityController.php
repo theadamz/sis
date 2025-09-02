@@ -123,7 +123,7 @@ class EntityController extends Controller
     {
         // validate query parameter
         $validated = Validator::make(['id' => $id], [
-            'id' => ['required', "uuid", "uuid", Rule::exists('entities', 'id')],
+            'id' => ['required', "uuid",  Rule::exists('entities', 'id')],
         ])->validated();
 
         // get data
@@ -179,7 +179,7 @@ class EntityController extends Controller
         try {
 
             // execute
-            Entity::whereIn('id', $validated['ids'])->delete();
+            Entity::whereIn('id', $validated['ids'])->lazyById(200, column: 'id')->each->delete();
 
             // clear cache
             GeneralHelper::removeCaches(CacheKey::ENTITY->value);

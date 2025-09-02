@@ -4,6 +4,7 @@ namespace App\Models\Inspection;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Auth;
 
 class InspectionFormItem extends Model
@@ -14,7 +15,7 @@ class InspectionFormItem extends Model
     protected $keyType = 'string';
     protected $guarded = ['created_by', 'updated_by'];
     protected $casts = [
-        'is_active' => 'boolean',
+        'order' => 'integer',
     ];
 
     protected static function boot()
@@ -28,5 +29,10 @@ class InspectionFormItem extends Model
         static::updating(function (InspectionFormItem $model) {
             $model->updated_by = Auth::id();
         });
+    }
+
+    public function inspection_form_section(): BelongsTo
+    {
+        return $this->belongsTo(InspectionFormSection::class);
     }
 }

@@ -200,7 +200,9 @@ class UserController extends Controller
         try {
 
             // execute
-            User::whereIn('id', $validated['ids'])->delete();
+            User::whereIn('id', $validated['ids'])->lazyById(200, column: 'id')->each->update([
+                'is_active' => false,
+            ]);
 
             // clear cache
             GeneralHelper::removeCaches(CacheKey::USER->value);

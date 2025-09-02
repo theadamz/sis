@@ -5,6 +5,7 @@ namespace App\Models\Inspection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
 
 class InspectionFormSection extends Model
@@ -35,5 +36,10 @@ class InspectionFormSection extends Model
     public function inspection_form(): BelongsTo
     {
         return $this->belongsTo(InspectionForm::class);
+    }
+
+    public function inspection_form_items(): HasMany
+    {
+        return $this->hasMany(InspectionFormItem::class);
     }
 }

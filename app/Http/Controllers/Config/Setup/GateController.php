@@ -180,7 +180,7 @@ class GateController extends Controller
         try {
 
             // execute
-            Gate::whereIn('id', $validated['ids'])->delete();
+            Gate::whereIn('id', $validated['ids'])->lazyById(200, column: 'id')->each->delete();
 
             // clear cache
             GeneralHelper::removeCaches(CacheKey::GATE->value);

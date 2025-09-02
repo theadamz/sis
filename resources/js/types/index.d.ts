@@ -141,7 +141,7 @@ export interface InspectionFormSection {
     inspection_form_id: string;
     stage: InspectionStage;
     description: string;
-    order: number;
+    seq: number;
     is_separate_page: boolean;
 }
 
@@ -150,7 +150,7 @@ export interface InspectionFormItem {
     inspection_form_section_id: string;
     description: string;
     type: InspectionItemType;
-    order: number;
+    seq: number;
 }
 
 /* Option */

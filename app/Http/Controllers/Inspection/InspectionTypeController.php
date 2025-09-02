@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Config\Inspection;
+namespace App\Http\Controllers\Inspection;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Config\Inspection\InspectionTypeRequest;
@@ -106,7 +106,7 @@ class InspectionTypeController extends Controller
     {
         // validate query parameter
         $validated = Validator::make(['id' => $id], [
-            'id' => ['required', "uuid", "uuid", Rule::exists('inspection_types', 'id')],
+            'id' => ['required', "uuid",  Rule::exists('inspection_types', 'id')],
         ])->validated();
 
         // get data
@@ -159,7 +159,7 @@ class InspectionTypeController extends Controller
         try {
 
             // execute
-            InspectionType::whereIn('id', $validated['ids'])->delete();
+            InspectionType::whereIn('id', $validated['ids'])->lazyById(200, column: 'id')->each->delete();
 
             // set toast
             Session::flash('toast', [

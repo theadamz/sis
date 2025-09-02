@@ -12,16 +12,17 @@ type FormSectionItemProps = {
     onSubmit: (data: InspectionFormItem) => void;
     inspectionFormSectionData?: InspectionFormSection;
     inspectionFormSectionItemData?: InspectionFormItem;
+    itemCount?: number;
 };
 
-const FormSectionItem = ({ onSubmit, inspectionFormSectionData, inspectionFormSectionItemData }: FormSectionItemProps): ReactNode => {
+const FormSectionItem = ({ onSubmit, inspectionFormSectionData, inspectionFormSectionItemData, itemCount }: FormSectionItemProps): ReactNode => {
     /*** inertia js ***/
     const { data, setData, clearErrors, processing, reset } = useForm<InspectionFormItem>({
         id: '',
         inspection_form_section_id: typeof inspectionFormSectionData === 'undefined' ? '' : inspectionFormSectionData.id,
         description: '',
         type: InspectionItemType.SELECT,
-        order: 1,
+        seq: itemCount ? itemCount + 1 : 1,
     });
 
     /*** componenet effect ***/
@@ -42,7 +43,7 @@ const FormSectionItem = ({ onSubmit, inspectionFormSectionData, inspectionFormSe
             inspection_form_section_id: typeof inspectionFormSectionData === 'undefined' ? '' : inspectionFormSectionData.id,
             description: '',
             type: InspectionItemType.SELECT,
-            order: 1,
+            seq: itemCount ? itemCount + 1 : 1,
         });
     };
 
@@ -103,18 +104,18 @@ const FormSectionItem = ({ onSubmit, inspectionFormSectionData, inspectionFormSe
                     />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="order" className="text-right">
+                    <Label htmlFor="seq" className="text-right">
                         Order <Label className="text-red-500">*</Label>
                     </Label>
                     <Input
-                        id="order"
-                        name="order"
+                        id="seq"
+                        name="seq"
                         type="number"
                         placeholder="Order"
                         className="col-span-3"
                         required
-                        onChange={(e) => setData('order', Number(e.target.value))}
-                        value={data.order}
+                        onChange={(e) => setData('seq', Number(e.target.value))}
+                        value={data.seq}
                     />
                 </div>
             </div>

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Facades\Auth;
 
 class InspectionForm extends Model
@@ -45,8 +46,8 @@ class InspectionForm extends Model
         return $this->hasMany(InspectionFormSection::class);
     }
 
-    public function inspection_form_items(): HasMany
+    public function inspection_form_items(): HasManyThrough
     {
-        return $this->hasMany(InspectionFormItem::class);
+        return $this->HasManyThrough(InspectionFormItem::class, InspectionFormSection::class, 'inspection_form_id', 'inspection_form_section_id', 'id', 'id');
     }
 }

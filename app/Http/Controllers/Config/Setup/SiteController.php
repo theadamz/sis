@@ -187,7 +187,7 @@ class SiteController extends Controller
         try {
 
             // execute
-            Site::whereIn('id', $validated['ids'])->delete();
+            Site::whereIn('id', $validated['ids'])->lazyById(200, column: 'id')->each->delete();
 
             // clear cache
             GeneralHelper::removeCaches(CacheKey::SITE->value);

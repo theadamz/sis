@@ -12,16 +12,17 @@ import { FormEventHandler, ReactNode, useEffect } from 'react';
 type FormSectionProps = {
     onSubmit: (data: InspectionFormSection) => void;
     inspectionFormSectionData?: InspectionFormSection;
+    sectionCount?: number;
 };
 
-const FormSection = ({ onSubmit, inspectionFormSectionData }: FormSectionProps): ReactNode => {
+const FormSection = ({ onSubmit, inspectionFormSectionData, sectionCount }: FormSectionProps): ReactNode => {
     /*** inertia js ***/
     const { data, setData, clearErrors, processing, reset } = useForm<InspectionFormSection>({
         id: '',
         inspection_form_id: '',
         stage: InspectionStage.CHECKED_IN,
         description: '',
-        order: 1,
+        seq: sectionCount ? sectionCount + 1 : 1,
         is_separate_page: false,
     });
 
@@ -43,7 +44,7 @@ const FormSection = ({ onSubmit, inspectionFormSectionData }: FormSectionProps):
             inspection_form_id: '',
             stage: InspectionStage.CHECKED_IN,
             description: '',
-            order: 1,
+            seq: sectionCount ? sectionCount + 1 : 1,
             is_separate_page: false,
         });
     };
@@ -90,22 +91,22 @@ const FormSection = ({ onSubmit, inspectionFormSectionData }: FormSectionProps):
                     />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="order" className="text-right">
+                    <Label htmlFor="seq" className="text-right">
                         Order <Label className="text-red-500">*</Label>
                     </Label>
                     <Input
-                        id="order"
-                        name="order"
+                        id="seq"
+                        name="seq"
                         type="number"
                         placeholder="Order"
                         className="col-span-3"
                         required
-                        onChange={(e) => setData('order', Number(e.target.value))}
-                        value={data.order}
+                        onChange={(e) => setData('seq', Number(e.target.value))}
+                        value={data.seq}
                     />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="order" className="text-right">
+                    <Label htmlFor="seq" className="text-right">
                         Print Separate Page
                     </Label>
                     <Checkbox

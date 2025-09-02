@@ -344,7 +344,7 @@ const DataTablePaginationAjax = <TData, TValue>(
             {/* Table */}
             <div className={cn('w-full', containerClass)}>
                 <div data-slot="table-container" className="w-full overflow-x-auto overflow-y-hidden">
-                    <ScrollArea className={cn('w-fit scroll-auto md:w-full', scrollAreaClass)}>
+                    <ScrollArea className={cn('w-fit scroll-auto md:min-w-full', scrollAreaClass)}>
                         <Table>
                             <TableHeader className="sticky top-0 z-10 table-fixed shadow-sm backdrop-blur-sm">
                                 {table.getHeaderGroups().map((headerGroup) => (

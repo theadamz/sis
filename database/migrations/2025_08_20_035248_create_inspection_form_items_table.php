@@ -17,13 +17,13 @@ return new class extends Migration
             $table->uuid('inspection_form_section_id')->index();
             $table->string('description', 100);
             $table->enum('type', InspectionCheckType::cases())->default("select")->comment("select (ok/no) / photo");
-            $table->smallInteger("order")->default(1);
+            $table->smallInteger("seq")->default(1);
             $table->uuid('created_by')->nullable();
             $table->uuid('updated_by')->nullable();
             $table->timestamps();
 
             // indexes
-            $table->index(['inspection_form_section_id', 'type', 'order']);
+            $table->index(['inspection_form_section_id', 'type', 'seq']);
 
             // FK
             $table->foreign("inspection_form_section_id")->references("id")->on("inspection_form_sections")->cascadeOnDelete()->cascadeOnUpdate();

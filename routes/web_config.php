@@ -10,27 +10,27 @@ Route::prefix("setup")->group(function () {
     Route::middleware(['can:cfg-stp-entity', 'access:cfg-stp-entity'])->group(function () {
         Route::get('/entities', [\App\Http\Controllers\Config\Setup\EntityController::class, 'index'])->name('config.setup.entity.index');
         Route::get('/entities/{id}', [\App\Http\Controllers\Config\Setup\EntityController::class, 'show'])->name('config.setup.entity.show');
-        Route::post('/entities', [\App\Http\Controllers\Config\Setup\EntityController::class, 'store'])->name('config.setup.entity.store');
-        Route::put('/entities/{id}', [\App\Http\Controllers\Config\Setup\EntityController::class, 'update'])->name('config.setup.entity.update');
-        Route::delete('/entities', [\App\Http\Controllers\Config\Setup\EntityController::class, 'destroy'])->name('config.setup.entity.destroy');
+        Route::post('/entities', [\App\Http\Controllers\Config\Setup\EntityController::class, 'store'])->can('cfg-stp-entity-create')->name('config.setup.entity.store');
+        Route::put('/entities/{id}', [\App\Http\Controllers\Config\Setup\EntityController::class, 'update'])->can('cfg-stp-entity-edit')->name('config.setup.entity.update');
+        Route::delete('/entities', [\App\Http\Controllers\Config\Setup\EntityController::class, 'destroy'])->can('cfg-stp-entity-delete')->name('config.setup.entity.destroy');
     });
 
     // site
     Route::middleware(['can:cfg-stp-site', 'access:cfg-stp-site'])->group(function () {
         Route::get('/sites', [\App\Http\Controllers\Config\Setup\SiteController::class, 'index'])->name('config.setup.site.index');
         Route::get('/sites/{id}', [\App\Http\Controllers\Config\Setup\SiteController::class, 'show'])->name('config.setup.site.show');
-        Route::post('/sites', [\App\Http\Controllers\Config\Setup\SiteController::class, 'store'])->name('config.setup.site.store');
-        Route::put('/sites/{id}', [\App\Http\Controllers\Config\Setup\SiteController::class, 'update'])->name('config.setup.site.update');
-        Route::delete('/sites', [\App\Http\Controllers\Config\Setup\SiteController::class, 'destroy'])->name('config.setup.site.destroy');
+        Route::post('/sites', [\App\Http\Controllers\Config\Setup\SiteController::class, 'store'])->can('cfg-stp-site-create')->name('config.setup.site.store');
+        Route::put('/sites/{id}', [\App\Http\Controllers\Config\Setup\SiteController::class, 'update'])->can('cfg-stp-site-edit')->name('config.setup.site.update');
+        Route::delete('/sites', [\App\Http\Controllers\Config\Setup\SiteController::class, 'destroy'])->can('cfg-stp-site-delete')->name('config.setup.site.destroy');
     });
 
     // gate
     Route::middleware(['can:cfg-stp-gate', 'access:cfg-stp-gate'])->group(function () {
         Route::get('/gates', [\App\Http\Controllers\Config\Setup\GateController::class, 'index'])->name('config.setup.gate.index');
         Route::get('/gates/{id}', [\App\Http\Controllers\Config\Setup\GateController::class, 'show'])->name('config.setup.gate.show');
-        Route::post('/gates', [\App\Http\Controllers\Config\Setup\GateController::class, 'store'])->name('config.setup.gate.store');
-        Route::put('/gates/{id}', [\App\Http\Controllers\Config\Setup\GateController::class, 'update'])->name('config.setup.gate.update');
-        Route::delete('/gates', [\App\Http\Controllers\Config\Setup\GateController::class, 'destroy'])->name('config.setup.gate.destroy');
+        Route::post('/gates', [\App\Http\Controllers\Config\Setup\GateController::class, 'store'])->can('cfg-stp-gate-create')->name('config.setup.gate.store');
+        Route::put('/gates/{id}', [\App\Http\Controllers\Config\Setup\GateController::class, 'update'])->can('cfg-stp-gate-edit')->name('config.setup.gate.update');
+        Route::delete('/gates', [\App\Http\Controllers\Config\Setup\GateController::class, 'destroy'])->can('cfg-stp-gate-delete')->name('config.setup.gate.destroy');
     });
 });
 
@@ -38,21 +38,22 @@ Route::prefix("setup")->group(function () {
 Route::prefix("inspections")->group(function () {
     // vehicle type
     Route::middleware(['can:cfg-ins-type', 'access:cfg-ins-type'])->group(function () {
-        Route::get('/types', [\App\Http\Controllers\Config\Inspection\InspectionTypeController::class, 'index'])->name('config.inspection.type.index');
-        Route::get('/types/{id}', [\App\Http\Controllers\Config\Inspection\InspectionTypeController::class, 'show'])->name('config.inspection.type.show');
-        Route::post('/types', [\App\Http\Controllers\Config\Inspection\InspectionTypeController::class, 'store'])->name('config.inspection.type.store');
-        Route::put('/types/{id}', [\App\Http\Controllers\Config\Inspection\InspectionTypeController::class, 'update'])->name('config.inspection.type.update');
-        Route::delete('/types', [\App\Http\Controllers\Config\Inspection\InspectionTypeController::class, 'destroy'])->name('config.inspection.type.destroy');
+        Route::get('/types', [\App\Http\Controllers\Inspection\InspectionTypeController::class, 'index'])->name('config.inspection.type.index');
+        Route::get('/types/{id}', [\App\Http\Controllers\Inspection\InspectionTypeController::class, 'show'])->name('config.inspection.type.show');
+        Route::post('/types', [\App\Http\Controllers\Inspection\InspectionTypeController::class, 'store'])->can('cfg-ins-type-create')->name('config.inspection.type.store');
+        Route::put('/types/{id}', [\App\Http\Controllers\Inspection\InspectionTypeController::class, 'update'])->can('cfg-ins-type-edit')->name('config.inspection.type.update');
+        Route::delete('/types', [\App\Http\Controllers\Inspection\InspectionTypeController::class, 'destroy'])->can('cfg-ins-type-delete')->name('config.inspection.type.destroy');
     });
 
     // vehicle type
     Route::middleware(['can:cfg-ins-form', 'access:cfg-ins-form'])->group(function () {
-        Route::get('/forms', [\App\Http\Controllers\Config\Inspection\InspectionFormController::class, 'index'])->name('config.inspection.form.index');
-        Route::get('/forms/create', [\App\Http\Controllers\Config\Inspection\InspectionFormController::class, 'create'])->name('config.inspection.form.create');
-        Route::get('/forms/{id}', [\App\Http\Controllers\Config\Inspection\InspectionFormController::class, 'show'])->name('config.inspection.form.show');
-        Route::post('/forms', [\App\Http\Controllers\Config\Inspection\InspectionFormController::class, 'store'])->name('config.inspection.form.store');
-        Route::put('/forms/{id}', [\App\Http\Controllers\Config\Inspection\InspectionFormController::class, 'update'])->name('config.inspection.form.update');
-        Route::delete('/forms', [\App\Http\Controllers\Config\Inspection\InspectionFormController::class, 'destroy'])->name('config.inspection.form.destroy');
+        Route::get('/forms', [\App\Http\Controllers\Inspection\InspectionFormController::class, 'index'])->name('config.inspection.form.index');
+        Route::get('/forms/{id}/edit', [\App\Http\Controllers\Inspection\InspectionFormController::class, 'edit'])->can('cfg-ins-form-edit')->name('config.inspection.form.edit');
+        Route::get('/forms/create', [\App\Http\Controllers\Inspection\InspectionFormController::class, 'create'])->can('cfg-ins-form-create')->name('config.inspection.form.create');
+        // Route::get('/forms/{id}', [\App\Http\Controllers\Inspection\InspectionFormController::class, 'show'])->name('config.inspection.form.show');
+        Route::post('/forms', [\App\Http\Controllers\Inspection\InspectionFormController::class, 'store'])->can('cfg-ins-form-create')->name('config.inspection.form.store');
+        Route::put('/forms/{id}', [\App\Http\Controllers\Inspection\InspectionFormController::class, 'update'])->can('cfg-ins-form-edit')->name('config.inspection.form.update');
+        Route::delete('/forms', [\App\Http\Controllers\Inspection\InspectionFormController::class, 'destroy'])->can('cfg-ins-form-delete')->name('config.inspection.form.destroy');
     });
 });
 
