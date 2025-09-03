@@ -2,15 +2,19 @@
 
 namespace App\Models\Inspection;
 
+use App\Helpers\GeneralHelper;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Activitylog\Contracts\Activity;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class InspectionFormSection extends Model
 {
-    use HasUuids;
+    use HasUuids, LogsActivity;
 
     public $incrementing = false;
     protected $keyType = 'string';
@@ -31,6 +35,18 @@ class InspectionFormSection extends Model
         static::updating(function (InspectionFormSection $model) {
             $model->updated_by = Auth::id();
         });
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()->logAll()->setDescriptionForEvent(function (string $eventName) {
+            return "gate " . $eventName;
+        });
+    }
+
+    public function tapActivity(Activity $activity, string $eventName)
+    {
+        $activity->properties = $activity->properties->merge(GeneralHelper::getAgentInfo());
     }
 
     public function inspection_form(): BelongsTo

@@ -37,15 +37,6 @@ Route::prefix("setup")->group(function () {
 // inspection
 Route::prefix("inspections")->group(function () {
     // vehicle type
-    Route::middleware(['can:cfg-ins-type', 'access:cfg-ins-type'])->group(function () {
-        Route::get('/types', [\App\Http\Controllers\Inspection\InspectionTypeController::class, 'index'])->name('config.inspection.type.index');
-        Route::get('/types/{id}', [\App\Http\Controllers\Inspection\InspectionTypeController::class, 'show'])->name('config.inspection.type.show');
-        Route::post('/types', [\App\Http\Controllers\Inspection\InspectionTypeController::class, 'store'])->can('cfg-ins-type-create')->name('config.inspection.type.store');
-        Route::put('/types/{id}', [\App\Http\Controllers\Inspection\InspectionTypeController::class, 'update'])->can('cfg-ins-type-edit')->name('config.inspection.type.update');
-        Route::delete('/types', [\App\Http\Controllers\Inspection\InspectionTypeController::class, 'destroy'])->can('cfg-ins-type-delete')->name('config.inspection.type.destroy');
-    });
-
-    // vehicle type
     Route::middleware(['can:cfg-ins-form', 'access:cfg-ins-form'])->group(function () {
         Route::get('/forms', [\App\Http\Controllers\Inspection\InspectionFormController::class, 'index'])->name('config.inspection.form.index');
         Route::get('/forms/{id}/edit', [\App\Http\Controllers\Inspection\InspectionFormController::class, 'edit'])->can('cfg-ins-form-edit')->name('config.inspection.form.edit');

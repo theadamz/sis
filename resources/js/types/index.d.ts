@@ -129,13 +129,6 @@ export interface UserAccess {
     is_allowed: boolean;
 }
 
-export interface InspectionType {
-    id: string;
-    code: string;
-    name: string;
-    is_visible: boolean;
-}
-
 export interface InspectionFormSection {
     id: string;
     inspection_form_id: string;
@@ -151,6 +144,14 @@ export interface InspectionFormItem {
     description: string;
     type: InspectionItemType;
     seq: number;
+}
+
+/* enum */
+
+export interface InspectionType {
+    value: string;
+    name: string;
+    label: string;
 }
 
 /* Option */
@@ -213,7 +214,7 @@ export interface InspectionTypeDT {
 export interface InspectionFormDT {
     id: string;
     flow: string;
-    inspection_type_id: string;
+    inspection_type: string;
     inspection_type_name: string;
     code: string;
     name: string;

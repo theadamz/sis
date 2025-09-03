@@ -19,7 +19,9 @@ export function Breadcrumbs({ breadcrumbs }: { breadcrumbs: BreadcrumbItemType[]
                                         ) : (
                                             <BreadcrumbLink asChild>
                                                 {typeof item.href !== 'undefined' ? (
-                                                    <Link href={item.href}>{item.title}</Link>
+                                                    <Link href={item.href} replace>
+                                                        {item.title}
+                                                    </Link>
                                                 ) : (
                                                     <BreadcrumbPage>{item.title}</BreadcrumbPage>
                                                 )}

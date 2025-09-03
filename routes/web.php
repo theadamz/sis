@@ -23,5 +23,11 @@ Route::prefix('configs')->middleware(['auth'])->group(base_path('routes/web_conf
 // datatable
 Route::prefix('dt')->middleware(['auth'])->group(base_path('routes/web_dt.php'));
 
+Route::prefix('inspections')->middleware(['auth'])->group(function () {
+    Route::middleware(['can:ins-vehicle', 'access:ins-vehicle'])->group(function () {
+        Route::get('vehicles', [\App\Http\Controllers\Inspection\VehicleInspectionController::class, 'index'])->name('inspection.vehicle.index');
+    });
+});
+
 require_once base_path('routes/settings.php');
 require_once base_path('routes/auth.php');

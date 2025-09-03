@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum TransactionType: string
+enum InspectionType: string
 {
     case VHC_INS = "VHC_INS";
     case ROOM_INS = "ROOM_INS";

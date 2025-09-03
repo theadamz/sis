@@ -5,11 +5,13 @@ namespace App\Helpers;
 use App\Enums\CacheKey;
 use Carbon\CarbonTimeZone;
 use DateTimeZone;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Redis;
+use Jenssegers\Agent\Agent;
 use Str;
 
 class GeneralHelper
@@ -101,6 +103,28 @@ class GeneralHelper
         Cache::put(CacheKey::TIMEZONE->value, $data, now()->addHours(24));
 
         return $data;
+    }
+
+    public static function getAgentInfo(): array
+    {
+        // init
+        $request = app(Request::class);
+        $agent = new Agent();
+
+        // variables
+        $url = $request->fullUrl();
+        $method = $request->method();
+        $body = $request->getContent();
+        $ip = $request->getClientIp();
+        $os = $agent->platform();
+        $device = $agent->device();
+        $device_type = $agent->deviceType();
+        $browser = $agent->browser();
+        $browser_version = $agent->version($browser);
+        $user_agent = $agent->getUserAgent();
+        $is_robot = $agent->robot();
+
+        return compact('url', 'method', 'body', 'ip', 'os', 'browser', 'device', 'device_type', 'browser', 'browser_version', 'user_agent', 'is_robot');
     }
 
     public static function getRouteList(): array

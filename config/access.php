@@ -17,7 +17,6 @@ return [
             ['group_code' => 'cfg', 'parent_menu_code' => 'cfg-stp', 'code' => 'cfg-stp-gate', 'name' => 'Gates', 'description' => 'Gate Management', 'path' => '/configs/setup/gates', 'icon' => 'door-open', 'visible' => true, 'children' => null],
         ]],
         ['group_code' => 'cfg', 'parent_menu_code' => 'cfg-ins', 'code' => 'cfg-ins', 'name' => 'Inspection', 'description' => 'Menu Parent Config > Inspection', 'path' => null, 'icon' => 'inspection-panel', 'visible' => true, 'children' => [
-            ['group_code' => 'cfg', 'parent_menu_code' => 'cfg-ins', 'code' => 'cfg-ins-type', 'name' => 'Types', 'description' => 'Inspection Type Management', 'path' => '/configs/inspections/types', 'icon' => 'list', 'visible' => true, 'children' => null],
             ['group_code' => 'cfg', 'parent_menu_code' => 'cfg-ins', 'code' => 'cfg-ins-form', 'name' => 'Forms', 'description' => 'Inspection Form Management', 'path' => '/configs/inspections/forms', 'icon' => 'file-text', 'visible' => true, 'children' => null],
         ]],
         ['group_code' => 'cfg', 'parent_menu_code' => 'cfg-user', 'code' => 'cfg-user', 'name' => 'Users', 'description' => 'User Management', 'path' => '/configs/users', 'icon' => 'users', 'visible' => true, 'children' => null],
@@ -27,7 +26,7 @@ return [
         ['group_code' => 'dsh', 'parent_menu_code' => 'dashboard', 'code' => 'dashboard', 'name' => 'Dashboard', 'description' => 'dashboard', 'path' => '/dashboard', 'icon' => 'circle-gauge', 'visible' => true, 'children' => null],
 
         /* Inspection */
-        ['group_code' => 'ins', 'parent_menu_code' => 'ins-list', 'code' => 'ins-list', 'name' => 'List', 'description' => 'Inspection List', 'path' => '/inspections', 'icon' => 'list', 'visible' => true, 'children' => null],
+        ['group_code' => 'ins', 'parent_menu_code' => 'ins-vehicle', 'code' => 'ins-vehicle', 'name' => 'Vehicles', 'description' => 'Inspection Vehicles', 'path' => '/inspections/vehicles', 'icon' => 'bus-front', 'visible' => true, 'children' => null],
         ['group_code' => 'ins', 'parent_menu_code' => 'ins-monitor', 'code' => 'ins-monitor', 'name' => 'Monitor', 'description' => 'Inspection Monitor', 'path' => '/inspections/monitor', 'icon' => 'scan-search', 'visible' => true, 'children' => null],
 
         /* Laporan */
@@ -50,7 +49,6 @@ return [
 
         /* Configuration - Inspection */
         ['code' => 'cfg-ins', 'name' => 'Menu Configuration - Inspection Parent', 'permissions' => ['read']],
-        ['code' => 'cfg-ins-type', 'name' => 'Menu Configuration - Inspection - Types', 'permissions' => ['read', 'create', 'edit', 'delete']],
         ['code' => 'cfg-ins-form', 'name' => 'Menu Configuration - Inspection - Forms', 'permissions' => ['read', 'create', 'edit', 'delete']],
 
         ['code' => 'cfg-user', 'name' => 'Menu Configuration - Users', 'permissions' => ['read', 'create', 'edit', 'delete']],
@@ -62,7 +60,7 @@ return [
         ['code' => 'dashboard', 'name' => 'Menu Dashboard', 'permissions' => ['read']],
 
         /* Inspection */
-        ['code' => 'ins-list', 'name' => 'Menu Inspection List', 'permissions' => ['read', 'create', 'edit', 'delete']],
+        ['code' => 'ins-vehicle', 'name' => 'Menu Inspection List', 'permissions' => ['read', 'create', 'edit', 'delete']],
         ['code' => 'ins-monitor', 'name' => 'Menu Inspection Monitor', 'permissions' => ['read']],
 
         /* Report */

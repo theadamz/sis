@@ -20,7 +20,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { refactorErrorMessage } from '@/lib/refactorMessages';
 import { type BreadcrumbItem, type InspectionFormItem, type InspectionFormSection, type InspectionType, type SharedData } from '@/types';
 import { getInspectionStage, InspectionFlow, InspectionStage } from '@/types/enum';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import _ from 'lodash';
 import { CheckIcon, EditIcon, Loader2, MenuIcon, PlusIcon, XIcon } from 'lucide-react';
 import { FormEventHandler, Fragment, ReactNode, useEffect, useRef, useState } from 'react';
@@ -40,7 +40,8 @@ const breadcrumbsData: BreadcrumbItem[] = [
         href: route('config.inspection.form.index'),
     },
     {
-        title: 'Edit',
+        title: 'Create',
+        href: route('config.inspection.form.create'),
     },
 ];
 
@@ -49,7 +50,6 @@ type Inspection = InspectionFormSection & {
 };
 
 type InspectionForm = {
-    id: string;
     flow: InspectionFlow;
     inspection_type: string;
     code: string;
@@ -65,22 +65,20 @@ const stages = Object.values(InspectionStage);
 
 interface CreateProps {
     inspectionTypes: InspectionType[];
-    data2edit: InspectionForm;
 }
 
-const Create = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
+const Create = ({ inspectionTypes }: CreateProps): ReactNode => {
     /*** inertia js ***/
-    const { data, setData, put, processing, errors, reset, clearErrors } = useForm<Required<InspectionForm>>({
-        id: data2edit.id,
-        flow: data2edit.flow,
-        inspection_type: data2edit.inspection_type,
-        code: data2edit.code,
-        name: data2edit.name,
-        use_eta_dest: data2edit.use_eta_dest,
-        use_ata_dest: data2edit.use_ata_dest,
-        is_publish: data2edit.is_publish,
-        required_stages: data2edit.required_stages,
-        inspections: data2edit.inspections,
+    const { data, setData, post, processing, errors, reset, clearErrors, isDirty } = useForm<Required<InspectionForm>>({
+        flow: InspectionFlow.IN,
+        inspection_type: '',
+        code: '',
+        name: '',
+        use_eta_dest: false,
+        use_ata_dest: false,
+        is_publish: true,
+        required_stages: [InspectionStage.CHECKED_IN, InspectionStage.LOADING, InspectionStage.CHECKED_OUT],
+        inspections: [],
     });
 
     /*** references ***/
@@ -109,11 +107,21 @@ const Create = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
     const submitForm: FormEventHandler = async (e: React.FormEvent<Element>) => {
         e.preventDefault();
 
-        put(route('config.inspection.form.update', { id: data2edit.id }), {
+        post(route('config.inspection.form.store'), {
             onSuccess: async (response) => {
                 const props = response.props as unknown as SharedData;
                 const flash = props.flash;
                 if (flash.toast) toast.success(flash.toast.title, { description: flash.toast.message });
+
+                // confirmation create new data
+                const confirmation = await confirmDialog.YesNo({ message: 'Create new inspection form?' });
+                if (confirmation) {
+                    resetForm();
+                } else {
+                    router.visit(route('config.inspection.form.index'), {
+                        replace: true,
+                    });
+                }
             },
             onError: async (errors) => {
                 if (errors.error) {
@@ -151,6 +159,21 @@ const Create = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
         setItemCount(0);
         setInspectionFormSectionData(undefined);
         setInspectionFormSectionItemData(undefined);
+    };
+
+    const handleCancel = async () => {
+        if (isDirty) {
+            // confirmation
+            const confirmation = await confirmDialog.YesNo({
+                message: `Are you sure want to cancel changes?`,
+                ConfirmButtonvariant: 'normal',
+            });
+            if (!confirmation) return;
+        }
+
+        router.visit(route('config.inspection.form.index'), {
+            replace: true,
+        });
     };
 
     const handleStageChange = (checked: boolean, value: InspectionStage) => {
@@ -377,7 +400,7 @@ const Create = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
 
     return (
         <>
-            <Head title="Edit Inspection Form" />
+            <Head title="Create Inspection Form" />
 
             <DialogContainer
                 title={sectionFormTitle}
@@ -442,7 +465,7 @@ const Create = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
                             value={data.inspection_type ? data.inspection_type : ''}
                             onValueChange={(value) => setData('inspection_type', value)}
                             items={inspectionTypes.map((item) => {
-                                return { value: item.id, label: item.name };
+                                return { value: item.value, label: item.label };
                             })}
                         />
                     </div>
@@ -456,6 +479,7 @@ const Create = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
                             type="text"
                             placeholder="Code"
                             required
+                            maxLength={20}
                             onChange={(e) => setData('code', e.target.value)}
                             value={data.code}
                             error={errors.code}
@@ -471,6 +495,7 @@ const Create = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
                             type="text"
                             placeholder="Name"
                             required
+                            maxLength={50}
                             onChange={(e) => setData('name', e.target.value)}
                             value={data.name}
                             error={errors.name}
@@ -548,7 +573,13 @@ const Create = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
                 </div>
                 <div className="col-span-12 mt-5 grid gap-2">
                     <div className="flex items-center justify-between">
-                        <Label className="scroll-m-20 text-xl font-semibold tracking-tight">Inspection Items</Label>
+                        <div>
+                            <Label className="scroll-m-20 text-xl font-semibold tracking-tight">Inspection Items</Label>
+                            <div className="flex space-x-2">
+                                <Label>Sections : {data.inspections.length}</Label>
+                                <Label>Items : {itemCount}</Label>
+                            </div>
+                        </div>
                         <div className="space-x-2">
                             <Button type="button" variant={'normal'} onClick={() => sectionForm.current?.open()}>
                                 <PlusIcon className="size-4" />
@@ -631,7 +662,7 @@ const Create = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
                                                                     section.items.map((item) => (
                                                                         <TableRow key={item.id}>
                                                                             <TableCell>{item.description}</TableCell>
-                                                                            <TableCell>{item.type}</TableCell>
+                                                                            <TableCell>{item.type.replaceAll('_', ' + ')}</TableCell>
                                                                             <TableCell className="text-center">{item.seq}</TableCell>
                                                                             <TableCell className="text-right">
                                                                                 <DropdownMenu>
@@ -672,12 +703,12 @@ const Create = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
                     </div>
 
                     <div className="flex items-start justify-between">
-                        <div className="flex">
-                            <Label className="me-5">Sections : {data.inspections.length}</Label>
-                            <Label>Items : {itemCount}</Label>
-                        </div>
+                        <Button type="button" disabled={processing} variant={'warning'} onClick={handleCancel}>
+                            <XIcon className="size-4" />
+                            Cancel
+                        </Button>
                         <Button type="submit" disabled={processing} variant={'success'}>
-                            {processing ? <Loader2 className="mr-2 size-4 animate-spin" /> : <CheckIcon className="mr-2 size-4" />}
+                            {processing ? <Loader2 className="size-4 animate-spin" /> : <CheckIcon className="size-4" />}
                             Submit
                         </Button>
                     </div>

@@ -5,6 +5,7 @@ namespace App\Data\Inspection;
 use App\Enums\InspectionCheckType;
 use App\Enums\InspectionFlow;
 use App\Enums\InspectionStage;
+use App\Enums\InspectionType;
 use Illuminate\Support\Facades\Auth;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
 use Spatie\LaravelData\Attributes\Validation\BooleanType;
@@ -40,8 +41,8 @@ class InspectionFormCreateData extends Data
     public static function rules(): array
     {
         return [
-            "flow" => [new Required, new In(collect(InspectionFlow::cases())->pluck('value')->toArray())],
-            "inspection_type" => [new Required, new Uuid, new Exists(table: "inspection_types", column: "id")],
+            "flow" => [new Required, new StringType, new In(collect(InspectionFlow::cases())->pluck('value')->toArray())],
+            "inspection_type" => [new Required, new StringType, new In(collect(InspectionType::cases())->pluck('value')->toArray())],
             "code" => [new Required, new StringType, new Max(20), new Regex(config('setting.regxp.forCode'))],
             "name" => [new Required, new StringType, new Max(50)],
             "use_eta_dest" => [new Required, new BooleanType],

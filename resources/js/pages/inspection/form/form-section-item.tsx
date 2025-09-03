@@ -99,7 +99,7 @@ const FormSectionItem = ({ onSubmit, inspectionFormSectionData, inspectionFormSe
                         value={data.type}
                         onValueChange={(value) => value && setData('type', value as InspectionItemType)}
                         items={Object.entries(InspectionItemType).map(([label, value]) => {
-                            return { value: value, label: label };
+                            return { value: value, label: label.replaceAll('_', ' + ') };
                         })}
                     />
                 </div>

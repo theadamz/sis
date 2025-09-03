@@ -237,6 +237,8 @@ class AccessController extends Controller
                 ]);
 
                 if ($isExist) {
+                    $model = $model->first(['is_allowed']);
+
                     $model->update([
                         'is_allowed' => $isAllowed
                     ]);

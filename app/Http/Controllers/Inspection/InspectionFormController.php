@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Inspection;
 
 use App\Data\Inspection\InspectionFormCreateData;
 use App\Data\Inspection\InspectionFormUpdateData;
+use App\Enums\InspectionType;
 use App\Http\Controllers\Controller;
 use App\Models\Inspection\InspectionForm;
 use App\Models\Inspection\InspectionFormItem;
 use App\Models\Inspection\InspectionFormSection;
-use App\Models\Inspection\InspectionType;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -22,12 +22,26 @@ use Inertia\Response;
 
 class InspectionFormController extends Controller
 {
+    private array $inspectionTypes;
+
+    public function __construct()
+    {
+        $this->inspectionTypes = collect(InspectionType::cases())->transform(function ($item) {
+            $label = $item->getName();
+            $item = (array) $item;
+
+            return [
+                ...$item,
+                'label' => $label
+            ];
+        })->all();
+    }
+
     public function index(): Response
     {
-        // get inspection type
-        $inspectionTypes = InspectionType::all();
-
-        return Inertia::render("config/inspection/form/index")->with(compact('inspectionTypes'));
+        return Inertia::render("inspection/form/index")->with([
+            'inspectionTypes' => $this->inspectionTypes
+        ]);
     }
 
     public function datatable(): LengthAwarePaginator
@@ -50,7 +64,7 @@ class InspectionFormController extends Controller
         }
 
         // prepare paginate and order by
-        $data = InspectionForm::query()->selectRaw("id, flow, inspection_type_id, code, name, use_eta_dest, use_ata_dest, is_publish, required_stages")->with(['inspection_type:id,code,name'])->withCount(['inspection_form_sections', 'inspection_form_items']);
+        $data = InspectionForm::query()->selectRaw("id, flow, inspection_type, code, name, use_eta_dest, use_ata_dest, is_publish, required_stages")->withCount(['inspection_form_sections', 'inspection_form_items']);
 
         // filter with search
         $data->when(!empty(str($search)->trim()), function ($query) use ($search) {
@@ -64,7 +78,7 @@ class InspectionFormController extends Controller
         });
 
         $data->when($request->has('inspection_type'), function ($query) use ($request) {
-            $query->where('inspection_type_id', $request->get('inspection_type'));
+            $query->where('inspection_type', $request->get('inspection_type'));
         });
 
         $data->when($request->has('eta_dest') && is_bool(filter_var($request->get('eta_dest'), FILTER_VALIDATE_BOOLEAN)), function ($query) use ($request) {
@@ -87,8 +101,8 @@ class InspectionFormController extends Controller
             ->through(fn($rec) => [
                 'id' => $rec->id,
                 'flow' => $rec->flow,
-                'inspection_type_id' => $rec->inspection_type_id,
-                'inspection_type_name' => $rec->inspection_type->name,
+                'inspection_type' => $rec->inspection_type,
+                'inspection_type_name' => InspectionType::tryFrom($rec->inspection_type)->getName(),
                 'code' => $rec->code,
                 'name' => $rec->name,
                 'use_eta_dest' => $rec->use_eta_dest,
@@ -104,9 +118,9 @@ class InspectionFormController extends Controller
 
     public function create(): Response
     {
-        $inspectionTypes = InspectionType::whereIsVisible(true)->get(DB::raw("id, code, name"));
-
-        return Inertia::render("config/inspection/form/create")->with(compact('inspectionTypes'));
+        return Inertia::render("inspection/form/create")->with([
+            'inspectionTypes' => $this->inspectionTypes
+        ]);
     }
 
     public function store(InspectionFormCreateData $validated)
@@ -131,7 +145,7 @@ class InspectionFormController extends Controller
             // insert inspection form
             $inspectionForm = InspectionForm::create([
                 'flow' => $validated->flow,
-                'inspection_type_id' => $validated->inspection_type,
+                'inspection_type' => $validated->inspection_type,
                 'code' => $validated->code,
                 'name' => $validated->name,
                 'use_eta_dest' => $validated->use_eta_dest,
@@ -200,7 +214,7 @@ class InspectionFormController extends Controller
 
         // get data
         $data = InspectionForm::where('id', $validated['id'])
-            ->with(['inspection_type', 'inspection_form_sections', 'inspection_form_sections.inspection_form_items']);
+            ->with(['inspection_form_sections', 'inspection_form_sections.inspection_form_items']);
 
         // check if data exist
         if (!$data->exists()) {
@@ -208,7 +222,7 @@ class InspectionFormController extends Controller
         }
 
         // get data
-        $data = $data->first(DB::raw("id, flow, inspection_type_id, code, name, use_eta_dest, use_ata_dest, is_publish, required_stages"));
+        $data = $data->first(DB::raw("id, flow, inspection_type, code, name, use_eta_dest, use_ata_dest, is_publish, required_stages"));
 
         // refactor
         $inspections = collect();
@@ -231,7 +245,7 @@ class InspectionFormController extends Controller
                         'type' => $item['type'],
                         'seq' => $item['seq'],
                     ];
-                })->sortBy('seq')->all(),
+                })->sortBy('seq')->values()->all(),
             ]);
         }
 
@@ -239,7 +253,7 @@ class InspectionFormController extends Controller
         $data2edit = [
             'id' => $data->id,
             'flow' => $data->flow,
-            'inspection_type' => $data->inspection_type_id,
+            'inspection_type' => $data->inspection_type,
             'code' => $data->code,
             'name' => $data->name,
             'use_eta_dest' => $data->use_eta_dest,
@@ -249,9 +263,10 @@ class InspectionFormController extends Controller
             'inspections' => $inspections->all(),
         ];
 
-        $inspectionTypes = InspectionType::whereIsVisible(true)->get(DB::raw("id, code, name"));
-
-        return Inertia::render("config/inspection/form/edit")->with(compact('inspectionTypes', 'data2edit'));
+        return Inertia::render("inspection/form/edit")->with([
+            'inspectionTypes' => $this->inspectionTypes,
+            'data2edit' => $data2edit
+        ]);
     }
 
     public function update(InspectionFormUpdateData $validated)
@@ -277,7 +292,7 @@ class InspectionFormController extends Controller
             $inspectionForm = InspectionForm::find($validated->id);
             $inspectionForm->fill([
                 'flow' => $validated->flow,
-                'inspection_type_id' => $validated->inspection_type,
+                'inspection_type' => $validated->inspection_type,
                 'code' => $validated->code,
                 'name' => $validated->name,
                 'use_eta_dest' => $validated->use_eta_dest,
@@ -324,7 +339,7 @@ class InspectionFormController extends Controller
                 InspectionFormItem::where('inspection_form_section_id', $inspectionFormSection->id)->whereNotIn('id', $sectionIds)->lazyById(200, column: 'id')->each->delete();
 
                 // loop section items
-                foreach ($section['items'] as $item) {
+                foreach (collect($section['items'])->sortBy('seq')->all() as $item) {
                     // get section
                     $inspectionFormItem = InspectionFormItem::where('id', $item['id']);
 

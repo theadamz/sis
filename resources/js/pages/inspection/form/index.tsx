@@ -130,13 +130,13 @@ const Index = ({ inspectionTypes }: IndexProps): JSX.Element => {
                             })}
                         />
                         <Select
-                            className="w-[150px]"
+                            className="w-[180px]"
                             placeholder="Inspection Type"
                             selectLabel="Filter Inspection Type"
                             value={queryStrings ? queryStrings['inspection_type'] : ''}
                             onValueChange={(value) => handleFilters('inspection_type', value)}
                             items={inspectionTypes.map((item) => {
-                                return { value: item.id, label: item.name };
+                                return { value: item.value, label: item.label };
                             })}
                         />
                         <Select

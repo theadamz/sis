@@ -67,10 +67,10 @@ export const InspectionFormColumns: ColumnDef<InspectionFormDT, unknown>[] = [
     {
         accessorKey: 'inspection_type_name',
         meta: {
-            columnDisplayName: 'Ins. Type',
+            columnDisplayName: 'Inspection Type',
         },
         header: ({ column }) => {
-            return <Label>Ins. Type</Label>;
+            return <Label>Inspection Type</Label>;
         },
     },
     {

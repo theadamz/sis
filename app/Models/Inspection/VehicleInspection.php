@@ -1,17 +1,16 @@
 <?php
 
-namespace App\Models\Config\Setup;
+namespace App\Models\Inspection;
 
 use App\Helpers\GeneralHelper;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Activitylog\Contracts\Activity;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-class Entity extends Model
+class VehicleInspection extends Model
 {
     use HasUuids, LogsActivity;
 
@@ -19,18 +18,26 @@ class Entity extends Model
     protected $keyType = 'string';
     protected $guarded = ['created_by', 'updated_by'];
     protected $casts = [
-        'is_active' => 'boolean',
+        'inspection_date' => 'date',
+        'checked_in_at' => 'datetime',
+        'loading_start_at' => 'datetime',
+        'loading_end_at' => 'datetime',
+        'checked_out_at' => 'datetime',
+        'arrival_time_at_fty' => 'datetime',
+        'depart_time_from_fty' => 'datetime',
+        'eta_to_dest' => 'datetime',
+        'ata_to_dest' => 'datetime',
     ];
 
     protected static function boot()
     {
         parent::boot();
 
-        static::creating(function (Entity $model) {
+        static::creating(function (VehicleInspection $model) {
             $model->created_by = Auth::id();
         });
 
-        static::updating(function (Entity $model) {
+        static::updating(function (VehicleInspection $model) {
             $model->updated_by = Auth::id();
         });
     }
@@ -38,17 +45,12 @@ class Entity extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()->logAll()->setDescriptionForEvent(function (string $eventName) {
-            return "entity " . $eventName;
+            return "gate " . $eventName;
         });
     }
 
     public function tapActivity(Activity $activity, string $eventName)
     {
         $activity->properties = $activity->properties->merge(GeneralHelper::getAgentInfo());
-    }
-
-    public function sites(): HasMany
-    {
-        return $this->hasMany(Site::class);
     }
 }

@@ -45,4 +45,5 @@ export const getInspectionStage = (value: string, type: 'value' | 'label' | 'var
 export enum InspectionItemType {
     SELECT = 'SELECT', // only ok/no
     PHOTO = 'PHOTO',
+    SELECT_PHOTO = 'SELECT_PHOTO',
 }
