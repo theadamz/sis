@@ -1,0 +1,311 @@
+// Docs: https://dbml.dbdiagram.io/docs
+// database structure : Security Information System (SIS)
+// author : theadamz91@gmail.com
+
+// core
+
+Table entities {
+    id uuid [primary key, not null]
+    code varchar(3) [not null, unique]
+    name varchar(50) [not null]
+    description varchar(100)
+    is_active boolean [not null, default: true]
+}
+
+Table sites {
+    id uuid [primary key, not null]
+    entity_id uuid [not null]
+    code varchar(6) [not null]
+    name varchar(50) [not null]
+    address varchar(150) [not null]
+    timezone varchar(50) [not null, default: 'Asia/Jakarta']
+    is_active boolean [not null, default: true]
+
+    indexes {
+        entity_id
+        (entity_id, code) [unique]
+    }
+
+}
+
+// relation sites
+Ref: sites.entity_id > entities.id [delete: restrict, update: cascade]
+
+Table gates {
+    id uuid [pk, not null]
+    site_id uuid [not null]
+    code varchar(15) [not null]
+    name varchar(50) [not null]
+    is_active boolean [not null, default: true]
+
+    indexes {
+        (site_id, code) [unique]
+    }
+
+}
+
+// relation gates
+Ref: gates.site_id > sites.id [delete: restrict, update: cascade]
+
+Table users {
+    id uuid [primary key, not null]
+    username varchar(255) [not null, unique]
+    email varchar(255) [not null, unique]
+    name varchar(255) [not null]
+    password varchar(255) [not null]
+    def_path varchar(255) [default: '/']
+    site_id uuid [not null]
+    is_active bool [not null, default: true]
+    email_verified_at timestamp
+    last_change_password_at timestamp
+    last_login_at timestamp
+    remember_token varchar(100)
+
+    indexes {
+        site_id
+    }
+
+}
+
+// relation users
+Ref: users.site_id > sites.id [delete: restrict, update: cascade]
+
+Table site_accesses {
+    id uuid [primary key, not null]
+    site_id uuid [not null]
+    user_id uuid [not null]
+    is_allowed boolean [not null, default: true]
+
+    indexes {
+        user_id
+        site_id
+        (user_id, site_id) [unique]
+    }
+
+}
+
+// relation site_accesses
+Ref: site_accesses.user_id > users.id [delete: restrict, update: cascade]
+Ref: site_accesses.site_id > sites.id [delete: restrict, update: cascade]
+
+Table accesses {
+    id uuid [primary key, not null]
+    site_id uuid [not null]
+    user_id uuid [not null]
+    code varchar(50) [not null]
+    permission varchar(20) [not null, note: "read,edit,delete,validation,etc"]
+    is_allowed bool [not null, default: true]
+
+    indexes {
+        site_id
+        user_id
+        code
+        (site_id, user_id, code, permission) [unique]
+    }
+
+}
+
+// relation accesses
+Ref: accesses.site_id > sites.id [delete: restrict, update: cascade]
+Ref: accesses.user_id > users.id [delete: restrict, update: cascade]
+
+Table sign_in_histories {
+    id uuid [primary key, not null]
+    ip varchar(255) [not null]
+    os varchar(255)
+    platform varchar(255)
+    browser varchar(255)
+    country varchar(255)
+    city varchar(255)
+    user_id uuid [not null]
+    created_at timestamp [default: `now()`]
+
+    indexes {
+        ip
+        user_id
+    }
+
+}
+
+// relation sign_in_histories
+Ref: sign_in_histories.user_id > users.id [delete: restrict, update: cascade]
+
+// ./ core
+
+// basic
+
+Table inspection_types {
+    id uuid [primary key, not null]
+    code varchar(20) [not null, unique]
+    name varchar(50) [not null]
+    is_visible bool [not null, default: true]
+}
+
+Table inspection_forms {
+    id uuid [primary key, not null]
+    flow enum(IN,OUT) [not null, default: "IN"]
+    inspection_type_id uuid [not null]
+    code varchar(20) [unique, not null, note: "INS/24/001"]
+    name varchar(50) [not null]
+    use_eta_dest bool [not null, default: false, note: "Flag to show Estimation Time Arrival datetime in form inspection"]
+    use_ata_dest bool [not null, default: false, note: "Flag to show Actual Time Arrival datetime in form inspection"]
+    is_publish bool [default: true]
+    required_stages json [not null, default: "[CHECKED_IN, LOADING, CHECKED_OUT]"]
+
+    indexes {
+        inspection_type_id
+    }
+
+}
+
+// relation inpection_forms
+Ref: inspection_forms.inspection_type_id > inspection_types.id [delete: restrict, update: cascade]
+
+Table inspection_form_sections {
+    id uuid [primary key, not null]
+    inpection_form_id uuid [not null]
+    stage enum(CHECKED_IN, LOADING, CHECKED_OUT) [not null, default: 'CHECKED_IN', note: "CHECKED_IN/LOADING/CHECKED_OUT"]
+    description varchar(100) [not null]
+    seq smallint [not null, default: 1]
+    is_separate_page bool [default: false, note: "flag print in new page"]
+
+    indexes {
+        inpection_form_id
+        stage
+    }
+
+}
+
+// relation inspection_form_sections
+Ref: inspection_form_sections.inpection_form_id > inspection_forms.id [delete: restrict, update: cascade]
+
+Table inspection_form_items {
+    id uuid [primary key, not null]
+    inpection_form_category_id uuid [not null]
+    description varchar(100) [not null]
+    type enum(SELECT,PHOTO) [not null, default: "select"]
+    seq smallint [not null, default: 1]
+
+    indexes {
+        inpection_form_category_id
+    }
+
+}
+
+// relation form_inspection_checks
+Ref: inspection_form_items.inpection_form_category_id > inspection_form_sections.id [delete: restrict, update: cascade]
+
+// ./ basic
+
+// transaction
+
+Table vehicle_inspections {
+    id uuid [primary key, not null]
+    gate_id uuid [not null]
+    inspection_form_id uuid [not null]
+    inspection_no varchar(50) [not null, unique]
+    inspection_date date [not null]
+    container_no varchar(50)
+    seal_no varhcar(50)
+    inspected_by uuid [not null]
+    driver_name varchar(100) [not null]
+    driver_id_no varchar(50) [not null, note: "Driver identity card ex: driver license"]
+    driver_pic varchar(50) [not null]
+    driver_phone_no varchar(20) [not null]
+    vehicle_reg_no varchar(20) [not null, note: "Vehicle registration number"]
+    vehicle_paper_no varchar(50) [note: "Vehicle registration number paper"]
+    vehicle_paper_pic varchar(50) [not null]
+    checked_in_by uuid [not null]
+    checked_in_at timestamp [not null, default: `now()`]
+    loading_start_by uuid
+    loading_start_at timestamp
+    loading_end_by uuid
+    loading_end_at timestamp
+    checked_out_by uuid
+    checked_out_at timestamp
+    arrival_time_at_fty timestamp [note: "Time arrived in factory to loading / unloading"]
+    depart_time_from_fty timestamp [note: "Time depart from factory to export"]
+    eta_to_dest timestamp [note: "Estimation time to destination harbour / airport"]
+    ata_to_dest timestamp [note: "Actual time arrived at destination harbour / airport"]
+    export_notified_by varchar(100) [note: "Notified to Export Departure by"]
+    remarks varchar(255)
+    stage varchar(20) [not null, default: 'CHECKED_IN', note: "CHECKED_IN/LOADING/CHECKED_OUT"]
+
+    indexes {
+        gate_id
+        inspection_form_id
+        inspection_date
+        container_no
+        seal_no
+        inspected_by
+        checked_in_by
+        checked_out_by
+        loading_start_by
+        loading_end_by
+        checked_out_by
+    }
+
+}
+
+// relation vehicle_inspections
+Ref: vehicle_inspections.inspection_form_id > inspection_forms.id [delete: restrict, update: cascade]
+Ref: vehicle_inspections.inspected_by > users.id [delete: restrict, update: cascade]
+Ref: vehicle_inspections.gate_id > gates.id [delete: restrict, update: cascade]
+
+Table vehicle_inspection_item_checks {
+    id uuid [primary key, not null]
+    inspection_id uuid [not null]
+    inspection_form_item_id uuid [not null]
+    check json [not null, note: "ok/no/filename.jpg"]
+    remarks varchar(100)
+
+    indexes {
+        inspection_id
+        inspection_form_item_id
+        (inspection_id, inspection_form_item_id) [unique]
+    }
+
+}
+
+// relation vehicle_inspection_item_checks
+Ref: vehicle_inspection_item_checks.inspection_id > vehicle_inspections.id [delete: restrict, update: cascade]
+Ref: vehicle_inspection_item_checks.inspection_form_item_id > inspection_form_items.id [delete: restrict, update: cascade]
+
+Table vehicle_inspection_item_pictures {
+    id uuid [primary key, not null]
+    inspection_id uuid [not null]
+    pic_file varchar(50) [note: "filename.jpg"]
+}
+
+// relation vehicle_inspection_item_pictures
+Ref: vehicle_inspection_item_pictures.inspection_id > vehicle_inspections.id [delete: restrict, update: cascade]
+
+Table inspection_logs {
+    id uuid [primary key, not null]
+    inspection_id uuid [not null]
+    user_id uuid [not null]
+    description text [not null]
+}
+
+// relation inspection_logs
+Ref: inspection_logs.inspection_id > vehicle_inspections.id [delete: restrict, update: cascade]
+
+Table sequences {
+    id uuid [primary key, not null]
+    transaction_type enum [not null, note: "VHC_INS/ROOM_INS"]
+    site_id uuid [not null]
+    year tinyint [not null]
+    month tinyint [not null]
+    next_no tinyint [not null, default: 1]
+
+    indexes {
+        site_id
+        (transaction_type, site_id, year, month) [unique]
+    }
+
+}
+
+// relation sequences
+Ref: sequences.site_id > sites.id [delete: cascade, update: cascade]
+
+// ./ transaction

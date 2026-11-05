@@ -1,6 +1,6 @@
 import { Head, useForm } from '@inertiajs/react';
 import { EyeClosedIcon, EyeIcon, LoaderCircle } from 'lucide-react';
-import { FormEventHandler, JSX, ReactNode, useState } from 'react';
+import { JSX, ReactNode, SubmitEventHandler, useState } from 'react';
 
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
@@ -33,7 +33,7 @@ const Login = ({ status, canResetPassword }: LoginProps): JSX.Element => {
         remember: false,
     });
 
-    const submit: FormEventHandler = (e) => {
+    const submit: SubmitEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();
         post(route('login'), {
             onFinish: () => reset('password'),
@@ -125,9 +125,9 @@ const Login = ({ status, canResetPassword }: LoginProps): JSX.Element => {
     );
 };
 
-Login.layout = (page: ReactNode & { props: LoginProps }) => {
+Login.layout = (page: ReactNode & LoginProps) => {
     return (
-        <AuthLayout title="Log in to your account" description="Enter your email and password below to log in" quote={page.props.quote}>
+        <AuthLayout title="Log in to your account" description="Enter your email and password below to log in" quote={page.quote}>
             {page}
         </AuthLayout>
     );

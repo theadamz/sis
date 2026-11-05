@@ -32,16 +32,17 @@
         }
     </style>
 
-    <title inertia>{{ config('app.name', 'Laravel') }}</title>
+    <title data-inertia>{{ config('app.name', 'Laravel') }}</title>
 
     @routes
     @viteReactRefresh
-    @vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
-    @inertiaHead
+    {{-- @vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"]) --}}
+    @vite('resources/js/app.tsx')
+    <x-inertia::head />
 </head>
 
 <body class="font-sans antialiased">
-    @inertia
+    <x-inertia::app />
 </body>
 
 </html>
