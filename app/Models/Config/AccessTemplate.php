@@ -2,17 +2,22 @@
 
 namespace App\Models\Config;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use CalebDW\Laraflake\Casts\AsSnowflake;
+use CalebDW\Laraflake\Concerns\HasSnowflakes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
 class AccessTemplate extends Model
 {
-    use HasUuids;
+    use HasSnowflakes;
 
     public $incrementing = false;
     protected $keyType = 'string';
     protected $guarded = ['created_by', 'updated_by'];
+    protected $casts = [
+        'id' => AsSnowflake::class,
+        'is_allowed' => 'boolean',
+    ];
 
     protected static function boot()
     {

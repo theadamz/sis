@@ -11,20 +11,59 @@
  */
 
 
+namespace App\Models{
+/**
+ * @property string $id
+ * @property string|null $log_name
+ * @property string $description
+ * @property string|null $subject_type
+ * @property int|null $subject_id
+ * @property string|null $event
+ * @property string|null $causer_type
+ * @property int|null $causer_id
+ * @property \Illuminate\Support\Collection<array-key, mixed>|null $attribute_changes
+ * @property \Illuminate\Support\Collection<array-key, mixed>|null $properties
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Model|null $causer
+ * @property-read \Illuminate\Database\Eloquent\Model|null $subject
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityLog causedBy(\Illuminate\Database\Eloquent\Model $causer)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityLog forEvent(\Spatie\Activitylog\Enums\ActivityEvent|string $event)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityLog forSubject(\Illuminate\Database\Eloquent\Model $subject)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityLog inLog(\BackedEnum|array|string ...$logNames)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityLog newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityLog newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityLog query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityLog whereAttributeChanges($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityLog whereCauserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityLog whereCauserType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityLog whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityLog whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityLog whereEvent($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityLog whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityLog whereLogName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityLog whereProperties($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityLog whereSubjectId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityLog whereSubjectType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|ActivityLog whereUpdatedAt($value)
+ */
+	class ActivityLog extends \Eloquent {}
+}
+
 namespace App\Models\Config{
 /**
- * 
- *
  * @property string $id
- * @property string $site_id
- * @property string $user_id
+ * @property int $site_id
+ * @property int $user_id
  * @property string $code
  * @property string $permission read,edit,delete,validation,etc
  * @property bool $is_allowed
- * @property string|null $created_by
- * @property string|null $updated_by
+ * @property int|null $created_by
+ * @property int|null $updated_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ActivityLog> $activitiesAsSubject
+ * @property-read int|null $activities_as_subject_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Access newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Access newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Access query()
@@ -44,15 +83,13 @@ namespace App\Models\Config{
 
 namespace App\Models\Config{
 /**
- * 
- *
  * @property string $id
  * @property string $name
- * @property string $site_id
+ * @property int $site_id
  * @property string $code
  * @property string $permission
- * @property string|null $created_by
- * @property string|null $updated_by
+ * @property int|null $created_by
+ * @property int|null $updated_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder<static>|AccessTemplate newModelQuery()
@@ -71,46 +108,19 @@ namespace App\Models\Config{
 	class AccessTemplate extends \Eloquent {}
 }
 
-namespace App\Models\Config\Inspection{
-/**
- * 
- *
- * @property string $id
- * @property string $code
- * @property string $name
- * @property bool $is_visible
- * @property string|null $created_by
- * @property string|null $updated_by
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleType newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleType newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleType query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleType whereCode($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleType whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleType whereCreatedBy($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleType whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleType whereIsVisible($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleType whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleType whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleType whereUpdatedBy($value)
- */
-	class VehicleType extends \Eloquent {}
-}
-
 namespace App\Models\Config\Setup{
 /**
- * 
- *
  * @property string $id
  * @property string $code
  * @property string $name
  * @property string|null $description
  * @property bool $is_active
- * @property string|null $created_by
- * @property string|null $updated_by
+ * @property int|null $created_by
+ * @property int|null $updated_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ActivityLog> $activitiesAsSubject
+ * @property-read int|null $activities_as_subject_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Config\Setup\Site> $sites
  * @property-read int|null $sites_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Entity newModelQuery()
@@ -131,17 +141,18 @@ namespace App\Models\Config\Setup{
 
 namespace App\Models\Config\Setup{
 /**
- * 
- *
  * @property string $id
- * @property string $site_id
+ * @property int $site_id
  * @property string $code
  * @property string $name
  * @property bool $is_active
- * @property string|null $created_by
- * @property string|null $updated_by
+ * @property int|null $created_by
+ * @property int|null $updated_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ActivityLog> $activitiesAsSubject
+ * @property-read int|null $activities_as_subject_count
+ * @property-read \App\Models\Config\Setup\Site $site
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Gate newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Gate newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Gate query()
@@ -160,20 +171,20 @@ namespace App\Models\Config\Setup{
 
 namespace App\Models\Config\Setup{
 /**
- * 
- *
  * @property string $id
- * @property string $entity_id
+ * @property int $entity_id
  * @property string $code
  * @property string $name
  * @property string|null $address
  * @property string $timezone
  * @property bool $is_active
- * @property bool $is_default
- * @property string|null $created_by
- * @property string|null $updated_by
+ * @property int|null $created_by
+ * @property int|null $updated_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ActivityLog> $activitiesAsSubject
+ * @property-read int|null $activities_as_subject_count
+ * @property-read \App\Models\Config\Setup\Entity $entity
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Site newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Site newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Site query()
@@ -184,7 +195,6 @@ namespace App\Models\Config\Setup{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Site whereEntityId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Site whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Site whereIsActive($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|Site whereIsDefault($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Site whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Site whereTimezone($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Site whereUpdatedAt($value)
@@ -195,16 +205,16 @@ namespace App\Models\Config\Setup{
 
 namespace App\Models\Config\Setup{
 /**
- * 
- *
  * @property string $id
- * @property string $site_id
- * @property string $user_id
+ * @property int $site_id
+ * @property int $user_id
  * @property bool $is_allowed
- * @property string|null $created_by
- * @property string|null $updated_by
+ * @property int|null $created_by
+ * @property int|null $updated_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ActivityLog> $activitiesAsSubject
+ * @property-read int|null $activities_as_subject_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteAccess newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteAccess newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SiteAccess query()
@@ -222,8 +232,6 @@ namespace App\Models\Config\Setup{
 
 namespace App\Models\Config{
 /**
- * 
- *
  * @property string $id
  * @property string $ip
  * @property string|null $os
@@ -231,7 +239,7 @@ namespace App\Models\Config{
  * @property string|null $browser
  * @property string|null $country
  * @property string|null $city
- * @property string $user_id
+ * @property int $user_id
  * @property \Illuminate\Support\Carbon $created_at
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SignInHistory newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SignInHistory newQuery()
@@ -249,26 +257,268 @@ namespace App\Models\Config{
 	class SignInHistory extends \Eloquent {}
 }
 
+namespace App\Models\Inspection{
+/**
+ * @property int $id
+ * @property string $flow
+ * @property string $inspection_type
+ * @property string $code
+ * @property string $name
+ * @property bool $use_eta_dest Flag to show Estimatin Time Arrival datetime in form inspection
+ * @property bool $use_ata_dest Flag to show Actual Time Arrival datetime in form inspection
+ * @property bool $is_publish
+ * @property array<array-key, mixed> $required_stages
+ * @property int|null $created_by
+ * @property int|null $updated_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ActivityLog> $activitiesAsSubject
+ * @property-read int|null $activities_as_subject_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Inspection\InspectionFormItem> $inspection_form_items
+ * @property-read int|null $inspection_form_items_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Inspection\InspectionFormSection> $inspection_form_sections
+ * @property-read int|null $inspection_form_sections_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm whereFlow($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm whereInspectionType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm whereIsPublish($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm whereRequiredStages($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm whereUpdatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm whereUseAtaDest($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm whereUseEtaDest($value)
+ */
+	class InspectionForm extends \Eloquent {}
+}
+
+namespace App\Models\Inspection{
+/**
+ * @property int $id
+ * @property int $inspection_form_section_id
+ * @property string $description
+ * @property string $type select (ok/no) / photo
+ * @property int $seq
+ * @property int|null $created_by
+ * @property int|null $updated_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ActivityLog> $activitiesAsSubject
+ * @property-read int|null $activities_as_subject_count
+ * @property-read \App\Models\Inspection\InspectionFormSection $inspection_form_section
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormItem newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormItem newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormItem query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormItem whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormItem whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormItem whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormItem whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormItem whereInspectionFormSectionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormItem whereSeq($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormItem whereType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormItem whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormItem whereUpdatedBy($value)
+ */
+	class InspectionFormItem extends \Eloquent {}
+}
+
+namespace App\Models\Inspection{
+/**
+ * @property int $id
+ * @property int $inspection_form_id
+ * @property string $stage CHECKED_IN/LOADING/CHECKED_OUT
+ * @property string $description
+ * @property int $seq
+ * @property bool $is_separate_page flag print in new page
+ * @property int|null $created_by
+ * @property int|null $updated_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ActivityLog> $activitiesAsSubject
+ * @property-read int|null $activities_as_subject_count
+ * @property-read \App\Models\Inspection\InspectionForm $inspection_form
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Inspection\InspectionFormItem> $inspection_form_items
+ * @property-read int|null $inspection_form_items_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormSection newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormSection newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormSection query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormSection whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormSection whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormSection whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormSection whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormSection whereInspectionFormId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormSection whereIsSeparatePage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormSection whereSeq($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormSection whereStage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormSection whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormSection whereUpdatedBy($value)
+ */
+	class InspectionFormSection extends \Eloquent {}
+}
+
+namespace App\Models\Inspection{
+/**
+ * @property int $id
+ * @property int $gate_id
+ * @property int $inspection_form_id
+ * @property string $inspection_no
+ * @property \Illuminate\Support\Carbon $inspection_date
+ * @property string|null $container_no
+ * @property string|null $seal_no
+ * @property int $inspected_by
+ * @property string $driver_name
+ * @property string|null $driver_id_no Driver identity card ex: driver license
+ * @property string|null $driver_pic
+ * @property string|null $driver_phone_no
+ * @property string $vehicle_reg_no Vehicle registration number
+ * @property string|null $vehicle_paper_no Vehicle registration number paper
+ * @property string|null $vehicle_paper_pic
+ * @property int $checked_in_by
+ * @property \Illuminate\Support\Carbon $checked_in_at
+ * @property int|null $loading_start_by
+ * @property \Illuminate\Support\Carbon|null $loading_start_at
+ * @property int|null $loading_end_by
+ * @property \Illuminate\Support\Carbon|null $loading_end_at
+ * @property int|null $checked_out_by
+ * @property \Illuminate\Support\Carbon|null $checked_out_at
+ * @property \Illuminate\Support\Carbon|null $arrival_time_at_fty Time arrived in factory to loading / unloading
+ * @property \Illuminate\Support\Carbon|null $depart_time_from_fty Time depart from factory to export
+ * @property \Illuminate\Support\Carbon|null $eta_to_dest Estimation time to destination harbour / airport
+ * @property \Illuminate\Support\Carbon|null $ata_to_dest Actual time arrived at destination harbour / airport
+ * @property string|null $export_notified_by Notified to Export Departure by
+ * @property string|null $remarks
+ * @property string $stage CHECKED_IN/LOADING/CHECKED_OUT
+ * @property int|null $created_by
+ * @property int|null $updated_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ActivityLog> $activitiesAsSubject
+ * @property-read int|null $activities_as_subject_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereArrivalTimeAtFty($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereAtaToDest($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereCheckedInAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereCheckedInBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereCheckedOutAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereCheckedOutBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereContainerNo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereDepartTimeFromFty($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereDriverIdNo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereDriverName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereDriverPhoneNo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereDriverPic($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereEtaToDest($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereExportNotifiedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereGateId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereInspectedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereInspectionDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereInspectionFormId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereInspectionNo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereLoadingEndAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereLoadingEndBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereLoadingStartAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereLoadingStartBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereRemarks($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereSealNo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereStage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereUpdatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereVehiclePaperNo($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereVehiclePaperPic($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereVehicleRegNo($value)
+ */
+	class VehicleInspection extends \Eloquent {}
+}
+
+namespace App\Models\Inspection{
+/**
+ * @property int $id
+ * @property int $inspection_id
+ * @property int $inspection_form_item_id
+ * @property string $check { select: ok/no, photo:filename.jpg}
+ * @property string|null $remarks
+ * @property int|null $created_by
+ * @property int|null $updated_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ActivityLog> $activitiesAsSubject
+ * @property-read int|null $activities_as_subject_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck whereCheck($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck whereInspectionFormItemId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck whereInspectionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck whereRemarks($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck whereUpdatedBy($value)
+ */
+	class VehicleInspectionItemCheck extends \Eloquent {}
+}
+
+namespace App\Models\Sanctum{
+/**
+ * @property string $id
+ * @property string $tokenable_type
+ * @property string $tokenable_id
+ * @property string $name
+ * @property string $token
+ * @property array<array-key, mixed>|null $abilities
+ * @property \Illuminate\Support\Carbon|null $last_used_at
+ * @property \Illuminate\Support\Carbon|null $expires_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Model|\Eloquent $tokenable
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PersonalAccessToken newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PersonalAccessToken newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PersonalAccessToken query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PersonalAccessToken whereAbilities($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PersonalAccessToken whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PersonalAccessToken whereExpiresAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PersonalAccessToken whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PersonalAccessToken whereLastUsedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PersonalAccessToken whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PersonalAccessToken whereToken($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PersonalAccessToken whereTokenableId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PersonalAccessToken whereTokenableType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|PersonalAccessToken whereUpdatedAt($value)
+ */
+	class PersonalAccessToken extends \Eloquent {}
+}
+
 namespace App\Models{
 /**
- * 
- *
  * @property string $id
- * @property string $username
  * @property string $email
  * @property string $name
  * @property string $password
  * @property string $def_path
- * @property string $site_id
+ * @property int $site_id
  * @property bool $is_active
  * @property \Illuminate\Support\Carbon|null $email_verified_at
  * @property \Illuminate\Support\Carbon|null $last_change_password_at
  * @property \Illuminate\Support\Carbon|null $last_login_at
  * @property string|null $remember_token
- * @property string|null $created_by
- * @property string|null $updated_by
+ * @property int|null $created_by
+ * @property int|null $updated_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ActivityLog> $activitiesAsSubject
+ * @property-read int|null $activities_as_subject_count
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection<int, \Illuminate\Notifications\DatabaseNotification> $notifications
  * @property-read int|null $notifications_count
  * @property-read \App\Models\Config\Setup\Site $site
@@ -293,7 +543,6 @@ namespace App\Models{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereSiteId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUpdatedBy($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|User whereUsername($value)
  */
 	class User extends \Eloquent {}
 }

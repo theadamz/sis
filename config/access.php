@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'userIdExceptions' => ['00000000-0000-0000-0000-000000000000', '00000000-0000-0000-0000-000000000001'],
+    'userIdExceptions' => [1, 2],
     'groups' => [
         ['code' => 'cfg', 'name' => 'Config', 'icon' => 'file-sliders', 'visible' => true],
         ['code' => 'dsh', 'name' => 'Dashboard', 'icon' => 'layout-dashboard', 'visible' => true],

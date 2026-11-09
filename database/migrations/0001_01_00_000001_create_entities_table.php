@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('entities', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->unsignedBigInteger('id')->primary();
             $table->string('code', 3)->unique();
             $table->string('name', 50);
             $table->string('description', 100)->nullable();
             $table->boolean('is_active')->default(true);
-            $table->uuid('created_by')->nullable();
-            $table->uuid('updated_by')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();
         });
     }

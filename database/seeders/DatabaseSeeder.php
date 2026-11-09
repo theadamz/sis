@@ -19,7 +19,6 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             AccessSeeder::class,
             AccessTemplateSeeder::class,
-            InspectionTypeSeeder::class,
         ]);
     }
 }

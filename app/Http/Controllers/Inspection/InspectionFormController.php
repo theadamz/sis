@@ -50,14 +50,14 @@ class InspectionFormController extends Controller
         $request = app(Request::class);
 
         // prepare filters
-        $perPage = $request->has("per_page") && !empty($request->get('per_page')) && is_numeric($request->get('per_page')) && in_array($request->get('per_page'), config('setting.page.limits')) ? $request->get('per_page') : config('setting.page.default_limit');
-        $page = $request->has("page") && !empty($request->get('page')) && is_numeric($request->get('page')) ? $request->get('page') : 1;
-        $search = $request->has("search") && str($request->get('search'))->isNotEmpty() ? $request->get('search') : null;
+        $perPage = $request->has("per_page") && !empty($request->query('per_page')) && is_numeric($request->query('per_page')) && in_array($request->query('per_page'), config('setting.page.limits')) ? $request->query('per_page') : config('setting.page.default_limit');
+        $page = $request->has("page") && !empty($request->query('page')) && is_numeric($request->query('page')) ? $request->query('page') : 1;
+        $search = $request->has("search") && str($request->query('search'))->isNotEmpty() ? $request->query('search') : null;
 
         // handling sort filter
         $sort = ['id', 'asc'];
-        if ($request->has("sort") && !empty($request->get('sort'))) {
-            $sort = str($request->get('sort'))->explode('.');
+        if ($request->has("sort") && !empty($request->query('sort'))) {
+            $sort = str($request->query('sort'))->explode('.');
             if (!in_array($sort[1], ['asc', 'desc'])) {
                 $sort[1] = 'asc';
             }
@@ -74,23 +74,23 @@ class InspectionFormController extends Controller
         });
 
         $data->when($request->has('flow'), function ($query) use ($request) {
-            $query->where('flow', $request->get('flow'));
+            $query->where('flow', $request->query('flow'));
         });
 
         $data->when($request->has('inspection_type'), function ($query) use ($request) {
-            $query->where('inspection_type', $request->get('inspection_type'));
+            $query->where('inspection_type', $request->query('inspection_type'));
         });
 
-        $data->when($request->has('eta_dest') && is_bool(filter_var($request->get('eta_dest'), FILTER_VALIDATE_BOOLEAN)), function ($query) use ($request) {
-            $query->where('use_eta_dest', filter_var($request->get('eta_dest'), FILTER_VALIDATE_BOOLEAN));
+        $data->when($request->has('eta_dest') && is_bool(filter_var($request->query('eta_dest'), FILTER_VALIDATE_BOOLEAN)), function ($query) use ($request) {
+            $query->where('use_eta_dest', filter_var($request->query('eta_dest'), FILTER_VALIDATE_BOOLEAN));
         });
 
-        $data->when($request->has('ata_dest') && is_bool(filter_var($request->get('ata_dest'), FILTER_VALIDATE_BOOLEAN)), function ($query) use ($request) {
-            $query->where('use_ata_dest', filter_var($request->get('ata_dest'), FILTER_VALIDATE_BOOLEAN));
+        $data->when($request->has('ata_dest') && is_bool(filter_var($request->query('ata_dest'), FILTER_VALIDATE_BOOLEAN)), function ($query) use ($request) {
+            $query->where('use_ata_dest', filter_var($request->query('ata_dest'), FILTER_VALIDATE_BOOLEAN));
         });
 
-        $data->when($request->has('is_publish') && is_bool(filter_var($request->get('is_publish'), FILTER_VALIDATE_BOOLEAN)), function ($query) use ($request) {
-            $query->where('is_publish', filter_var($request->get('is_publish'), FILTER_VALIDATE_BOOLEAN));
+        $data->when($request->has('is_publish') && is_bool(filter_var($request->query('is_publish'), FILTER_VALIDATE_BOOLEAN)), function ($query) use ($request) {
+            $query->where('is_publish', filter_var($request->query('is_publish'), FILTER_VALIDATE_BOOLEAN));
         });
 
         // order by

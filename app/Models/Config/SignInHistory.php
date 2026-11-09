@@ -2,18 +2,20 @@
 
 namespace App\Models\Config;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use CalebDW\Laraflake\Casts\AsSnowflake;
+use CalebDW\Laraflake\Concerns\HasSnowflakes;
 use Illuminate\Database\Eloquent\Model;
 
 class SignInHistory extends Model
 {
-    use HasUuids;
+    use HasSnowflakes;
 
     public $incrementing = false;
     protected $keyType = 'string';
     public $timestamps = false;
     protected $guarded = ['created_at'];
     protected $casts = [
+        'id' => AsSnowflake::class,
         'created_at' => 'datetime',
     ];
 

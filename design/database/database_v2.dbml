@@ -1,0 +1,310 @@
+// Docs: https://dbml.dbdiagram.io/docs
+// database structure : Security Information System (SIS)
+// author : theadamz91@gmail.com
+
+// core
+
+Table entities {
+    id bigint [primary key, not null]
+    code varchar(3) [not null, unique]
+    name varchar(50) [not null]
+    description varchar(100)
+    is_active boolean [not null, default: true]
+}
+
+Table sites {
+    id bigint [primary key, not null]
+    entity_id bigint [not null]
+    code varchar(6) [not null]
+    name varchar(50) [not null]
+    address varchar(150) [not null]
+    timezone varchar(50) [not null, default: 'Asia/Jakarta']
+    is_active boolean [not null, default: true]
+
+    indexes {
+        entity_id
+        code
+        (entity_id, code) [unique]
+    }
+
+}
+
+// relation sites
+Ref: sites.entity_id > entities.id [delete: restrict, update: cascade]
+
+Table gates {
+    id bigint [pk, not null]
+    site_id bigint [not null]
+    code varchar(15) [not null]
+    name varchar(50) [not null]
+    is_active boolean [not null, default: true]
+
+    indexes {
+        site_id
+        (site_id, code) [unique]
+    }
+
+}
+
+// relation gates
+Ref: gates.site_id > sites.id [delete: restrict, update: cascade]
+
+Table users {
+    id bigint [primary key, not null]
+    email varchar(255) [not null, unique]
+    name varchar(255) [not null]
+    password varchar(255) [not null]
+    def_path varchar(255) [default: '/']
+    site_id bigint [not null]
+    is_active bool [not null, default: true]
+    email_verified_at timestamp
+    last_change_password_at timestamp
+    last_login_at timestamp
+    remember_token varchar(100)
+
+    indexes {
+        site_id
+    }
+
+}
+
+// relation users
+Ref: users.site_id > sites.id [delete: restrict, update: cascade]
+
+Table site_accesses {
+    id bigint [primary key, not null]
+    site_id bigint [not null]
+    user_id bigint [not null]
+    is_allowed boolean [not null, default: true]
+
+    indexes {
+        user_id
+        site_id
+        (user_id, site_id) [unique]
+    }
+
+}
+
+// relation site_accesses
+Ref: site_accesses.user_id > users.id [delete: restrict, update: cascade]
+Ref: site_accesses.site_id > sites.id [delete: restrict, update: cascade]
+
+Table accesses {
+    id bigint [primary key, not null]
+    site_id bigint [not null]
+    user_id bigint [not null]
+    code varchar(50) [not null]
+    permission varchar(20) [not null, note: "read,edit,delete,validation,etc"]
+    is_allowed bool [not null, default: true]
+
+    indexes {
+        site_id
+        user_id
+        code
+        (site_id, user_id, code, permission) [unique]
+    }
+
+}
+
+// relation accesses
+Ref: accesses.site_id > sites.id [delete: restrict, update: cascade]
+Ref: accesses.user_id > users.id [delete: restrict, update: cascade]
+
+Table sign_in_histories {
+    id bigint [primary key, not null]
+    ip varchar(255) [not null]
+    os varchar(255)
+    platform varchar(255)
+    browser varchar(255)
+    country varchar(255)
+    city varchar(255)
+    user_id bigint [not null]
+    created_at timestamp [default: `now()`]
+
+    indexes {
+        ip
+        user_id
+    }
+
+}
+
+// relation sign_in_histories
+Ref: sign_in_histories.user_id > users.id [delete: restrict, update: cascade]
+
+// ./ core
+
+// basic
+
+Table inspection_forms {
+    id bigint [primary key, not null]
+    type varchar(20) [not null, default: 'VEHICLE']
+    code varchar(50) [unique, not null, note: "INS/24/001"]
+    name varchar(100) [not null]
+    is_publish bool [default: true]
+
+    indexes {
+        type
+    }
+
+}
+
+Table inspection_vehicle_forms {
+    id bigint [primary key, not null]
+    inspection_form_id bigint [not null]
+    use_eta_dest bool [not null, default: false, note: "Flag to show Estimation Time Arrival datetime in form inspection"]
+    use_ata_dest bool [not null, default: false, note: "Flag to show Actual Time Arrival datetime in form inspection"]
+    stage varchar(20) [not null, default: "[CHECKED_IN, LOADING/UNLOADING, CHECKED_OUT]"]
+
+    indexes {
+        inspection_form_id
+        stage
+        (inspection_form_id, stage) [unique]
+    }
+
+}
+
+// relation inspection_vehicle_forms
+Ref: inspection_vehicle_forms.id > inspection_forms.id [delete: cascade, update: cascade]
+
+Table inspection_vehicle_form_sections {
+    id bigint [primary key, not null]
+    inspection_vehicle_form_id bigint [not null]
+    description varchar(200) [not null]
+    seq smallint [not null, default: 1]
+    is_separate_page bool [default: false, note: "flag print in new page"]
+
+    indexes {
+        inspection_vehicle_form_id
+        seq
+        (inspection_vehicle_form_id, seq) [unique]
+    }
+
+}
+
+// relation inspection_vehicle_form_sections
+Ref: inspection_vehicle_form_sections.inspection_vehicle_form_id > inspection_vehicle_forms.id [delete: cascade, update: cascade]
+
+Table inspection_vehicle_form_items {
+    id bigint [primary key, not null]
+    inspection_vehicle_form_section_id bigint [not null]
+    description varchar(200) [not null]
+    item_type varchar(20) [not null, default: "select/photo/both"]
+    seq smallint [not null, default: 1]
+
+    indexes {
+        inspection_vehicle_form_section_id
+        item_type
+        seq
+        (inspection_vehicle_form_section_id, seq) [unique]
+    }
+
+}
+
+// relation inspection_vehicle_form_items
+Ref: inspection_vehicle_form_items.inspection_vehicle_form_section_id > inspection_vehicle_form_sections.id [delete: cascade, update: cascade]
+
+// ./ basic
+
+// transaction
+
+Table vehicle_inspections {
+    id bigint [primary key, not null]
+    inspection_no varchar(50) [not null, unique]
+    inspection_date date [not null]
+    inspection_form_id bigint [not null]
+    inspected_by bigint [not null]
+    gate_id bigint [not null]
+    container_no varchar(100)
+    seal_no varchar(100)
+    vehicle_reg_no varchar(50) [not null, note: "Vehicle registration number"]
+    vehicle_paper_no varchar(50) [note: "Vehicle registration number paper"]
+    driver_id_no varchar(50) [not null, note: "Driver identity card ex: driver license"]
+    driver_name varchar(100) [not null]
+    driver_phone_no varchar(20) [not null]
+    arrival_time_at_fty timestamp [note: "Time arrived in factory to loading / unloading"]
+    depart_time_from_fty timestamp [note: "Time depart from factory to export"]
+    eta_to_dest timestamp [note: "Estimation time to destination harbour / airport"]
+    ata_to_dest timestamp [note: "Actual time arrived at destination harbour / airport"]
+    export_notified_by varchar(100) [note: "Notified to Export Departure by (name)"]
+    remarks varchar(255)
+    stage varchar(20) [not null, default: 'CHECKED_IN', note: "CHECKED_IN/LOADING/CHECKED_OUT"]
+
+    indexes {
+        inspection_date
+        inspection_form_id
+        inspected_by
+        gate_id
+        container_no
+        seal_no
+        vehicle_reg_no
+        vehicle_paper_no
+        driver_id_no
+        driver_phone_no
+        stage
+    }
+
+}
+
+// relation vehicle_inspections
+Ref: vehicle_inspections.inspection_form_id > inspection_forms.id [delete: restrict, update: cascade]
+Ref: vehicle_inspections.inspected_by > users.id [delete: restrict, update: cascade]
+Ref: vehicle_inspections.gate_id > gates.id [delete: restrict, update: cascade]
+
+Table vehicle_inspection_item_checks {
+    id bigint [primary key, not null]
+    vehicle_inspection_id bigint [not null]
+    inspection_vehicle_form_item_id bigint [not null]
+    result jsonb [not null, note: '{ is_passed: true/false, picture_file: "image.webp" }']
+    remarks varchar(100)
+
+    indexes {
+        vehicle_inspection_id
+        inspection_vehicle_form_item_id
+        (vehicle_inspection_id, inspection_vehicle_form_item_id) [unique]
+    }
+
+}
+
+// relation vehicle_inspection_item_checks
+Ref: vehicle_inspection_item_checks.vehicle_inspection_id > vehicle_inspections.id [delete: restrict, update: cascade]
+Ref: vehicle_inspection_item_checks.inspection_vehicle_form_item_id > inspection_vehicle_form_items.id [delete: restrict, update: cascade]
+
+Table vehicle_inspection_item_pictures {
+    id bigint [primary key, not null]
+    inspection_id bigint [not null]
+    pic_file varchar(50) [note: "filename.jpg"]
+}
+
+// relation vehicle_inspection_item_pictures
+Ref: vehicle_inspection_item_pictures.inspection_id > vehicle_inspections.id [delete: restrict, update: cascade]
+
+Table inspection_logs {
+    id bigint [primary key, not null]
+    inspection_id bigint [not null]
+    user_id bigint [not null]
+    description text [not null]
+}
+
+// relation inspection_logs
+Ref: inspection_logs.inspection_id > vehicle_inspections.id [delete: restrict, update: cascade]
+Ref: inspection_logs.user_id > users.id [delete: restrict, update: cascade]
+
+Table document_sequences {
+    id bigint [primary key, not null]
+    type varchar(20) [not null, note: "VEHICLE/ROOM"]
+    site_id bigint [not null]
+    year tinyint [not null]
+    month tinyint [not null]
+    next_no tinyint [not null, default: 1]
+
+    indexes {
+        site_id
+        (type, site_id, year, month) [unique]
+    }
+
+}
+
+// relation document_sequences
+Ref: document_sequences.site_id > sites.id [delete: cascade, update: cascade]
+
+// ./ transaction

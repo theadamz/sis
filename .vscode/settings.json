@@ -29,5 +29,7 @@
     "intelephense.files.associations": ["*.php", "*.phtml"],
     "intelephense.format.enable": true,
     "intelephense.format.braces": "per",
-    "LaravelExtraIntellisense.basePath": "${workspaceFolder}"
+    "LaravelExtraIntellisense.basePath": "${workspaceFolder}",
+    "inertia.pages": "resources/js/Pages/**/*.tsx",
+    "inertia.defaultExtension": ".tsx"
 }

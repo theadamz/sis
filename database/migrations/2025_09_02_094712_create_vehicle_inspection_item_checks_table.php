@@ -12,21 +12,21 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('vehicle_inspection_item_checks', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->uuid('inspection_id')->index();
-            $table->uuid('inspection_form_item_id')->index();
-            $table->json('check')->comment("{ select: ok/no, photo:filename.jpg}");
+            $table->unsignedBigInteger('id')->primary();
+            $table->unsignedBigInteger('vehicle_inspection_id')->index();
+            $table->unsignedBigInteger('inspection_vehicle_form_item_id')->index();
+            $table->jsonb('result')->comment('{ is_passed: true/false, picture_file: "image.webp" }');
             $table->string('remarks', 100)->nullable();
-            $table->uuid('created_by')->nullable();
-            $table->uuid('updated_by')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();
 
             // unique
-            $table->unique(['inspection_id', 'inspection_form_item_id']);
+            $table->unique(['vehicle_inspection_id', 'inspection_vehicle_form_item_id']);
 
             // FK
-            $table->foreign('inspection_id')->references('id')->on('vehicle_inspections')->restrictOnDelete()->cascadeOnUpdate();
-            $table->foreign('inspection_form_item_id')->references('id')->on('inspection_form_items')->restrictOnDelete()->cascadeOnUpdate();
+            $table->foreign('vehicle_inspection_id')->references('id')->on('vehicle_inspections')->restrictOnDelete()->cascadeOnUpdate();
+            $table->foreign('inspection_vehicle_form_item_id')->references('id')->on('inspection_vehicle_form_items')->restrictOnDelete()->cascadeOnUpdate();
         });
     }
 

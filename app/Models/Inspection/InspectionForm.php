@@ -3,18 +3,18 @@
 namespace App\Models\Inspection;
 
 use App\Helpers\GeneralHelper;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use CalebDW\Laraflake\Concerns\HasSnowflakes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Activitylog\Contracts\Activity;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
 
 class InspectionForm extends Model
 {
-    use HasUuids, LogsActivity;
+    use HasSnowflakes, LogsActivity;
 
     public $incrementing = false;
     protected $keyType = 'string';
@@ -46,7 +46,7 @@ class InspectionForm extends Model
         });
     }
 
-    public function tapActivity(Activity $activity, string $eventName)
+    public function beforeActivityLogged(Activity $activity, string $eventName)
     {
         $activity->properties = $activity->properties->merge(GeneralHelper::getAgentInfo());
     }

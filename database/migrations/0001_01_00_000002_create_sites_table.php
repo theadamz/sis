@@ -12,15 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('sites', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->uuid('entity_id')->index();
+            $table->unsignedBigInteger('id')->primary();
+            $table->unsignedBigInteger('entity_id')->index();
             $table->string('code', 6);
             $table->string('name', 50);
             $table->string('address', 150)->nullable();
             $table->string('timezone', 50)->default('Asia/Jakarta')->index();
             $table->boolean('is_active')->default(true);
-            $table->uuid('created_by')->nullable();
-            $table->uuid('updated_by')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();
 
             // unique

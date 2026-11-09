@@ -7,8 +7,6 @@ use Illuminate\Support\Collection;
 
 class AccessService
 {
-    // protected AccessRepository $repository;
-
     public function __construct(
         protected AccessRepository $repository
     ) {}

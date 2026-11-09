@@ -38,14 +38,14 @@ class EntityController extends Controller
         }
 
         // prepare filters
-        $perPage = $request->has("per_page") && !empty($request->get('per_page')) && is_numeric($request->get('per_page')) && in_array($request->get('per_page'), config('setting.page.limits')) ? $request->get('per_page') : config('setting.page.default_limit');
-        $page = $request->has("page") && !empty($request->get('page')) && is_numeric($request->get('page')) ? $request->get('page') : 1;
-        $search = $request->has("search") && str($request->get('search'))->isNotEmpty() ? $request->get('search') : null;
+        $perPage = $request->has("per_page") && !empty($request->query('per_page')) && is_numeric($request->query('per_page')) && in_array($request->query('per_page'), config('setting.page.limits')) ? $request->query('per_page') : config('setting.page.default_limit');
+        $page = $request->has("page") && !empty($request->query('page')) && is_numeric($request->query('page')) ? $request->query('page') : 1;
+        $search = $request->has("search") && str($request->query('search'))->isNotEmpty() ? $request->query('search') : null;
 
         // handling sort filter
         $sort = ['id', 'asc'];
-        if ($request->has("sort") && !empty($request->get('sort'))) {
-            $sort = str($request->get('sort'))->explode('.');
+        if ($request->has("sort") && !empty($request->query('sort'))) {
+            $sort = str($request->query('sort'))->explode('.');
             if (!in_array($sort[1], ['asc', 'desc'])) {
                 $sort[1] = 'asc';
             }
@@ -61,8 +61,8 @@ class EntityController extends Controller
             });
         });
 
-        $data->when($request->has('is_active') && is_bool(filter_var($request->get('is_active'), FILTER_VALIDATE_BOOLEAN)), function ($query) use ($request) {
-            $query->where('is_active', filter_var($request->get('is_active'), FILTER_VALIDATE_BOOLEAN));
+        $data->when($request->has('is_active') && is_bool(filter_var($request->query('is_active'), FILTER_VALIDATE_BOOLEAN)), function ($query) use ($request) {
+            $query->where('is_active', filter_var($request->query('is_active'), FILTER_VALIDATE_BOOLEAN));
         });
 
         // order by

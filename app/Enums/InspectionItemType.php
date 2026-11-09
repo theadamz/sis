@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum InspectionCheckType: string
+enum InspectionItemType: string
 {
     case SELECT = "SELECT";
     case PHOTO = "PHOTO";

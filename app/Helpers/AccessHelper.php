@@ -9,17 +9,17 @@ class AccessHelper
 {
     public static function hasAccess(string $siteId, string $userId, string $menuCode): bool
     {
-        return app(AccessService::class)->hasAccess($siteId, $userId, $menuCode);
+        return app(AccessService::class)->hasAccess(siteId: $siteId, userId: $userId, menuCode: $menuCode);
     }
 
-    public static function isAllowed(string $siteId, string $userId, string $menuCode): bool
+    public static function isAllowed(string $siteId, string $userId, string $menuCode, ?string $permission): bool
     {
-        return app(AccessService::class)->isAllowed($siteId, $userId, $menuCode);
+        return app(AccessService::class)->isAllowed(siteId: $siteId, userId: $userId, menuCode: $menuCode, permission: $permission);
     }
 
     public static function getPermissions(string $siteId, string $userId, string $menuCode): Collection
     {
-        return app(AccessService::class)->getPermissions($siteId, $userId, $menuCode);
+        return app(AccessService::class)->getPermissions(siteId: $siteId, userId: $userId, menuCode: $menuCode);
     }
 
     public static function getUserAccesses(string $siteId, string $userId): Collection

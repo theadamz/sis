@@ -12,14 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('sign_in_histories', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->unsignedBigInteger('id')->primary();
             $table->string('ip')->index();
             $table->string('os')->nullable();
             $table->string('platform')->nullable();
             $table->string('browser')->nullable();
             $table->string('country')->nullable();
             $table->string('city')->nullable();
-            $table->uuid('user_id')->index();
+            $table->unsignedBigInteger('user_id')->index();
             $table->timestamp('created_at');
 
             // FK

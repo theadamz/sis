@@ -6,7 +6,9 @@ namespace App\Models;
 
 use App\Helpers\GeneralHelper;
 use App\Models\Config\Setup\Site;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use CalebDW\Laraflake\Casts\AsSnowflake;
+use CalebDW\Laraflake\Concerns\HasSnowflakes;
+use Illuminate\Database\Eloquent\Attributes\WithoutIncrementing;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -14,15 +16,15 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Activitylog\Contracts\Activity;
-use Spatie\Activitylog\LogOptions;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
 
+#[WithoutIncrementing]
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasUuids, HasApiTokens, LogsActivity;
+    use HasFactory, Notifiable, HasSnowflakes, HasApiTokens, LogsActivity;
 
-    public $incrementing = false;
     protected $keyType = 'string';
 
     /**
@@ -31,7 +33,6 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'username',
         'email',
         'name',
         'password',
@@ -63,6 +64,7 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
+            'id' => AsSnowflake::class,
             'password' => 'hashed',
             'is_active' => 'boolean',
             'email_verified_at' => 'datetime',
@@ -86,10 +88,12 @@ class User extends Authenticatable
 
     public function getActivitylogOptions(): LogOptions
     {
-        return LogOptions::defaults()->logAll()->logExcept(['password', 'remember_token']);
+        return LogOptions::defaults()->logAll()->logExcept(['password', 'remember_token'])->setDescriptionForEvent(function (string $eventName) {
+            return "user " . $eventName;
+        });
     }
 
-    public function tapActivity(Activity $activity, string $eventName)
+    public function beforeActivityLogged(Activity $activity, string $eventName)
     {
         $activity->properties = $activity->properties->merge(GeneralHelper::getAgentInfo());
     }

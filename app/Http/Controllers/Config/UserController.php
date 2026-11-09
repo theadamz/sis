@@ -46,14 +46,14 @@ class UserController extends Controller
         }
 
         // prepare filters
-        $perPage = $request->has("per_page") && !empty($request->get('per_page')) && is_numeric($request->get('per_page')) && in_array($request->get('per_page'), config('setting.page.limits')) ? $request->get('per_page') : config('setting.page.default_limit');
-        $page = $request->has("page") && !empty($request->get('page')) && is_numeric($request->get('page')) ? $request->get('page') : 1;
-        $search = $request->has("search") && str($request->get('search'))->isNotEmpty() ? $request->get('search') : null;
+        $perPage = $request->has("per_page") && !empty($request->query('per_page')) && is_numeric($request->query('per_page')) && in_array($request->query('per_page'), config('setting.page.limits')) ? $request->query('per_page') : config('setting.page.default_limit');
+        $page = $request->has("page") && !empty($request->query('page')) && is_numeric($request->query('page')) ? $request->query('page') : 1;
+        $search = $request->has("search") && str($request->query('search'))->isNotEmpty() ? $request->query('search') : null;
 
         // handling sort filter
         $sort = ['id', 'asc'];
-        if ($request->has("sort") && !empty($request->get('sort'))) {
-            $sort = str($request->get('sort'))->explode('.');
+        if ($request->has("sort") && !empty($request->query('sort'))) {
+            $sort = str($request->query('sort'))->explode('.');
             if (!in_array($sort[1], ['asc', 'desc'])) {
                 $sort[1] = 'asc';
             }
@@ -69,8 +69,8 @@ class UserController extends Controller
             });
         });
 
-        $data->when($request->has('is_active') && is_bool(filter_var($request->get('is_active'), FILTER_VALIDATE_BOOLEAN)), function ($query) use ($request) {
-            $query->where('is_active', filter_var($request->get('is_active'), FILTER_VALIDATE_BOOLEAN));
+        $data->when($request->has('is_active') && is_bool(filter_var($request->query('is_active'), FILTER_VALIDATE_BOOLEAN)), function ($query) use ($request) {
+            $query->where('is_active', filter_var($request->query('is_active'), FILTER_VALIDATE_BOOLEAN));
         });
 
         // order by
@@ -225,10 +225,10 @@ class UserController extends Controller
     public function options(Request $request): JsonResponse
     {
         // variables
-        $pagingType = $request->has('page_type') && !empty(PagingType::tryFrom($request->get('page_type'))) ? PagingType::tryFrom($request->get('page_type')) : PagingType::PAGE; // paging type page|id|no_paging, if $usePaging = true but no PageType then page. default: no_paging
-        $perPage = $request->has('per_page') ? filter_var($request->get('per_page'), FILTER_VALIDATE_INT) : config('setting.page.default_limit', 10); // set limit, if not found then become 10
-        $page = $pagingType === PagingType::PAGE && $request->has('page') ? filter_var($request->get('page'), FILTER_VALIDATE_INT) : 1; // set page if pageType is offset
-        $lastId = $pagingType === PagingType::ID && $request->has('id') ? $request->get('id') : null;
+        $pagingType = $request->has('page_type') && !empty(PagingType::tryFrom($request->query('page_type'))) ? PagingType::tryFrom($request->query('page_type')) : PagingType::PAGE; // paging type page|id|no_paging, if $usePaging = true but no PageType then page. default: no_paging
+        $perPage = $request->has('per_page') ? filter_var($request->query('per_page'), FILTER_VALIDATE_INT) : config('setting.page.default_limit', 10); // set limit, if not found then become 10
+        $page = $pagingType === PagingType::PAGE && $request->has('page') ? filter_var($request->query('page'), FILTER_VALIDATE_INT) : 1; // set page if pageType is offset
+        $lastId = $pagingType === PagingType::ID && $request->has('id') ? $request->query('id') : null;
 
         // check if cache exist
         if (Cache::has(CacheKey::USER->getKey())) {

@@ -25,25 +25,23 @@ class UserSeeder extends Seeder
     private function createDefaultUsers(): void
     {
         User::create([
-            'id' => '00000000-0000-0000-0000-000000000000',
-            'username' => 'dev',
+            'id' => 1,
             'email' => 'theadamz91@gmail.com',
             'name' => 'Developer',
             'password' => '12345678',
             'def_path' => '/dashboard',
-            'site_id' => '00000000-0000-0000-0000-000000000000',
+            'site_id' => 1,
             'is_active' => true,
             'email_verified_at' => now(),
         ]);
 
         User::create([
-            'id' => '00000000-0000-0000-0000-000000000001',
-            'username' => 'administrator',
+            'id' => 2,
             'email' => 'adam.malik@busanagroup.com',
             'name' => 'Administrator',
             'password' => '12345678',
             'def_path' => '/dashboard',
-            'site_id' => '00000000-0000-0000-0000-000000000000',
+            'site_id' => 1,
             'is_active' => true,
             'email_verified_at' => now(),
         ]);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Config;
 use App\Data\Config\UserAccessCreateData;
 use App\Data\Config\UserAccessDuplicateData;
 use App\Data\Config\UserAccessUpdateData;
+use App\Enums\CacheKey;
 use App\Http\Controllers\Controller;
 use App\Models\Config\Access;
 use App\Services\AccessService;
@@ -23,7 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AccessController extends Controller
 {
-    private string $cacheKey;
+    private string $cacheStore = 'file';
 
     public function __construct(
         protected AccessService $service
@@ -394,24 +395,24 @@ class AccessController extends Controller
             'groups' => [],
             'menus' => [],
         ];
-        $this->cacheKey = "MENU_" . Auth::id();
 
-        // get from cache if production
-        if (app()->isProduction()) {
-            $menuData = Cache::get($this->cacheKey);
+        // get cache key
+        $cacheKey = CacheKey::MENU->getKeyWithoutRequest(Auth::id());
+        if (Cache::store($this->cacheStore)->has($cacheKey)) {
+            $menuData = Cache::store($this->cacheStore)->get($cacheKey);
         }
 
         // if menuData null
         if (empty($menuData)) {
             // delete cache
-            Cache::forget($this->cacheKey);
+            Cache::forget($cacheKey);
 
             // get access menu codes
             $menuData = $this->service->getUserAccesses(siteId: Session::get('site_id'), userId: Auth::id());
 
             // if menuData empty then 404
             if (empty($menuData)) {
-                return response()->json(['message' => 'Not found.'])->setStatusCode(Response::HTTP_OK);
+                return response()->json(['message' => 'Not found.'])->setStatusCode(Response::HTTP_NOT_FOUND);
             }
 
             // get menus by parsing menu codes
@@ -430,7 +431,9 @@ class AccessController extends Controller
             $menuData = $data;
 
             // save cache
-            Cache::forever($this->cacheKey, $menuData);
+            if (!empty($menuData)) {
+                Cache::store($this->cacheStore)->put($cacheKey, $menuData, now()->addDays(1));
+            }
         }
 
         return response()->json(['data' => $menuData, 'message' => 'OK'])->setStatusCode(Response::HTTP_OK);

@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('access_templates', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->unsignedBigInteger('id')->primary();
             $table->string('name', 50)->index();
-            $table->uuid('site_id');
+            $table->unsignedBigInteger('site_id')->index();
             $table->string('code', 50)->index();
             $table->string('permission', 20);
-            $table->uuid('created_by')->nullable();
-            $table->uuid('updated_by')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();
 
             // FK

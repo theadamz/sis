@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('gates', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->uuid('site_id')->index();
+            $table->unsignedBigInteger('id')->primary();
+            $table->unsignedBigInteger('site_id')->index();
             $table->string('code', 15);
             $table->string('name', 50);
             $table->boolean('is_active')->default(true);
-            $table->uuid('created_by')->nullable();
-            $table->uuid('updated_by')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();
 
             // unique

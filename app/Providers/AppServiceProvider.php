@@ -36,8 +36,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-
-
         // define gate
         $accesses = config('access.lists');
 
@@ -59,7 +57,7 @@ class AppServiceProvider extends ServiceProvider
                         return false;
                     }
 
-                    return AccessHelper::isAllowed(Session::get('site_id'), Auth::id(), $access['code'], $permission);
+                    return AccessHelper::isAllowed(siteId: Session::get('site_id'), userId: Auth::id(), menuCode: $access['code'], permission: $permission);
                 });
             }
         }

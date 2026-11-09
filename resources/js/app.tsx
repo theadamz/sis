@@ -12,7 +12,7 @@ createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     resolve: (name) => {
         const pages = import.meta.glob('./pages/**/*.tsx', { eager: true });
-        const page: any = pages[`./pages/${name}.tsx`];
+        const page: any = pages[`./pages/${name}/index.tsx`] || pages[`./pages/${name}.tsx`];
 
         const breadcrumbs = page.default.breadcrumbs;
 
@@ -22,7 +22,6 @@ createInertiaApp({
     },
     setup({ el, App, props }) {
         const root = createRoot(el);
-
         root.render(<App {...props} />);
     },
     progress: {

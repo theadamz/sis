@@ -18,13 +18,8 @@ class Access
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, string $accessCode = null, bool $checkAuthorization = true): Response
+    public function handle(Request $request, Closure $next, ?string $accessCode = null, bool $checkAuthorization = true): Response
     {
-        // check if logged in
-        if (!Auth::check()) {
-            to_route('login');
-        }
-
         // send to client
         $access = [
             'menu' => null,

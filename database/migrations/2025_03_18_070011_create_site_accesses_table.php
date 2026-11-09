@@ -12,12 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('site_accesses', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->uuid('site_id')->index();
-            $table->uuid('user_id')->index();
+            $table->unsignedBigInteger('id')->primary();
+            $table->unsignedBigInteger('site_id')->index();
+            $table->unsignedBigInteger('user_id')->index();
             $table->boolean('is_allowed')->default(true);
-            $table->uuid('created_by')->nullable();
-            $table->uuid('updated_by')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();
 
             // unique

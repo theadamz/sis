@@ -49,14 +49,7 @@ class LoginRequest extends FormRequest
             'is_active' => true
         ];
 
-        // credential with username
-        $credentialsUsername = [
-            'username' => $this->post('email'),
-            'password' => $this->post('password'),
-            'is_active' => true
-        ];
-
-        if (!Auth::attempt($credentials, $this->boolean('remember')) && !Auth::attempt($credentialsUsername, $this->boolean('remember'))) {
+        if (!Auth::attempt($credentials, $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
