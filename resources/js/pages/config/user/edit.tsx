@@ -20,7 +20,6 @@ import { FormEventHandler, ReactNode, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner';
 
 type UserForm = {
-    username: string;
     email: string;
     name: string;
     password: string;
@@ -41,7 +40,6 @@ type EditProps = {
 const Edit = ({ id, routes, onFormClosed, onUpdated, onError }: EditProps): ReactNode => {
     /*** inertia js ***/
     const { data, setData, put, processing, errors, reset, clearErrors } = useForm<Required<UserForm>>({
-        username: '',
         email: '',
         name: '',
         password: '',
@@ -75,7 +73,6 @@ const Edit = ({ id, routes, onFormClosed, onUpdated, onError }: EditProps): Reac
         const data: UserDT = response.data.data;
 
         setData({
-            username: data.username,
             email: data.email,
             name: data.name,
             password: '',
@@ -127,26 +124,10 @@ const Edit = ({ id, routes, onFormClosed, onUpdated, onError }: EditProps): Reac
     return (
         <>
             <div className="px-2">
-                {!data.username ? (
+                {!data.email ? (
                     <Spinner />
                 ) : (
                     <form onSubmit={submitForm} className="grid gap-4">
-                        <div className="grid gap-2">
-                            <Label htmlFor="username">
-                                Username <Label className="text-red-500">*</Label>
-                            </Label>
-                            <Input
-                                id="username"
-                                type="text"
-                                tabIndex={2}
-                                autoComplete="username"
-                                value={data.username}
-                                onChange={(e) => setData('username', e.target.value)}
-                                placeholder="Username"
-                                error={errors.username}
-                                maxLength={255}
-                            />
-                        </div>
                         <div className="grid gap-2">
                             <Label htmlFor="email">
                                 Email <Label className="text-red-500">*</Label>

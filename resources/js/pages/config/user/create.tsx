@@ -19,7 +19,6 @@ import { FormEventHandler, ReactNode, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 type UserForm = {
-    username: string;
     email: string;
     name: string;
     password: string;
@@ -39,7 +38,6 @@ interface CreateProps {
 const Create = ({ routes, onFormClosed, onCreated, onError }: CreateProps): ReactNode => {
     /*** inertia js ***/
     const { data, setData, post, processing, errors, reset, clearErrors } = useForm<Required<UserForm>>({
-        username: '',
         email: '',
         name: '',
         password: '',
@@ -93,7 +91,6 @@ const Create = ({ routes, onFormClosed, onCreated, onError }: CreateProps): Reac
         reset(); // clear form to initial values
         clearErrors(); // clear errors
         setData({
-            username: '',
             email: '',
             name: '',
             password: '',
@@ -114,22 +111,6 @@ const Create = ({ routes, onFormClosed, onCreated, onError }: CreateProps): Reac
         <>
             <div className="px-2">
                 <form onSubmit={submitForm} className="grid gap-4">
-                    <div className="grid gap-2">
-                        <Label htmlFor="username">
-                            Username <Label className="text-red-500">*</Label>
-                        </Label>
-                        <Input
-                            id="username"
-                            type="text"
-                            tabIndex={2}
-                            autoComplete="username"
-                            value={data.username}
-                            onChange={(e) => setData('username', e.target.value)}
-                            placeholder="Username"
-                            error={errors.username}
-                            maxLength={255}
-                        />
-                    </div>
                     <div className="grid gap-2">
                         <Label htmlFor="email">
                             Email <Label className="text-red-500">*</Label>

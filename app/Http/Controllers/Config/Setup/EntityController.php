@@ -123,7 +123,7 @@ class EntityController extends Controller
     {
         // validate query parameter
         $validated = Validator::make(['id' => $id], [
-            'id' => ['required', "uuid",  Rule::exists('entities', 'id')],
+            'id' => ['required', Rule::snowflake(),  Rule::exists('entities', 'id')],
         ])->validated();
 
         // get data
@@ -173,7 +173,7 @@ class EntityController extends Controller
         // validate request
         $validated = Validator::make($request->post(), [
             'ids' => ['required', "array"],
-            'ids.*' => ['required', 'string', "uuid", Rule::exists('entities', 'id')],
+            'ids.*' => ['required', Rule::snowflake(), Rule::exists('entities', 'id')],
         ])->validated();
 
         try {

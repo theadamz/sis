@@ -15,7 +15,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
@@ -60,17 +59,21 @@ class UserController extends Controller
         }
 
         // prepare paginate and order by
-        $data = User::query()->selectRaw("id, username, email, name, def_path, site_id, is_active, last_login_at")->with(['site:id,name,entity_id', 'site.entity:id,name']);
+        $data = User::query()->selectRaw("id, email, name, def_path, site_id, is_active, last_login_at")->with(['site:id,name,entity_id', 'site.entity:id,name']);
 
         // filter with search
         $data->when(!empty(str($search)->trim()), function ($query) use ($search) {
             $query->where(function ($query) use ($search) {
-                $query->where('username', 'ilike', "%{$search}%")->orWhere('email', 'ilike', "%{$search}%")->orWhere('name', 'ilike', "%{$search}%");
+                $query->orWhere('email', 'ilike', "%{$search}%")->orWhere('name', 'ilike', "%{$search}%");
             });
         });
 
-        $data->when($request->has('is_active') && is_bool(filter_var($request->query('is_active'), FILTER_VALIDATE_BOOLEAN)), function ($query) use ($request) {
-            $query->where('is_active', filter_var($request->query('is_active'), FILTER_VALIDATE_BOOLEAN));
+        $data->when($request->has('active') && is_bool(filter_var($request->query('active'), FILTER_VALIDATE_BOOLEAN)), function ($query) use ($request) {
+            $query->where('is_active', filter_var($request->query('active'), FILTER_VALIDATE_BOOLEAN));
+        });
+
+        $data->when($request->has('site'), function ($query) use ($request) {
+            $query->where('site_id', $request->query('site'));
         });
 
         // order by
@@ -80,13 +83,12 @@ class UserController extends Controller
         $data = $data->paginate($perPage, page: $page)->withQueryString()
             ->through(fn($rec) => [
                 'id' => $rec->id,
-                'username' => $rec->username,
                 'email' => $rec->email,
                 'name' => $rec->name,
                 'def_path' => $rec->def_path,
                 'site_id' => $rec->site_id,
                 'site_name' => $rec->site->name,
-                'entity_id' => $rec->entity_id,
+                'entity_id' => $rec->site->entity_id,
                 'entity_name' => $rec->site->entity->name,
                 'is_active' => $rec->is_active,
                 'last_login_at' => $rec->last_login_at,
@@ -102,9 +104,8 @@ class UserController extends Controller
     {
         try {
             // check duplicate
-            if (User::whereUsername($validated->username)->orWhere('email', $validated->email)->exists()) {
+            if (User::where('email', $validated->email)->exists()) {
                 return back()->withErrors([
-                    "username" => "Duplicate data",
                     "email" => "Duplicate data",
                 ]);
             }
@@ -137,11 +138,11 @@ class UserController extends Controller
     {
         // validate query parameter
         $validated = Validator::make(['id' => $id], [
-            'id' => ['required', "uuid", Rule::exists('users', 'id')],
+            'id' => ['required', Rule::snowflake(), Rule::exists('users', 'id')],
         ])->validated();
 
         // get data
-        $data = $user->whereId($validated['id'])->selectRaw("username, email, email_verified_at, name, def_path, site_id, is_active")->with('site:id,name')->first();
+        $data = $user->whereId($validated['id'])->selectRaw("email, email_verified_at, name, def_path, site_id, is_active")->with('site:id,name')->first();
 
         return new UserResource($data);
     }
@@ -151,10 +152,9 @@ class UserController extends Controller
         try {
             // check duplicate
             if (User::where(function (Builder $query) use ($validated) {
-                $query->whereUsername($validated->username)->orWhere('email', $validated->email);
+                $query->where('email', $validated->email);
             })->where('id', '!=', $validated->id)->exists()) {
                 return back()->withErrors([
-                    "username" => "Duplicate data",
                     "email" => "Duplicate data",
                 ]);
             }
@@ -236,9 +236,9 @@ class UserController extends Controller
         }
 
         // query
-        $query = User::select('id', 'username', 'name', 'email', 'site_id')->with('site:id,code,name')
+        $query = User::select('id', 'name', 'email', 'site_id')->with('site:id,code,name')
             ->where(function ($query) use ($request) {
-                $query->where('username', 'ilike', "%{$request->keyword}%")->orWhere('email', 'ilike', "%{$request->keyword}%")->orWhere('name', 'ilike', "%{$request->keyword}%");
+                $query->where('email', 'ilike', "%{$request->keyword}%")->orWhere('name', 'ilike', "%{$request->keyword}%");
             })->where('is_active', true)->orderBy('id');
 
         ############################# START PAGING #############################

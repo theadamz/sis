@@ -24,8 +24,8 @@ class GateRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'site' => ['required', 'uuid', Rule::exists("sites", "id")],
-            'code' => ['required', 'string', 'min:1', "max:15"],
+            'site' => ['required', Rule::snowflake(), Rule::exists("sites", "id")],
+            'code' => ['required', 'string', 'min:1', "max:15", Rule::regex(config("setting.regxp.forCode"))],
             'name' => ['required', 'string', 'min:3', "max:50"],
             'is_active' => ["required", "boolean"],
         ];
@@ -33,7 +33,7 @@ class GateRequest extends FormRequest
         // update
         if (in_array($this->method(), ["PUT", "PATCH"])) {
             $rules = array_merge($rules, [
-                "id" => ["required", "uuid", Rule::exists("gates", "id")],
+                "id" => ["required", Rule::snowflake(), Rule::exists("gates", "id")],
             ]);
         }
 

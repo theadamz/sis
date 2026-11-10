@@ -8,8 +8,7 @@ import { Label } from '@/components/ui/label';
 import { InspectionFormColumns } from '@/datatables/columns/inspection-form-columns';
 import DataTablePaginationAjax, { DataTablePaginationAjaxRef } from '@/datatables/components/data-table-pagination-ajax';
 import { refactorErrorMessage } from '@/lib/refactorMessages';
-import { InspectionFormDT, InspectionType, type BreadcrumbItem, type SharedData } from '@/types';
-import { InspectionFlow } from '@/types/enum';
+import { type BreadcrumbItem, type InspectionFormDT, type SharedData } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { PlusIcon, XIcon } from 'lucide-react';
 import { JSX, useEffect, useRef, useState } from 'react';
@@ -20,19 +19,17 @@ const breadcrumbsData: BreadcrumbItem[] = [
         title: 'Config',
     },
     {
-        title: 'Inspection',
+        title: 'Inspection Forms',
     },
     {
-        title: 'Form',
-        href: route('config.inspection.form.index'),
+        title: 'Vehicle',
+        href: route('basic.inspection-form.vehicle.index'),
     },
 ];
 
-interface IndexProps {
-    inspectionTypes: InspectionType[];
-}
+interface IndexProps {}
 
-const Index = ({ inspectionTypes }: IndexProps): JSX.Element => {
+const Index = ({}: IndexProps): JSX.Element => {
     /*** inertia js ***/
     const { access } = usePage<SharedData>().props;
 
@@ -78,7 +75,7 @@ const Index = ({ inspectionTypes }: IndexProps): JSX.Element => {
         const ids = data!.map((item) => item.id);
 
         // delete
-        router.delete(route('config.inspection.form.destroy'), {
+        router.delete(route('basic.inspection-form.vehicle.destroy'), {
             data: { ids: ids },
             onSuccess: (response) => {
                 loadingDialog.hide();
@@ -107,7 +104,7 @@ const Index = ({ inspectionTypes }: IndexProps): JSX.Element => {
     };
 
     const handleEdit = (data: InspectionFormDT) => {
-        router.visit(route('config.inspection.form.edit', { id: data.id }));
+        router.visit(route('basic.inspection-form.vehicle.edit', { id: data.id }));
     };
 
     return (
@@ -120,27 +117,7 @@ const Index = ({ inspectionTypes }: IndexProps): JSX.Element => {
                     {/* filters */}
                     <div className="flex space-x-2">
                         <Select
-                            className="w-[80px]"
-                            placeholder="Flow"
-                            selectLabel="Filter Flow"
-                            value={queryStrings ? queryStrings['flow'] : ''}
-                            onValueChange={(value) => handleFilters('flow', value)}
-                            items={Object.entries(InspectionFlow).map(([label, value]) => {
-                                return { value: value, label: label };
-                            })}
-                        />
-                        <Select
-                            className="w-[180px]"
-                            placeholder="Inspection Type"
-                            selectLabel="Filter Inspection Type"
-                            value={queryStrings ? queryStrings['inspection_type'] : ''}
-                            onValueChange={(value) => handleFilters('inspection_type', value)}
-                            items={inspectionTypes.map((item) => {
-                                return { value: item.value, label: item.label };
-                            })}
-                        />
-                        <Select
-                            className="w-[110px]"
+                            className="w-27.5"
                             placeholder="ETA Dest"
                             selectLabel="Filter ETA Dest"
                             value={queryStrings ? queryStrings['eta_dest'] : ''}
@@ -151,7 +128,7 @@ const Index = ({ inspectionTypes }: IndexProps): JSX.Element => {
                             ]}
                         />
                         <Select
-                            className="w-[110px]"
+                            className="w-27.5"
                             placeholder="ATA Dest"
                             selectLabel="Filter ATA Dest"
                             value={queryStrings ? queryStrings['ata_dest'] : ''}
@@ -162,7 +139,7 @@ const Index = ({ inspectionTypes }: IndexProps): JSX.Element => {
                             ]}
                         />
                         <Select
-                            className="w-[110px]"
+                            className="w-27.5"
                             placeholder="Publish"
                             selectLabel="Filter Publish"
                             value={queryStrings ? queryStrings['is_publish'] : ''}
@@ -182,7 +159,7 @@ const Index = ({ inspectionTypes }: IndexProps): JSX.Element => {
                     {/* actions */}
                     {access.permissions.create && (
                         <Button type="button" variant={'outline'} asChild>
-                            <Link href={route('config.inspection.form.create')}>
+                            <Link href={route('basic.inspection-form.vehicle.create')}>
                                 <PlusIcon />
                                 <Label className="hidden md:flex">Create</Label>
                             </Link>
@@ -190,7 +167,7 @@ const Index = ({ inspectionTypes }: IndexProps): JSX.Element => {
                     )}
                 </div>
                 <DataTablePaginationAjax
-                    url={route('dt.config.inspection.form')}
+                    url={route('dt.basic.inspection-form.vehicle')}
                     additionalQueryStrings={queryStrings}
                     ref={dataTable}
                     columnDefs={InspectionFormColumns}

@@ -291,14 +291,15 @@ Ref: inspection_logs.user_id > users.id [delete: restrict, update: cascade]
 
 Table document_sequences {
     id bigint [primary key, not null]
-    type varchar(20) [not null, note: "VEHICLE/ROOM"]
     site_id bigint [not null]
+    type varchar(20) [not null, note: "VEHICLE/ROOM"]
     year tinyint [not null]
     month tinyint [not null]
     next_no tinyint [not null, default: 1]
 
     indexes {
         site_id
+        type
         (type, site_id, year, month) [unique]
     }
 

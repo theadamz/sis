@@ -21,6 +21,7 @@ class Site extends Model
     protected $guarded = ['created_by', 'updated_by'];
     protected $casts = [
         'id' => AsSnowflake::class,
+        'entity_id' => AsSnowflake::class,
         'is_active' => 'boolean',
     ];
 

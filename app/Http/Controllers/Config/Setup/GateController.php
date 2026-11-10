@@ -123,7 +123,7 @@ class GateController extends Controller
     {
         // validate query parameter
         $validated = Validator::make(['id' => $id], [
-            'id' => ['required', "uuid", Rule::exists('gates', 'id')],
+            'id' => ['required', Rule::snowflake(), Rule::exists('gates', 'id')],
         ])->validated();
 
         // get data
@@ -174,7 +174,7 @@ class GateController extends Controller
         // validate request
         $validated = Validator::make($request->post(), [
             'ids' => ['required', "array"],
-            'ids.*' => ['required', "uuid", Rule::exists('gates', 'id')],
+            'ids.*' => ['required', Rule::snowflake(), Rule::exists('gates', 'id')],
         ])->validated();
 
         try {

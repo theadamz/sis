@@ -5,11 +5,6 @@ export enum DateDefault {
     DATE_TIME = 'yyyy-MM-dd HH:mm:ss',
 }
 
-export enum InspectionFlow {
-    IN = 'IN',
-    OUT = 'OUT',
-}
-
 export enum InspectionStage {
     CHECKED_IN = 'CHECKED_IN',
     LOADING = 'LOADING',

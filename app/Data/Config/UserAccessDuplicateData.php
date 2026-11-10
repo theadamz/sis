@@ -2,6 +2,7 @@
 
 namespace App\Data\Config;
 
+use CalebDW\Laraflake\Rules\Snowflake;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\Auth;
 use Spatie\LaravelData\Attributes\Validation\AlphaDash;
@@ -11,7 +12,6 @@ use Spatie\LaravelData\Attributes\Validation\In;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Nullable;
 use Spatie\LaravelData\Attributes\Validation\Required;
-use Spatie\LaravelData\Attributes\Validation\Uuid;
 use Spatie\LaravelData\Data;
 
 class UserAccessDuplicateData extends Data
@@ -31,14 +31,14 @@ class UserAccessDuplicateData extends Data
     public static function rules(): array
     {
         return [
-            "from_user" => [new Required, new Uuid, new Exists(table: "users", column: "id", where: function (Builder $query) {
+            "from_user" => [new Required, new Snowflake(), new Exists(table: "users", column: "id", where: function (Builder $query) {
                 $query->where('is_active', true);
             })],
-            "to_user" => [new Required, new Uuid, new Exists(table: "users", column: "id", where: function (Builder $query) {
+            "to_user" => [new Required, new Snowflake(), new Exists(table: "users", column: "id", where: function (Builder $query) {
                 $query->where('is_active', true);
             })],
             "exclude_sites" => [new Nullable, new ArrayType],
-            "exclude_sites.*" => [new Nullable, new Uuid, new Exists(table: "users", column: "id")],
+            "exclude_sites.*" => [new Nullable, new Snowflake(), new Exists(table: "users", column: "id")],
             "access_lists" => [new Nullable, new ArrayType],
             "access_lists.*" => [new Nullable, new AlphaDash, new Max(50), new In(collect(config('access.lists'))->pluck("code")->toArray())],
         ];

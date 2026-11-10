@@ -83,8 +83,10 @@ class GeneralHelper
 
     public static function getTimezones(): array
     {
-        if (Cache::has(CacheKey::TIMEZONE->value)) {
-            return Cache::get(CacheKey::TIMEZONE->value);
+        $cacheStore = 'file';
+
+        if (Cache::store($cacheStore)->has(CacheKey::TIMEZONE->value)) {
+            return Cache::store($cacheStore)->get(CacheKey::TIMEZONE->value);
         }
 
         $data = [];
@@ -100,7 +102,7 @@ class GeneralHelper
             ];
         }
 
-        Cache::put(CacheKey::TIMEZONE->value, $data, now()->addHours(24));
+        Cache::store($cacheStore)->put(CacheKey::TIMEZONE->value, $data, now()->addHours(24));
 
         return $data;
     }

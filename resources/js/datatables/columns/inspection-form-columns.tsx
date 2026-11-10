@@ -50,30 +50,6 @@ export const InspectionFormColumns: ColumnDef<InspectionFormDT, unknown>[] = [
         enableHiding: false,
     },
     {
-        accessorKey: 'flow',
-        meta: {
-            columnDisplayName: 'Flow',
-            headerClassName: 'w-[80px]',
-        },
-        header: ({ column }) => {
-            return (
-                <Button type="button" variant="ghost" onClick={() => column.toggleSorting(sortHandler(column.getIsSorted()))} className="p-0">
-                    Flow
-                    <CaretColumn sort={column.getIsSorted()} />
-                </Button>
-            );
-        },
-    },
-    {
-        accessorKey: 'inspection_type_name',
-        meta: {
-            columnDisplayName: 'Inspection Type',
-        },
-        header: ({ column }) => {
-            return <Label>Inspection Type</Label>;
-        },
-    },
-    {
         accessorKey: 'code',
         meta: {
             columnDisplayName: 'Code',
@@ -103,19 +79,18 @@ export const InspectionFormColumns: ColumnDef<InspectionFormDT, unknown>[] = [
         },
     },
     {
-        accessorKey: 'required_stages',
+        accessorKey: 'stage',
         meta: {
             columnDisplay: true, // hide column after init
         },
-        header: () => <Label>Stages</Label>,
+        header: () => <Label>Stage</Label>,
         cell: ({ row }) => {
-            const stages = JSON.parse(row.getValue('required_stages')) as string[];
-
-            return stages.map((stage) => (
+            const stage = row.getValue('stage') as string;
+            return (
                 <Badge key={stage} variant={getInspectionStage(stage, 'variant') as any} className="me-1">
                     {getInspectionStage(stage, 'label')}
                 </Badge>
-            ));
+            );
         },
     },
     {
@@ -148,7 +123,7 @@ export const InspectionFormColumns: ColumnDef<InspectionFormDT, unknown>[] = [
         ),
     },
     {
-        accessorKey: 'inspection_form_sections_count',
+        accessorKey: 'inspection_vehicle_form_sections_count',
         enableResizing: true,
         meta: {
             headerClassName: 'w-[40px] text-center',
@@ -156,10 +131,10 @@ export const InspectionFormColumns: ColumnDef<InspectionFormDT, unknown>[] = [
             columnDisplay: true, // hide column after init
         },
         header: () => <Label>Sections</Label>,
-        cell: ({ row }) => <Label className="flex justify-center">{row.getValue('inspection_form_sections_count')}</Label>,
+        cell: ({ row }) => <Label className="flex justify-center">{row.getValue('inspection_vehicle_form_sections_count')}</Label>,
     },
     {
-        accessorKey: 'inspection_form_items_count',
+        accessorKey: 'inspection_vehicle_form_items_count',
         enableResizing: true,
         meta: {
             headerClassName: 'w-[40px] text-center',
@@ -167,7 +142,7 @@ export const InspectionFormColumns: ColumnDef<InspectionFormDT, unknown>[] = [
             columnDisplay: true, // hide column after init
         },
         header: () => <Label>Items</Label>,
-        cell: ({ row }) => <Label className="flex justify-center">{row.getValue('inspection_form_items_count')}</Label>,
+        cell: ({ row }) => <Label className="flex justify-center">{row.getValue('inspection_vehicle_form_items_count')}</Label>,
     },
     {
         accessorKey: 'is_publish',

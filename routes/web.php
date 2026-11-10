@@ -20,6 +20,9 @@ Route::prefix('options')->middleware(['auth'])->group(function () {
 // cfg - config
 Route::prefix('configs')->middleware(['auth'])->group(base_path('routes/web_config.php'));
 
+// bsc - basic
+Route::prefix('basic')->middleware(['auth'])->group(base_path('routes/web_basic.php'));
+
 // datatable
 Route::prefix('dt')->middleware(['auth'])->group(base_path('routes/web_dt.php'));
 

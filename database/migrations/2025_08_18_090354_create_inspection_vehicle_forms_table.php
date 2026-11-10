@@ -14,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('inspection_vehicle_forms', function (Blueprint $table) {
             $table->unsignedBigInteger('id')->primary();
-            $table->unsignedBigInteger('inspection_form_id')->index();
+            $table->unsignedBigInteger('inspection_form_id')->unique();
             $table->boolean('use_eta_dest')->default(false);
             $table->boolean('use_ata_dest')->default(false);
             $table->string('stage', 20)->default(InspectionStage::CHECKED_IN->value)->index();

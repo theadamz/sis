@@ -24,8 +24,8 @@ class SiteRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'entity' => ['required', 'uuid', Rule::exists("entities", "id")],
-            'code' => ['required', 'string', 'min:1', "max:6"],
+            'entity' => ['required', Rule::snowflake(), Rule::exists("entities", "id")],
+            'code' => ['required', 'string', 'min:1', "max:6", Rule::regex(config("setting.regxp.forCode"))],
             'name' => ['required', 'string', 'min:3', "max:50"],
             'address' => ['nullable', 'string', "max:150"],
             'timezone' => ['required', 'timezone:all'],
@@ -35,7 +35,7 @@ class SiteRequest extends FormRequest
         // update
         if (in_array($this->method(), ["PUT", "PATCH"])) {
             $rules = array_merge($rules, [
-                "id" => ["required", "uuid", Rule::exists("sites", "id")],
+                "id" => ["required", Rule::snowflake(), Rule::exists("sites", "id")],
             ]);
         }
 

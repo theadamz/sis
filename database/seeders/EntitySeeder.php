@@ -17,7 +17,7 @@ class EntitySeeder extends Seeder
         Entity::truncate();
 
         Entity::create([
-            'id' => 1,
+            'id' => 1000000000000000001,
             'code' => 'DMY',
             'name' => 'Dummy',
             'description' => 'Description Dummy',

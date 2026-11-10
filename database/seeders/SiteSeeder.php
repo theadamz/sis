@@ -14,8 +14,8 @@ class SiteSeeder extends Seeder
     public function run(): void
     {
         Site::create([
-            'id' => 1,
-            'entity_id' => 1,
+            'id' => 1000000000000000001,
+            'entity_id' => 1000000000000000001,
             'code' => 'DMY',
             'name' => 'Dummy',
             'address' => 'Address Dummy',

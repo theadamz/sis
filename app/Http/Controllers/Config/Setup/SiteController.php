@@ -130,7 +130,7 @@ class SiteController extends Controller
     {
         // validate query parameter
         $validated = Validator::make(['id' => $id], [
-            'id' => ['required', "uuid", Rule::exists('sites', 'id')],
+            'id' => ['required', Rule::snowflake(), Rule::exists('sites', 'id')],
         ])->validated();
 
         // get data
@@ -181,7 +181,7 @@ class SiteController extends Controller
         // validate request
         $validated = Validator::make($request->post(), [
             'ids' => ['required', "array"],
-            'ids.*' => ['required', "uuid", Rule::exists('sites', 'id')],
+            'ids.*' => ['required', Rule::snowflake(), Rule::exists('sites', 'id')],
         ])->validated();
 
         try {

@@ -111,7 +111,7 @@ const Edit = ({ id, onFormClosed, onUpdated, onError }: EditProps): ReactNode =>
     return (
         <>
             <div className="px-4">
-                {!data.code ? (
+                {!data ? (
                     <Spinner />
                 ) : (
                     <form onSubmit={submitForm} className="grid gap-4">

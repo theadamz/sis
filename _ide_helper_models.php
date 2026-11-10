@@ -257,53 +257,85 @@ namespace App\Models\Config{
 	class SignInHistory extends \Eloquent {}
 }
 
+namespace App\Models{
+/**
+ * @property string $id
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ActivityLog> $activitiesAsSubject
+ * @property-read int|null $activities_as_subject_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DocumentSequence newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DocumentSequence newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|DocumentSequence query()
+ */
+	class DocumentSequence extends \Eloquent {}
+}
+
 namespace App\Models\Inspection{
 /**
- * @property int $id
- * @property string $flow
- * @property string $inspection_type
+ * @property string $id
+ * @property string $type
  * @property string $code
  * @property string $name
- * @property bool $use_eta_dest Flag to show Estimatin Time Arrival datetime in form inspection
- * @property bool $use_ata_dest Flag to show Actual Time Arrival datetime in form inspection
  * @property bool $is_publish
- * @property array<array-key, mixed> $required_stages
  * @property int|null $created_by
  * @property int|null $updated_by
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ActivityLog> $activitiesAsSubject
  * @property-read int|null $activities_as_subject_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Inspection\InspectionFormItem> $inspection_form_items
- * @property-read int|null $inspection_form_items_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Inspection\InspectionFormSection> $inspection_form_sections
- * @property-read int|null $inspection_form_sections_count
  * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm whereCode($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm whereCreatedBy($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm whereFlow($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm whereInspectionType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm whereIsPublish($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm whereName($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm whereRequiredStages($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm whereType($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm whereUpdatedBy($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm whereUseAtaDest($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionForm whereUseEtaDest($value)
  */
 	class InspectionForm extends \Eloquent {}
 }
 
 namespace App\Models\Inspection{
 /**
- * @property int $id
- * @property int $inspection_form_section_id
+ * @property string $id
+ * @property int $inspection_form_id
+ * @property bool $use_eta_dest
+ * @property bool $use_ata_dest
+ * @property string $stage
+ * @property int|null $created_by
+ * @property int|null $updated_by
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ActivityLog> $activitiesAsSubject
+ * @property-read int|null $activities_as_subject_count
+ * @property-read \App\Models\Inspection\InspectionForm $inspection_form
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Inspection\InspectionVehicleFormSection> $inspection_vehicle_form_sections
+ * @property-read int|null $inspection_vehicle_form_sections_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleForm newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleForm newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleForm query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleForm whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleForm whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleForm whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleForm whereInspectionFormId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleForm whereStage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleForm whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleForm whereUpdatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleForm whereUseAtaDest($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleForm whereUseEtaDest($value)
+ */
+	class InspectionVehicleForm extends \Eloquent {}
+}
+
+namespace App\Models\Inspection{
+/**
+ * @property string $id
+ * @property int $inspection_vehicle_form_section_id
  * @property string $description
- * @property string $type select (ok/no) / photo
+ * @property string $item_type
  * @property int $seq
  * @property int|null $created_by
  * @property int|null $updated_by
@@ -311,28 +343,27 @@ namespace App\Models\Inspection{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ActivityLog> $activitiesAsSubject
  * @property-read int|null $activities_as_subject_count
- * @property-read \App\Models\Inspection\InspectionFormSection $inspection_form_section
- * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormItem newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormItem newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormItem query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormItem whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormItem whereCreatedBy($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormItem whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormItem whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormItem whereInspectionFormSectionId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormItem whereSeq($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormItem whereType($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormItem whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormItem whereUpdatedBy($value)
+ * @property-read \App\Models\Inspection\InspectionVehicleFormSection $inspection_vehicle_form_section
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleFormItem newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleFormItem newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleFormItem query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleFormItem whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleFormItem whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleFormItem whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleFormItem whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleFormItem whereInspectionVehicleFormSectionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleFormItem whereItemType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleFormItem whereSeq($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleFormItem whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleFormItem whereUpdatedBy($value)
  */
-	class InspectionFormItem extends \Eloquent {}
+	class InspectionVehicleFormItem extends \Eloquent {}
 }
 
 namespace App\Models\Inspection{
 /**
- * @property int $id
- * @property int $inspection_form_id
- * @property string $stage CHECKED_IN/LOADING/CHECKED_OUT
+ * @property string $id
+ * @property int $inspection_vehicle_form_id
  * @property string $description
  * @property int $seq
  * @property bool $is_separate_page flag print in new page
@@ -342,56 +373,45 @@ namespace App\Models\Inspection{
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\ActivityLog> $activitiesAsSubject
  * @property-read int|null $activities_as_subject_count
- * @property-read \App\Models\Inspection\InspectionForm $inspection_form
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Inspection\InspectionFormItem> $inspection_form_items
- * @property-read int|null $inspection_form_items_count
- * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormSection newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormSection newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormSection query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormSection whereCreatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormSection whereCreatedBy($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormSection whereDescription($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormSection whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormSection whereInspectionFormId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormSection whereIsSeparatePage($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormSection whereSeq($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormSection whereStage($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormSection whereUpdatedAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionFormSection whereUpdatedBy($value)
+ * @property-read \App\Models\Inspection\InspectionVehicleForm $inspection_vehicle_form
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Inspection\InspectionVehicleFormItem> $inspection_vehicle_form_items
+ * @property-read int|null $inspection_vehicle_form_items_count
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleFormSection newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleFormSection newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleFormSection query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleFormSection whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleFormSection whereCreatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleFormSection whereDescription($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleFormSection whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleFormSection whereInspectionVehicleFormId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleFormSection whereIsSeparatePage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleFormSection whereSeq($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleFormSection whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|InspectionVehicleFormSection whereUpdatedBy($value)
  */
-	class InspectionFormSection extends \Eloquent {}
+	class InspectionVehicleFormSection extends \Eloquent {}
 }
 
 namespace App\Models\Inspection{
 /**
- * @property int $id
- * @property int $gate_id
- * @property int $inspection_form_id
+ * @property string $id
  * @property string $inspection_no
  * @property \Illuminate\Support\Carbon $inspection_date
+ * @property int $inspection_form_id
+ * @property int $inspected_by
+ * @property int $gate_id
  * @property string|null $container_no
  * @property string|null $seal_no
- * @property int $inspected_by
- * @property string $driver_name
- * @property string|null $driver_id_no Driver identity card ex: driver license
- * @property string|null $driver_pic
- * @property string|null $driver_phone_no
  * @property string $vehicle_reg_no Vehicle registration number
  * @property string|null $vehicle_paper_no Vehicle registration number paper
- * @property string|null $vehicle_paper_pic
- * @property int $checked_in_by
- * @property \Illuminate\Support\Carbon $checked_in_at
- * @property int|null $loading_start_by
- * @property \Illuminate\Support\Carbon|null $loading_start_at
- * @property int|null $loading_end_by
- * @property \Illuminate\Support\Carbon|null $loading_end_at
- * @property int|null $checked_out_by
- * @property \Illuminate\Support\Carbon|null $checked_out_at
+ * @property string $driver_id_no Driver identity card ex: driver license
+ * @property string $driver_name
+ * @property string $driver_phone_no
  * @property \Illuminate\Support\Carbon|null $arrival_time_at_fty Time arrived in factory to loading / unloading
  * @property \Illuminate\Support\Carbon|null $depart_time_from_fty Time depart from factory to export
  * @property \Illuminate\Support\Carbon|null $eta_to_dest Estimation time to destination harbour / airport
  * @property \Illuminate\Support\Carbon|null $ata_to_dest Actual time arrived at destination harbour / airport
- * @property string|null $export_notified_by Notified to Export Departure by
+ * @property string|null $export_notified_by Notified to Export Departure by (name)
  * @property string|null $remarks
  * @property string $stage CHECKED_IN/LOADING/CHECKED_OUT
  * @property int|null $created_by
@@ -405,10 +425,6 @@ namespace App\Models\Inspection{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection query()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereArrivalTimeAtFty($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereAtaToDest($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereCheckedInAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereCheckedInBy($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereCheckedOutAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereCheckedOutBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereContainerNo($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereCreatedBy($value)
@@ -416,7 +432,6 @@ namespace App\Models\Inspection{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereDriverIdNo($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereDriverName($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereDriverPhoneNo($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereDriverPic($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereEtaToDest($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereExportNotifiedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereGateId($value)
@@ -425,17 +440,12 @@ namespace App\Models\Inspection{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereInspectionDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereInspectionFormId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereInspectionNo($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereLoadingEndAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereLoadingEndBy($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereLoadingStartAt($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereLoadingStartBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereRemarks($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereSealNo($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereStage($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereUpdatedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereVehiclePaperNo($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereVehiclePaperPic($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereVehicleRegNo($value)
  */
 	class VehicleInspection extends \Eloquent {}
@@ -443,10 +453,10 @@ namespace App\Models\Inspection{
 
 namespace App\Models\Inspection{
 /**
- * @property int $id
- * @property int $inspection_id
- * @property int $inspection_form_item_id
- * @property string $check { select: ok/no, photo:filename.jpg}
+ * @property string $id
+ * @property int $vehicle_inspection_id
+ * @property int $inspection_vehicle_form_item_id
+ * @property string $result { is_passed: true/false, picture_file: "image.webp" }
  * @property string|null $remarks
  * @property int|null $created_by
  * @property int|null $updated_by
@@ -457,15 +467,15 @@ namespace App\Models\Inspection{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck query()
- * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck whereCheck($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck whereCreatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck whereCreatedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck whereId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck whereInspectionFormItemId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck whereInspectionId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck whereInspectionVehicleFormItemId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck whereRemarks($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck whereResult($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck whereUpdatedBy($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck whereVehicleInspectionId($value)
  */
 	class VehicleInspectionItemCheck extends \Eloquent {}
 }

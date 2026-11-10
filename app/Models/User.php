@@ -65,6 +65,7 @@ class User extends Authenticatable
     {
         return [
             'id' => AsSnowflake::class,
+            'site_id' => AsSnowflake::class,
             'password' => 'hashed',
             'is_active' => 'boolean',
             'email_verified_at' => 'datetime',

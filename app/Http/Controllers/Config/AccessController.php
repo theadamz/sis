@@ -46,12 +46,12 @@ class AccessController extends Controller
     {
         // validate request
         $validated = Validator::make(['site' => $siteId, 'user' => $userId], [
-            'site' => ['required', "uuid", Rule::exists("sites", "id")],
-            'user' => ['required', "uuid", Rule::exists("users", "id")],
+            'site' => ['required', Rule::snowflake(), Rule::exists("sites", "id")],
+            'user' => ['required', Rule::snowflake(), Rule::exists("users", "id")],
         ])->validated();
 
         // get access
-        $accesses = $model->whereSiteId($validated['site'])->whereUserId($validated['user'])->orderBy('code')->get(['id', 'code', 'permission', 'is_allowed'])->toArray();
+        $accesses = $model->query()->whereSiteId($validated['site'])->whereUserId($validated['user'])->orderByRaw('code, permission')->get(['id', 'code', 'permission', 'is_allowed'])->toArray();
 
         // if access empty
         if (empty($accesses)) {
@@ -169,13 +169,13 @@ class AccessController extends Controller
     {
         // validate request
         $validated = Validator::make(['site' => $siteId, 'user' => $userId, 'code' => $accessCode], [
-            'site' => ['required', "uuid", Rule::exists("sites", "id")],
-            'user' => ['required', "uuid", Rule::exists("users", "id")],
+            'site' => ['required', Rule::snowflake(), Rule::exists("sites", "id")],
+            'user' => ['required', Rule::snowflake(), Rule::exists("users", "id")],
             'code' => ['required', "alpha_dash", Rule::in(collect(config('access.lists'))->pluck("code")->toArray())],
         ])->validated();
 
         // get access
-        $accesses = $model->whereSiteId($validated['site'])->whereUserId($validated['user'])->whereCode($validated['code'])->get(['id', 'code', 'permission', 'is_allowed'])->toArray();
+        $accesses = $model->whereSiteId($validated['site'])->whereUserId($validated['user'])->whereCode($validated['code'])->orderBy('permission')->get(['id', 'code', 'permission', 'is_allowed'])->toArray();
 
         // if access empty
         if (empty($accesses)) {
@@ -221,30 +221,19 @@ class AccessController extends Controller
 
             // Looping accesses
             foreach ($validated->permissions as $permission => $isAllowed) {
-                // check if already exist
-                $isExist = Access::where([
+                $access = Access::query()->where([
                     ['site_id', '=', $validated->site],
                     ['user_id', '=', $validated->user],
                     ['code', '=', $validated->code],
                     ['permission', '=', $permission],
-                ])->exists();
+                ])->first();
 
-                // model
-                $model = Access::where([
-                    ['site_id', '=', $validated->site],
-                    ['user_id', '=', $validated->user],
-                    ['code', '=', $validated->code],
-                    ['permission', '=', $permission],
-                ]);
-
-                if ($isExist) {
-                    $model = $model->first(['is_allowed']);
-
-                    $model->update([
+                if ($access->query()->exists()) {
+                    $access->update([
                         'is_allowed' => $isAllowed
                     ]);
                 } else {
-                    $model->create([
+                    $access->create([
                         'site_id' => $validated->site,
                         'user_id' => $validated->user,
                         'code' => $validated->code,
@@ -279,8 +268,8 @@ class AccessController extends Controller
     {
         // validate request
         $validated = Validator::make($request->post(), [
-            'site' => ['required', "uuid", Rule::exists('sites', 'id')],
-            'user' => ['required', "uuid", Rule::exists('users', 'id')],
+            'site' => ['required', Rule::snowflake(), Rule::exists('sites', 'id')],
+            'user' => ['required', Rule::snowflake(), Rule::exists('users', 'id')],
             'ids' => ['required', "array"],
             'ids.*' => ['required', "alpha_dash", Rule::in(collect(config('access.lists'))->pluck("code")->toArray())],
         ])->validated();

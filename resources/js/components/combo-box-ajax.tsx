@@ -219,7 +219,7 @@ const ComboBoxAjax = (
                         )}
                     </Button>
                 </PopoverTrigger>
-                <PopoverContent className={cn('w-[var(--radix-popover-trigger-width)] p-0', className)}>
+                <PopoverContent className={cn('w-(--radix-popover-trigger-width) p-0', className)}>
                     <Command shouldFilter={false}>
                         <CommandInput
                             placeholder="Search..."

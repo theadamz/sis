@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Inspection;
 
 use App\Data\Inspection\InspectionFormCreateData;
 use App\Data\Inspection\InspectionFormUpdateData;
+use App\Enums\InspectionStage;
 use App\Enums\InspectionType;
 use App\Http\Controllers\Controller;
 use App\Models\Inspection\InspectionForm;
@@ -22,11 +23,11 @@ use Inertia\Response;
 
 class InspectionFormController extends Controller
 {
-    private array $inspectionTypes;
+    private array $inspectionStages;
 
     public function __construct()
     {
-        $this->inspectionTypes = collect(InspectionType::cases())->transform(function ($item) {
+        $this->inspectionStages = collect(InspectionStage::cases())->transform(function ($item) {
             $label = $item->getName();
             $item = (array) $item;
 
@@ -39,8 +40,8 @@ class InspectionFormController extends Controller
 
     public function index(): Response
     {
-        return Inertia::render("inspection/form/index")->with([
-            'inspectionTypes' => $this->inspectionTypes
+        return Inertia::render("basic/inspection-form/vehicle/index")->with([
+            'inspectionStages' => $this->inspectionStages
         ]);
     }
 
@@ -64,7 +65,9 @@ class InspectionFormController extends Controller
         }
 
         // prepare paginate and order by
-        $data = InspectionForm::query()->selectRaw("id, flow, inspection_type, code, name, use_eta_dest, use_ata_dest, is_publish, required_stages")->withCount(['inspection_form_sections', 'inspection_form_items']);
+        $data = InspectionForm::query()->selectRaw("id, type, code, name, is_publish")->where('type', InspectionType::VEHICLE)
+            ->with('inspection_vehicle_forms')
+            ->withCount(['inspection_vehicle_form_sections', 'inspection_vehicle_form_items']);
 
         // filter with search
         $data->when(!empty(str($search)->trim()), function ($query) use ($search) {
@@ -100,17 +103,14 @@ class InspectionFormController extends Controller
         $data = $data->paginate($perPage, page: $page)->withQueryString()
             ->through(fn($rec) => [
                 'id' => $rec->id,
-                'flow' => $rec->flow,
-                'inspection_type' => $rec->inspection_type,
-                'inspection_type_name' => InspectionType::tryFrom($rec->inspection_type)->getName(),
                 'code' => $rec->code,
                 'name' => $rec->name,
-                'use_eta_dest' => $rec->use_eta_dest,
-                'use_ata_dest' => $rec->use_ata_dest,
-                'is_publish' => $rec->is_publish,
-                'required_stages' => $rec->required_stages,
-                'inspection_form_sections_count' => $rec->inspection_form_sections_count,
-                'inspection_form_items_count' => $rec->inspection_form_items_count,
+                'stage' => $rec->inspection_vehicle_forms->stage,
+                'use_eta_dest' => $rec->inspection_vehicle_forms->use_eta_dest,
+                'use_ata_dest' => $rec->inspection_vehicle_forms->use_ata_dest,
+                'is_publish' => $rec->inspection_vehicle_forms->is_publish,
+                'inspection_vehicle_form_sections_count' => $rec->inspection_vehicle_form_sections_count,
+                'inspection_vehicle_form_items_count' => $rec->inspection_vehicle_form_items_count,
             ]);
 
         return $data;
@@ -118,8 +118,8 @@ class InspectionFormController extends Controller
 
     public function create(): Response
     {
-        return Inertia::render("inspection/form/create")->with([
-            'inspectionTypes' => $this->inspectionTypes
+        return Inertia::render("basic/inspection-form/vehicle/create")->with([
+            'inspectionStages' => $this->inspectionStages
         ]);
     }
 
@@ -264,7 +264,7 @@ class InspectionFormController extends Controller
         ];
 
         return Inertia::render("inspection/form/edit")->with([
-            'inspectionTypes' => $this->inspectionTypes,
+            'inspectionStages' => $this->inspectionStages,
             'data2edit' => $data2edit
         ]);
     }

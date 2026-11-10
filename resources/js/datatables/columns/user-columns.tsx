@@ -50,20 +50,6 @@ export const UserColumns: ColumnDef<User, unknown>[] = [
         enableHiding: false,
     },
     {
-        accessorKey: 'username',
-        meta: {
-            columnDisplayName: 'Username',
-        },
-        header: ({ column }) => {
-            return (
-                <Button type="button" variant="ghost" onClick={() => column.toggleSorting(sortHandler(column.getIsSorted()))} className="p-0">
-                    Username
-                    <CaretColumn sort={column.getIsSorted()} />
-                </Button>
-            );
-        },
-    },
-    {
         accessorKey: 'email',
         meta: {
             columnDisplayName: 'Email',

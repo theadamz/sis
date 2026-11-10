@@ -14,7 +14,7 @@ class GateSeeder extends Seeder
     public function run(): void
     {
         Gate::create([
-            'site_id' => 1,
+            'site_id' => 1000000000000000001,
             'code' => 'DMY',
             'name' => 'Dummy Gate',
             'is_active' => true,

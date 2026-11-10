@@ -1,17 +1,20 @@
+import ComboBoxAjax, { ComboBoxAjaxRef } from '@/components/combo-box-ajax';
+import { ComboBoxSiteOption, ComboBoxSiteOptionSelected } from '@/components/combo-box-templates/site';
 import { confirmDialog } from '@/components/confirm-dialog';
 import DialogContainer, { DialogContainerRef } from '@/components/dialog-container';
 import { DialogSheetRef } from '@/components/dialog-sheet';
 import { errorDialog } from '@/components/error-dialog';
 import { loadingDialog } from '@/components/loading-dialog';
+import Select from '@/components/select';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { UserColumns } from '@/datatables/columns/user-columns';
 import DataTablePaginationAjax, { DataTablePaginationAjaxRef } from '@/datatables/components/data-table-pagination-ajax';
 import { refactorErrorMessage } from '@/lib/refactorMessages';
-import { type BreadcrumbItem, type Menu, type SharedData, type UserDT } from '@/types';
+import { SiteOption, type BreadcrumbItem, type Menu, type SharedData, type UserDT } from '@/types';
 import { Head, router, usePage } from '@inertiajs/react';
-import { PlusIcon } from 'lucide-react';
-import { JSX, useRef, useState } from 'react';
+import { PlusIcon, XIcon } from 'lucide-react';
+import { JSX, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import Create from './create';
 import Edit from './edit';
@@ -36,11 +39,20 @@ const Index = ({ routes }: IndexProps): JSX.Element => {
 
     /*** state ***/
     const [id, setId] = useState<string | null>(null);
+    const [queryStrings, setQueryStrings] = useState<{ [field: string]: any } | undefined>(undefined);
 
     /*** references ***/
     const dataTable = useRef<DataTablePaginationAjaxRef>(null);
     const createForm = useRef<DialogContainerRef>(null);
     const editForm = useRef<DialogSheetRef>(null);
+    const filterSiteComboAjax = useRef<ComboBoxAjaxRef>(null);
+
+    /*** effect ***/
+    useEffect(() => {
+        if (queryStrings !== undefined) {
+            dataTable.current?.refresh();
+        }
+    }, [queryStrings]);
 
     /*** events ***/
     const handleDelete = async (data: Array<UserDT>) => {
@@ -87,6 +99,19 @@ const Index = ({ routes }: IndexProps): JSX.Element => {
         });
     };
 
+    const handleFilters = (field: string, value: any) => {
+        setQueryStrings({
+            ...queryStrings,
+            ...{ [field]: value },
+        });
+    };
+
+    const handleFilterClear = () => {
+        setQueryStrings(undefined);
+        filterSiteComboAjax.current?.clearOptions();
+        dataTable.current?.resetFilters();
+    };
+
     return (
         <>
             <Head title="Users" />
@@ -107,7 +132,37 @@ const Index = ({ routes }: IndexProps): JSX.Element => {
 
             {/* main content */}
             <section className="mx-auto w-full max-w-7xl p-4">
-                <div className="flex items-center justify-end">
+                <div className="flex items-center justify-between">
+                    {/* filters */}
+                    <div className="flex space-x-2">
+                        <Select
+                            className="w-30"
+                            placeholder="Active"
+                            selectLabel="Filter Active"
+                            value={queryStrings ? queryStrings['active'] : ''}
+                            onValueChange={(value) => handleFilters('active', value)}
+                            items={[
+                                { value: 'true', label: 'Yes' },
+                                { value: 'false', label: 'No' },
+                            ]}
+                        />
+                        <ComboBoxAjax
+                            ref={filterSiteComboAjax}
+                            url={route('option.config.setup.site')}
+                            additionalQueryStrings={{ is_active: true }}
+                            className="me-2 min-w-xs"
+                            placeholder="Select site"
+                            onValueChange={(data: SiteOption) => handleFilters('site', data.id)}
+                            optionComponent={ComboBoxSiteOption}
+                            selectedOptionComponent={ComboBoxSiteOptionSelected}
+                        />
+                        {queryStrings && (
+                            <Button aria-label="Reset filters" variant="ghost" className="px-2 lg:px-3" onClick={() => handleFilterClear()}>
+                                Reset
+                                <XIcon className="size-4" aria-hidden="true" />
+                            </Button>
+                        )}
+                    </div>
                     {access.permissions.create && (
                         <Button type="button" variant={'outline'} onClick={() => createForm.current?.open()}>
                             <PlusIcon />
@@ -117,6 +172,7 @@ const Index = ({ routes }: IndexProps): JSX.Element => {
                 </div>
                 <DataTablePaginationAjax
                     url={route('dt.config.user')}
+                    additionalQueryStrings={queryStrings}
                     ref={dataTable}
                     columnDefs={UserColumns}
                     containerClass="rounded-sm border"

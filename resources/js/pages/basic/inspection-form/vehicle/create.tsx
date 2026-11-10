@@ -19,28 +19,29 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { refactorErrorMessage } from '@/lib/refactorMessages';
 import { type BreadcrumbItem, type InspectionFormItem, type InspectionFormSection, type InspectionType, type SharedData } from '@/types';
-import { getInspectionStage, InspectionFlow, InspectionStage } from '@/types/enum';
+import { getInspectionStage, InspectionStage } from '@/types/enum';
 import { Head, router, useForm } from '@inertiajs/react';
 import _ from 'lodash';
 import { CheckIcon, EditIcon, Loader2, MenuIcon, PlusIcon, XIcon } from 'lucide-react';
-import { FormEventHandler, Fragment, ReactNode, useEffect, useRef, useState } from 'react';
+import { Fragment, ReactNode, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import FormSection from './form-section';
 import FormSectionItem from './form-section-item';
 
 const breadcrumbsData: BreadcrumbItem[] = [
     {
-        title: 'Config',
+        title: 'Basic',
     },
     {
-        title: 'Inspection',
+        title: 'Inspection Form',
     },
     {
-        title: 'Form',
-        href: route('config.inspection.form.index'),
+        title: 'Vehicles',
+        href: route('basic.inspection-form.vehicle.index'),
     },
     {
-        title: 'Edit',
+        title: 'Create',
+        href: route('basic.inspection-form.vehicle.create'),
     },
 ];
 
@@ -49,38 +50,31 @@ type Inspection = InspectionFormSection & {
 };
 
 type InspectionForm = {
-    id: string;
-    flow: InspectionFlow;
-    inspection_type: string;
     code: string;
     name: string;
     use_eta_dest: boolean;
     use_ata_dest: boolean;
     is_publish: boolean;
-    required_stages: string[];
+    stage: string;
     inspections: Inspection[];
 };
 
 const stages = Object.values(InspectionStage);
 
 interface CreateProps {
-    inspectionTypes: InspectionType[];
-    data2edit: InspectionForm;
+    inspectionStages: InspectionType[];
 }
 
-const Edit = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
+const Create = ({ inspectionStages }: CreateProps): ReactNode => {
     /*** inertia js ***/
-    const { data, setData, put, processing, errors, reset, clearErrors, isDirty } = useForm<Required<InspectionForm>>({
-        id: data2edit.id,
-        flow: data2edit.flow,
-        inspection_type: data2edit.inspection_type,
-        code: data2edit.code,
-        name: data2edit.name,
-        use_eta_dest: data2edit.use_eta_dest,
-        use_ata_dest: data2edit.use_ata_dest,
-        is_publish: data2edit.is_publish,
-        required_stages: data2edit.required_stages,
-        inspections: data2edit.inspections,
+    const { data, setData, post, processing, errors, reset, clearErrors, isDirty } = useForm<Required<InspectionForm>>({
+        code: '',
+        name: '',
+        use_eta_dest: false,
+        use_ata_dest: false,
+        is_publish: true,
+        stage: '',
+        inspections: [],
     });
 
     /*** references ***/
@@ -106,14 +100,24 @@ const Edit = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
     }, [data.inspections]);
 
     /*** events ***/
-    const submitForm: FormEventHandler = async (e: React.FormEvent<Element>) => {
+    const submitForm = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        put(route('config.inspection.form.update', { id: data2edit.id }), {
+        post(route('basic.inspection-form.vehicle.store'), {
             onSuccess: async (response) => {
                 const props = response.props as unknown as SharedData;
                 const flash = props.flash;
                 if (flash.toast) toast.success(flash.toast.title, { description: flash.toast.message });
+
+                // confirmation create new data
+                const confirmation = await confirmDialog.YesNo({ message: 'Create new inspection form?' });
+                if (confirmation) {
+                    resetForm();
+                } else {
+                    router.visit(route('basic.inspection-form.vehicle.index'), {
+                        replace: true,
+                    });
+                }
             },
             onError: async (errors) => {
                 if (errors.error) {
@@ -136,14 +140,12 @@ const Edit = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
         reset(); // clear form to initial values
         clearErrors(); // clear errors
         setData({
-            flow: InspectionFlow.IN,
-            inspection_type: '',
             code: '',
             name: '',
             use_eta_dest: false,
             use_ata_dest: false,
             is_publish: true,
-            required_stages: [InspectionStage.CHECKED_IN, InspectionStage.LOADING, InspectionStage.CHECKED_OUT],
+            stage: '',
             inspections: [],
         });
         setSectionFormTitle('Create Section');
@@ -163,27 +165,9 @@ const Edit = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
             if (!confirmation) return;
         }
 
-        router.visit(route('config.inspection.form.index'), {
+        router.visit(route('basic.inspection-form.vehicle.index'), {
             replace: true,
         });
-    };
-
-    const handleStageChange = (checked: boolean, value: InspectionStage) => {
-        if (!checked) {
-            setData((prevData) => {
-                return {
-                    ...prevData,
-                    required_stages: prevData.required_stages.filter((item) => value !== item),
-                };
-            });
-        } else {
-            setData((prevData) => {
-                return {
-                    ...prevData,
-                    ...{ required_stages: [...prevData.required_stages, value] },
-                };
-            });
-        }
     };
 
     const handleStageSort = (element: Inspection) => {
@@ -392,7 +376,7 @@ const Edit = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
 
     return (
         <>
-            <Head title="Edit Inspection Form" />
+            <Head title="Create Inspection Form" />
 
             <DialogContainer
                 title={sectionFormTitle}
@@ -431,36 +415,6 @@ const Edit = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
             {/* main content */}
             <form onSubmit={submitForm} className="mx-auto w-full p-4">
                 <div className="grid grid-cols-12 gap-4">
-                    <div className="col-span-2 grid gap-2">
-                        <Label htmlFor="inspection_type">
-                            Flow <Label className="text-red-500">*</Label>
-                        </Label>
-                        <Select
-                            className="w-full"
-                            placeholder="Flow"
-                            selectLabel="Flow"
-                            value={data.flow ? data.flow : ''}
-                            onValueChange={(value) => setData('flow', value as InspectionFlow)}
-                            items={Object.entries(InspectionFlow).map(([label, value]) => {
-                                return { value: value, label: label };
-                            })}
-                        />
-                    </div>
-                    <div className="col-span-2 grid gap-2">
-                        <Label htmlFor="inspection_type">
-                            Inspection Type <Label className="text-red-500">*</Label>
-                        </Label>
-                        <Select
-                            className="w-full"
-                            placeholder="Inspection Type"
-                            selectLabel="Inspection Type"
-                            value={data.inspection_type ? data.inspection_type : ''}
-                            onValueChange={(value) => setData('inspection_type', value)}
-                            items={inspectionTypes.map((item) => {
-                                return { value: item.value, label: item.label };
-                            })}
-                        />
-                    </div>
                     <div className="col-span-4 grid gap-2">
                         <Label htmlFor="code">
                             Code <Label className="text-red-500">*</Label>
@@ -471,6 +425,7 @@ const Edit = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
                             type="text"
                             placeholder="Code"
                             required
+                            maxLength={20}
                             onChange={(e) => setData('code', e.target.value)}
                             value={data.code}
                             error={errors.code}
@@ -486,6 +441,7 @@ const Edit = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
                             type="text"
                             placeholder="Name"
                             required
+                            maxLength={50}
                             onChange={(e) => setData('name', e.target.value)}
                             value={data.name}
                             error={errors.name}
@@ -523,26 +479,16 @@ const Edit = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
                     </div>
                     <div className="col-span-4 grid gap-2">
                         <Label htmlFor="is_publish">
-                            Stages <Label className="text-red-500">*</Label>
+                            Stage <Label className="text-red-500">*</Label>
                         </Label>
                         <div className="flex items-center space-x-2">
-                            {Object.entries(InspectionStage).map(([label, value]) => {
-                                return (
-                                    <div className="flex items-center justify-around" key={value}>
-                                        <Checkbox
-                                            className="mr-1"
-                                            id={`stage_check_${value}`}
-                                            name={`stage_check_${value}`}
-                                            defaultChecked={data.required_stages.includes(value)}
-                                            checked={data.required_stages.includes(value)}
-                                            onCheckedChange={(e) => handleStageChange(e.valueOf() as boolean, value)}
-                                        />
-                                        <Label htmlFor={`stage_check_${value}`} className="text-muted-foreground mr-2 text-sm">
-                                            {label.replace('_', ' ')}
-                                        </Label>
-                                    </div>
-                                );
-                            })}
+                            <Select
+                                placeholder="Stage"
+                                selectLabel="Select Stage"
+                                value={data.stage}
+                                onValueChange={(value) => setData('stage', value)}
+                                items={inspectionStages}
+                            />
                         </div>
                     </div>
                     <div className="col-span-4 grid gap-2">
@@ -633,14 +579,14 @@ const Edit = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
                                                     </div>
                                                 </div>
                                                 <div className="rounded-sm border">
-                                                    <ScrollArea className="h-[20rem] w-full">
+                                                    <ScrollArea className="h-80 w-full">
                                                         <Table>
                                                             <TableHeader className="sticky top-0 z-10 table-fixed shadow-sm backdrop-blur-sm">
                                                                 <TableRow>
                                                                     <TableHead className="w-auto">Description</TableHead>
-                                                                    <TableHead className="w-[100px]">Type</TableHead>
-                                                                    <TableHead className="w-[100px] text-center">Seq / Order</TableHead>
-                                                                    <TableHead className="w-[40px]"></TableHead>
+                                                                    <TableHead className="w-25">Type</TableHead>
+                                                                    <TableHead className="w-25 text-center">Seq / Order</TableHead>
+                                                                    <TableHead className="w-10"></TableHead>
                                                                 </TableRow>
                                                             </TableHeader>
                                                             <TableBody>
@@ -708,5 +654,5 @@ const Edit = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
     );
 };
 
-Edit.breadcrumbs = breadcrumbsData;
-export default Edit;
+Create.breadcrumbs = breadcrumbsData;
+export default Create;

@@ -24,7 +24,7 @@ class EntityRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'code' => ['required', 'string', 'min:1', "max:3"],
+            'code' => ['required', 'string', 'min:1', "max:3", Rule::regex(config("setting.regxp.forCode"))],
             'name' => ['required', 'string', 'min:3', "max:50"],
             'description' => ['nullable', 'string', "max:100"],
             "is_active" => ["required", "boolean"],
@@ -33,7 +33,7 @@ class EntityRequest extends FormRequest
         // update
         if (in_array($this->method(), ["PUT", "PATCH"])) {
             $rules = array_merge($rules, [
-                "id" => ["required", "uuid", Rule::exists("entities", "id")],
+                "id" => ["required", Rule::snowflake(), Rule::exists("entities", "id")],
             ]);
         }
 

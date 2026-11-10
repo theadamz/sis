@@ -4,8 +4,8 @@ namespace App\Enums;
 
 enum TransactionType: string
 {
-    case VHC_INS = "VHC_INS";
-    case ROOM_INS = "ROOM_INS";
+    case VHC_INS = "VHCINS";
+    case ROOM_INS = "RMINS";
 
     public function getName(): string
     {

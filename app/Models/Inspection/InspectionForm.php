@@ -7,6 +7,7 @@ use CalebDW\Laraflake\Concerns\HasSnowflakes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Activitylog\Contracts\Activity;
 use Spatie\Activitylog\Support\LogOptions;
@@ -20,10 +21,7 @@ class InspectionForm extends Model
     protected $keyType = 'string';
     protected $guarded = ['created_by', 'updated_by'];
     protected $casts = [
-        'use_eta_dest' => 'boolean',
-        'use_ata_dest' => 'boolean',
         'is_publish' => 'boolean',
-        'required_stages' => 'array',
     ];
 
     protected static function boot()
@@ -42,7 +40,7 @@ class InspectionForm extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()->logAll()->setDescriptionForEvent(function (string $eventName) {
-            return "gate " . $eventName;
+            return "inspection form " . $eventName;
         });
     }
 
@@ -51,13 +49,18 @@ class InspectionForm extends Model
         $activity->properties = $activity->properties->merge(GeneralHelper::getAgentInfo());
     }
 
-    public function inspection_form_sections(): HasMany
+    public function inspection_vehicle_forms(): HasOne
     {
-        return $this->hasMany(InspectionFormSection::class);
+        return $this->hasOne(InspectionVehicleForm::class);
     }
 
-    public function inspection_form_items(): HasManyThrough
+    public function inspection_vehicle_form_sections(): HasMany
     {
-        return $this->HasManyThrough(InspectionFormItem::class, InspectionFormSection::class, 'inspection_form_id', 'inspection_form_section_id', 'id', 'id');
+        return $this->hasMany(InspectionVehicleFormSection::class);
+    }
+
+    public function inspection_vehicle_form_items(): HasManyThrough
+    {
+        return $this->HasManyThrough(InspectionVehicleFormItem::class, InspectionVehicleFormSection::class, 'inspection_form_id', 'inspection_vehicle_form_section_id', 'id', 'id');
     }
 }

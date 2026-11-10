@@ -9,7 +9,6 @@ import { InspectionFormColumns } from '@/datatables/columns/inspection-form-colu
 import DataTablePaginationAjax, { DataTablePaginationAjaxRef } from '@/datatables/components/data-table-pagination-ajax';
 import { refactorErrorMessage } from '@/lib/refactorMessages';
 import { InspectionFormDT, InspectionType, type BreadcrumbItem, type SharedData } from '@/types';
-import { InspectionFlow } from '@/types/enum';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { PlusIcon, XIcon } from 'lucide-react';
 import { JSX, useEffect, useRef, useState } from 'react';
@@ -75,7 +74,7 @@ const Index = ({ inspectionTypes }: IndexProps): JSX.Element => {
         const ids = data!.map((item) => item.id);
 
         // delete
-        router.delete(route('config.inspection.form.destroy'), {
+        router.delete(route('basic.inspection-form.vehicle.destroy'), {
             data: { ids: ids },
             onSuccess: (response) => {
                 loadingDialog.hide();
@@ -104,7 +103,7 @@ const Index = ({ inspectionTypes }: IndexProps): JSX.Element => {
     };
 
     const handleEdit = (data: InspectionFormDT) => {
-        router.visit(route('config.inspection.form.edit', { id: data.id }));
+        router.visit(route('basic.inspection-form.vehicle.edit', { id: data.id }));
     };
 
     return (
@@ -116,16 +115,6 @@ const Index = ({ inspectionTypes }: IndexProps): JSX.Element => {
                 <div className="flex items-center justify-between">
                     {/* filters */}
                     <div className="flex space-x-2">
-                        <Select
-                            className="w-[80px]"
-                            placeholder="Flow"
-                            selectLabel="Filter Flow"
-                            value={queryStrings ? queryStrings['flow'] : ''}
-                            onValueChange={(value) => handleFilters('flow', value)}
-                            items={Object.entries(InspectionFlow).map(([label, value]) => {
-                                return { value: value, label: label };
-                            })}
-                        />
                         <Select
                             className="w-[180px]"
                             placeholder="Inspection Type"
@@ -179,7 +168,7 @@ const Index = ({ inspectionTypes }: IndexProps): JSX.Element => {
                     {/* actions */}
                     {access.permissions.create && (
                         <Button type="button" variant={'outline'} asChild>
-                            <Link href={route('config.inspection.form.create')}>
+                            <Link href={route('basic.inspection-form.vehicle.create')}>
                                 <PlusIcon />
                                 <Label className="hidden md:flex">Create</Label>
                             </Link>
@@ -187,7 +176,7 @@ const Index = ({ inspectionTypes }: IndexProps): JSX.Element => {
                     )}
                 </div>
                 <DataTablePaginationAjax
-                    url={route('dt.config.inspection.form')}
+                    url={route('dt.basic.inspection-form.vehicle')}
                     additionalQueryStrings={queryStrings}
                     ref={dataTable}
                     columnDefs={InspectionFormColumns}
