@@ -6,7 +6,7 @@ import { InspectionFormSection, type InspectionFormItem } from '@/types';
 import { InspectionItemType } from '@/types/enum';
 import { useForm } from '@inertiajs/react';
 import { CheckIcon, Loader2 } from 'lucide-react';
-import { FormEventHandler, ReactNode, useEffect } from 'react';
+import { ReactNode, SubmitEvent, useEffect } from 'react';
 
 type FormSectionItemProps = {
     onSubmit: (data: InspectionFormItem) => void;
@@ -19,9 +19,9 @@ const FormSectionItem = ({ onSubmit, inspectionFormSectionData, inspectionFormSe
     /*** inertia js ***/
     const { data, setData, clearErrors, processing, reset } = useForm<InspectionFormItem>({
         id: '',
-        inspection_form_section_id: typeof inspectionFormSectionData === 'undefined' ? '' : inspectionFormSectionData.id,
+        inspection_vehicle_form_section_id: typeof inspectionFormSectionData === 'undefined' ? '' : inspectionFormSectionData.id,
         description: '',
-        type: InspectionItemType.SELECT,
+        item_type: InspectionItemType.SELECT,
         seq: itemCount ? itemCount + 1 : 1,
     });
 
@@ -40,14 +40,14 @@ const FormSectionItem = ({ onSubmit, inspectionFormSectionData, inspectionFormSe
         clearErrors();
         setData({
             id: '',
-            inspection_form_section_id: typeof inspectionFormSectionData === 'undefined' ? '' : inspectionFormSectionData.id,
+            inspection_vehicle_form_section_id: typeof inspectionFormSectionData === 'undefined' ? '' : inspectionFormSectionData.id,
             description: '',
-            type: InspectionItemType.SELECT,
+            item_type: InspectionItemType.SELECT,
             seq: itemCount ? itemCount + 1 : 1,
         });
     };
 
-    const submitForm: FormEventHandler = (e: React.FormEvent<Element>) => {
+    const submitForm = (e: SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         onSubmit(data);
@@ -81,7 +81,7 @@ const FormSectionItem = ({ onSubmit, inspectionFormSectionData, inspectionFormSe
                         type="text"
                         placeholder="Description"
                         className="col-span-3"
-                        maxLength={100}
+                        maxLength={200}
                         required
                         onChange={(e) => setData('description', e.target.value)}
                         value={data.description}
@@ -96,8 +96,8 @@ const FormSectionItem = ({ onSubmit, inspectionFormSectionData, inspectionFormSe
                         className="col-span-3"
                         placeholder="Type"
                         selectLabel="Type"
-                        value={data.type}
-                        onValueChange={(value) => value && setData('type', value as InspectionItemType)}
+                        value={data.item_type}
+                        onValueChange={(value) => value && setData('item_type', value as InspectionItemType)}
                         items={Object.entries(InspectionItemType).map(([label, value]) => {
                             return { value: value, label: label.replaceAll('_', ' + ') };
                         })}

@@ -3,9 +3,9 @@
 namespace App\Models\Inspection;
 
 use App\Helpers\GeneralHelper;
+use CalebDW\Laraflake\Casts\AsSnowflake;
 use CalebDW\Laraflake\Concerns\HasSnowflakes;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Auth;
@@ -21,6 +21,7 @@ class InspectionForm extends Model
     protected $keyType = 'string';
     protected $guarded = ['created_by', 'updated_by'];
     protected $casts = [
+        'id' => AsSnowflake::class,
         'is_publish' => 'boolean',
     ];
 
@@ -49,18 +50,13 @@ class InspectionForm extends Model
         $activity->properties = $activity->properties->merge(GeneralHelper::getAgentInfo());
     }
 
-    public function inspection_vehicle_forms(): HasOne
+    public function inspection_vehicle_form(): HasOne
     {
         return $this->hasOne(InspectionVehicleForm::class);
     }
 
-    public function inspection_vehicle_form_sections(): HasMany
+    public function inspection_vehicle_form_sections(): HasManyThrough
     {
-        return $this->hasMany(InspectionVehicleFormSection::class);
-    }
-
-    public function inspection_vehicle_form_items(): HasManyThrough
-    {
-        return $this->HasManyThrough(InspectionVehicleFormItem::class, InspectionVehicleFormSection::class, 'inspection_form_id', 'inspection_vehicle_form_section_id', 'id', 'id');
+        return $this->HasManyThrough(InspectionVehicleFormSection::class, InspectionVehicleForm::class, 'inspection_form_id', 'inspection_vehicle_form_id', 'id', 'id');
     }
 }

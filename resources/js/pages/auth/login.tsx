@@ -125,11 +125,12 @@ const Login = ({ status, canResetPassword }: LoginProps): JSX.Element => {
     );
 };
 
-Login.layout = (page: ReactNode & LoginProps) => {
+Login.layout = (page: ReactNode) => {
     return (
-        <AuthLayout title="Log in to your account" description="Enter your email and password below to log in" quote={page.quote}>
+        <AuthLayout title="Log in to your account" description="Enter your email and password below to log in">
             {page}
         </AuthLayout>
     );
 };
+
 export default Login;

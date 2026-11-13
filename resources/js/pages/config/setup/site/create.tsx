@@ -14,7 +14,7 @@ import { refactorErrorMessage } from '@/lib/refactorMessages';
 import { type EntityDT, type SharedData, type Timezone } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { CheckIcon, Loader2 } from 'lucide-react';
-import { FormEventHandler, ReactNode, useRef } from 'react';
+import { ReactNode, SubmitEvent, useRef } from 'react';
 import { toast } from 'sonner';
 
 type SiteForm = {
@@ -51,7 +51,7 @@ const Create = ({ timezones, onFormClosed, onCreated, onError }: CreateProps): R
     const lovDataTableEntity = useRef<DataTablePaginationAjaxRef>(null);
 
     /*** events ***/
-    const submitForm: FormEventHandler = async (e: React.FormEvent<Element>) => {
+    const submitForm = async (e: SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         post(route('config.setup.site.store'), {

@@ -10,7 +10,7 @@ import { type EntityDT, type SharedData } from '@/types';
 import { useForm } from '@inertiajs/react';
 import axios, { HttpStatusCode } from 'axios';
 import { CheckIcon, Loader2 } from 'lucide-react';
-import { FormEventHandler, ReactNode, useEffect } from 'react';
+import { ReactNode, SubmitEvent, useEffect } from 'react';
 import { toast } from 'sonner';
 
 type EntityForm = {
@@ -59,7 +59,7 @@ const Edit = ({ id, onUpdated, onError }: EditProps): ReactNode => {
         });
     };
 
-    const submitForm: FormEventHandler = (e: React.FormEvent<Element>) => {
+    const submitForm = async (e: SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         put(route('config.setup.entity.update', { id: id }), {

@@ -21,9 +21,6 @@ return new class extends Migration
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();
 
-            // indexes
-            $table->unique(['inspection_vehicle_form_id', 'seq'], $table->getTable() . '_unique');
-
             // FK
             $table->foreign("inspection_vehicle_form_id")->references("id")->on("inspection_vehicle_forms")->cascadeOnDelete()->cascadeOnUpdate();
         });

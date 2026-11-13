@@ -16,7 +16,7 @@ import { type Menu, type SharedData, type SiteDT, type UserDT } from '@/types';
 import { useForm } from '@inertiajs/react';
 import axios, { HttpStatusCode } from 'axios';
 import { CheckIcon, EyeClosedIcon, EyeIcon, Loader2, XIcon } from 'lucide-react';
-import { FormEventHandler, ReactNode, useEffect, useRef, useState } from 'react';
+import { ReactNode, SubmitEvent, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 type UserForm = {
@@ -83,7 +83,7 @@ const Edit = ({ id, routes, onFormClosed, onUpdated, onError }: EditProps): Reac
         });
     };
 
-    const submitForm: FormEventHandler = (e: React.FormEvent<Element>) => {
+    const submitForm = async (e: SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         put(route('config.user.update', { id: id }), {

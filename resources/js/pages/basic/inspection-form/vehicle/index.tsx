@@ -140,6 +140,17 @@ const Index = ({}: IndexProps): JSX.Element => {
                         />
                         <Select
                             className="w-27.5"
+                            placeholder="Duration"
+                            selectLabel="Filter Duration"
+                            value={queryStrings ? queryStrings['use_duration'] : ''}
+                            onValueChange={(value) => handleFilters('use_duration', value)}
+                            items={[
+                                { value: 'true', label: 'Yes' },
+                                { value: 'false', label: 'No' },
+                            ]}
+                        />
+                        <Select
+                            className="w-27.5"
                             placeholder="Publish"
                             selectLabel="Filter Publish"
                             value={queryStrings ? queryStrings['is_publish'] : ''}
@@ -172,7 +183,7 @@ const Index = ({}: IndexProps): JSX.Element => {
                     ref={dataTable}
                     columnDefs={InspectionFormColumns}
                     containerClass="rounded-sm border"
-                    scrollAreaClass="h-[calc(100vh-18rem)]"
+                    scrollAreaClass="h-[calc(100vh-19rem)]"
                     rowId="id"
                     onEdit={handleEdit}
                     onDeleteClicked={handleDelete}

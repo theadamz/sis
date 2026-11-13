@@ -1,7 +1,7 @@
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { FormEventHandler, JSX } from 'react';
+import { JSX, SubmitEvent } from 'react';
 
 import DeleteUser from '@/components/delete-user';
 import HeadingSmall from '@/components/heading-small';
@@ -31,7 +31,7 @@ const Profile = ({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status
         email: auth.user.email,
     });
 
-    const submit: FormEventHandler = (e) => {
+    const submit = (e: SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         patch(route('profile.update'), {

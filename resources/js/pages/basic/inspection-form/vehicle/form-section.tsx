@@ -1,13 +1,11 @@
-import Select from '@/components/select';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { type InspectionFormSection } from '@/types';
-import { getInspectionStage, InspectionStage } from '@/types/enum';
 import { useForm } from '@inertiajs/react';
 import { CheckIcon, Loader2 } from 'lucide-react';
-import { FormEventHandler, ReactNode, useEffect } from 'react';
+import { ReactNode, SubmitEvent, useEffect } from 'react';
 
 type FormSectionProps = {
     onSubmit: (data: InspectionFormSection) => void;
@@ -19,8 +17,7 @@ const FormSection = ({ onSubmit, inspectionFormSectionData, sectionCount }: Form
     /*** inertia js ***/
     const { data, setData, clearErrors, processing, reset } = useForm<InspectionFormSection>({
         id: '',
-        inspection_form_id: '',
-        stage: InspectionStage.CHECKED_IN,
+        inspection_vehicle_form_id: '',
         description: '',
         seq: sectionCount ? sectionCount + 1 : 1,
         is_separate_page: false,
@@ -41,15 +38,14 @@ const FormSection = ({ onSubmit, inspectionFormSectionData, sectionCount }: Form
         clearErrors();
         setData({
             id: '',
-            inspection_form_id: '',
-            stage: InspectionStage.CHECKED_IN,
+            inspection_vehicle_form_id: '',
             description: '',
             seq: sectionCount ? sectionCount + 1 : 1,
             is_separate_page: false,
         });
     };
 
-    const submitForm: FormEventHandler = (e: React.FormEvent<Element>) => {
+    const submitForm = (e: SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         onSubmit(data);
@@ -59,21 +55,6 @@ const FormSection = ({ onSubmit, inspectionFormSectionData, sectionCount }: Form
     return (
         <form onSubmit={submitForm}>
             <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="stage" className="text-right">
-                        Stage <Label className="text-red-500">*</Label>
-                    </Label>
-                    <Select
-                        className="col-span-3"
-                        placeholder="Stage"
-                        selectLabel="Stage"
-                        value={data.stage}
-                        onValueChange={(value) => value && setData('stage', value as InspectionStage)}
-                        items={Object.entries(InspectionStage).map(([label, value]) => {
-                            return { value: value, label: getInspectionStage(value, 'label') };
-                        })}
-                    />
-                </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="description" className="text-right">
                         Description <Label className="text-red-500">*</Label>
@@ -88,6 +69,7 @@ const FormSection = ({ onSubmit, inspectionFormSectionData, sectionCount }: Form
                         required
                         onChange={(e) => setData('description', e.target.value)}
                         value={data.description}
+                        autoFocus
                     />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">

@@ -8,6 +8,7 @@ export enum DateDefault {
 export enum InspectionStage {
     CHECKED_IN = 'CHECKED_IN',
     LOADING = 'LOADING',
+    UNLOADING = 'UNLOADING',
     CHECKED_OUT = 'CHECKED_OUT',
 }
 
@@ -20,6 +21,7 @@ export enum InspectionStageVariant {
 export enum InspectionStageLabel {
     CHECKED_IN = 'Checked In',
     LOADING = 'Loading',
+    UNLOADING = 'Unloading',
     CHECKED_OUT = 'Checked Out',
 }
 

@@ -3,6 +3,7 @@
 namespace App\Models\Inspection;
 
 use App\Helpers\GeneralHelper;
+use CalebDW\Laraflake\Casts\AsSnowflake;
 use CalebDW\Laraflake\Concerns\HasSnowflakes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -20,6 +21,8 @@ class InspectionVehicleFormSection extends Model
     protected $keyType = 'string';
     protected $guarded = ['created_by', 'updated_by'];
     protected $casts = [
+        'id' => AsSnowflake::class,
+        'inspection_vehicle_form_id' => AsSnowflake::class,
         'seq' => 'integer',
         'is_separate_page' => 'boolean',
     ];

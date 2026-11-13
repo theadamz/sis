@@ -9,7 +9,7 @@ import { refactorErrorMessage } from '@/lib/refactorMessages';
 import { type SharedData } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { CheckIcon, Loader2 } from 'lucide-react';
-import { FormEventHandler, ReactNode } from 'react';
+import { ReactNode, SubmitEvent } from 'react';
 import { toast } from 'sonner';
 
 type EntityForm = {
@@ -35,7 +35,7 @@ const Create = ({ onFormClosed, onCreated, onError }: CreateProps): ReactNode =>
     });
 
     /*** events ***/
-    const submitForm: FormEventHandler = async (e: React.FormEvent<Element>) => {
+    const submitForm = async (e: SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         post(route('config.setup.entity.store'), {

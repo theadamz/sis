@@ -1,0 +1,169 @@
+import Select from '@/components/select';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { InspectionFormSection, type InspectionFormItem } from '@/types';
+import { InspectionItemType } from '@/types/enum';
+import { useForm } from '@inertiajs/react';
+import { CheckIcon, Loader2 } from 'lucide-react';
+import { ReactNode, SubmitEvent, useEffect } from 'react';
+
+type FormSectionItemMoveProps = {
+    onSubmit: (data: InspectionFormItem) => void;
+    inspectionFormSectionData?: InspectionFormSection;
+    inspectionFormSectionItemData?: InspectionFormItem;
+    itemCount?: number;
+    sections: InspectionFormSection[];
+};
+
+const FormSectionItemMove = ({
+    onSubmit,
+    inspectionFormSectionData,
+    inspectionFormSectionItemData,
+    sections,
+    itemCount,
+}: FormSectionItemMoveProps): ReactNode => {
+    /*** inertia js ***/
+    const { data, setData, clearErrors, processing, reset } = useForm<InspectionFormItem & { sectionTargetId: string }>({
+        id: '',
+        inspection_vehicle_form_section_id: '',
+        sectionTargetId: '',
+        description: '',
+        item_type: InspectionItemType.SELECT,
+        seq: itemCount ? itemCount + 1 : 1,
+    });
+
+    /*** componenet effect ***/
+    useEffect(() => {
+        if (inspectionFormSectionItemData) {
+            setData({
+                ...inspectionFormSectionItemData,
+                sectionTargetId: '',
+            });
+        } else {
+            resetForm();
+        }
+    }, [inspectionFormSectionItemData]);
+
+    /*** events ***/
+    const resetForm = () => {
+        reset();
+        clearErrors();
+        setData({
+            id: '',
+            inspection_vehicle_form_section_id: '',
+            sectionTargetId: '',
+            description: '',
+            item_type: InspectionItemType.SELECT,
+            seq: itemCount ? itemCount + 1 : 1,
+        });
+    };
+
+    const submitForm = (e: SubmitEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        onSubmit({
+            ...data,
+            inspection_vehicle_form_section_id: data.sectionTargetId,
+        });
+
+        resetForm();
+    };
+
+    return (
+        <form onSubmit={submitForm}>
+            <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="section" className="text-right">
+                        From Section
+                    </Label>
+                    <Input
+                        id="section"
+                        name="section"
+                        type="text"
+                        placeholder="Section"
+                        value={inspectionFormSectionData ? inspectionFormSectionData.description : ''}
+                        className="col-span-3 border-none p-0"
+                        readOnly
+                    />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="section" className="text-right">
+                        To Section
+                    </Label>
+                    <Select
+                        className="col-span-3"
+                        placeholder="To Section"
+                        selectLabel="To Section"
+                        value={data.sectionTargetId}
+                        onValueChange={(value) => setData('sectionTargetId', value)}
+                        items={
+                            !inspectionFormSectionData
+                                ? undefined
+                                : sections
+                                      .filter((item) => item.id !== inspectionFormSectionData.id)
+                                      .map((item) => {
+                                          return { value: item.id, label: item.description };
+                                      })
+                        }
+                    />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="description" className="text-right">
+                        Description <Label className="text-red-500">*</Label>
+                    </Label>
+                    <Input
+                        id="description"
+                        name="description"
+                        type="text"
+                        placeholder="Description"
+                        className="col-span-3"
+                        maxLength={200}
+                        required
+                        onChange={(e) => setData('description', e.target.value)}
+                        value={data.description}
+                        autoFocus
+                    />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="type" className="text-right">
+                        Type <Label className="text-red-500">*</Label>
+                    </Label>
+                    <Select
+                        className="col-span-3"
+                        placeholder="Type"
+                        selectLabel="Type"
+                        value={data.item_type}
+                        onValueChange={(value) => value && setData('item_type', value as InspectionItemType)}
+                        items={Object.entries(InspectionItemType).map(([label, value]) => {
+                            return { value: value, label: label.replaceAll('_', ' + ') };
+                        })}
+                    />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="seq" className="text-right">
+                        Order <Label className="text-red-500">*</Label>
+                    </Label>
+                    <Input
+                        id="seq"
+                        name="seq"
+                        type="number"
+                        placeholder="Order"
+                        className="col-span-3"
+                        required
+                        onChange={(e) => setData('seq', Number(e.target.value))}
+                        value={data.seq}
+                    />
+                </div>
+            </div>
+            <div className="flex w-full justify-end">
+                <Button type="submit" disabled={processing} variant={'outline'}>
+                    {processing ? <Loader2 className="mr-2 size-4 animate-spin" /> : <CheckIcon className="mr-2 h-4 w-4" />}
+                    Save
+                </Button>
+            </div>
+        </form>
+    );
+};
+
+export default FormSectionItemMove;

@@ -13,7 +13,7 @@ import { type GateDT, type SharedData, type SiteDT } from '@/types';
 import { useForm } from '@inertiajs/react';
 import axios, { HttpStatusCode } from 'axios';
 import { CheckIcon, Loader2 } from 'lucide-react';
-import { FormEventHandler, ReactNode, useEffect, useRef } from 'react';
+import { ReactNode, SubmitEvent, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
 type GateForm = {
@@ -70,7 +70,7 @@ const Edit = ({ id, onFormClosed, onUpdated, onError }: EditProps): ReactNode =>
         });
     };
 
-    const submitForm: FormEventHandler = (e: React.FormEvent<Element>) => {
+    const submitForm = async (e: SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         put(route('config.setup.gate.update', { id: id }), {

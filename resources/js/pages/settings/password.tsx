@@ -3,7 +3,7 @@ import SettingsLayout from '@/layouts/settings/layout';
 import { type BreadcrumbItem } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Head, useForm } from '@inertiajs/react';
-import { FormEventHandler, JSX, useRef } from 'react';
+import { JSX, SubmitEvent, useRef } from 'react';
 
 import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
@@ -27,7 +27,7 @@ const Password = (): JSX.Element => {
         password_confirmation: '',
     });
 
-    const updatePassword: FormEventHandler = (e) => {
+    const updatePassword = (e: SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         put(route('password.update'), {

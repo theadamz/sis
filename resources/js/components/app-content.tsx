@@ -4,6 +4,7 @@ import { SidebarInset } from '@/components/ui/sidebar';
 import * as React from 'react';
 import { ErrorDialogModal } from './error-dialog';
 import { Toaster } from './ui/sonner';
+import { TooltipProvider } from './ui/tooltip';
 
 interface AppContentProps extends React.ComponentProps<'main'> {
     variant?: 'header' | 'sidebar';
@@ -16,7 +17,7 @@ export function AppContent({ variant = 'sidebar', children, ...props }: AppConte
 
     return (
         <main className="mx-auto flex h-full w-full flex-1 flex-col gap-4 rounded-xl" {...props}>
-            {children}
+            <TooltipProvider>{children}</TooltipProvider>
             <Toaster richColors={true} expand={true} position="top-left" />
             <LoadingDialogModal />
             <ConfirmDialogModal />

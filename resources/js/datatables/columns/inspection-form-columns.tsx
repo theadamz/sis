@@ -82,14 +82,17 @@ export const InspectionFormColumns: ColumnDef<InspectionFormDT, unknown>[] = [
         accessorKey: 'stage',
         meta: {
             columnDisplay: true, // hide column after init
+            headerClassName: 'w-[150px] text-center',
         },
         header: () => <Label>Stage</Label>,
         cell: ({ row }) => {
             const stage = row.getValue('stage') as string;
             return (
-                <Badge key={stage} variant={getInspectionStage(stage, 'variant') as any} className="me-1">
-                    {getInspectionStage(stage, 'label')}
-                </Badge>
+                <div className="flex w-full justify-center">
+                    <Badge key={stage} variant={getInspectionStage(stage, 'variant') as any} className="me-1">
+                        {getInspectionStage(stage, 'label')}
+                    </Badge>
+                </div>
             );
         },
     },
@@ -103,7 +106,7 @@ export const InspectionFormColumns: ColumnDef<InspectionFormDT, unknown>[] = [
         header: () => <Label>ETA Dest.</Label>,
         cell: ({ row }) => (
             <div className="flex w-full justify-center">
-                <Badge variant={'outline'}>{row.getValue('use_eta_dest') ? 'Yes' : 'No'}</Badge>
+                <Badge variant={row.getValue('use_eta_dest') ? 'info' : 'outline'}>{row.getValue('use_eta_dest') ? 'Yes' : 'No'}</Badge>
             </div>
         ),
     },
@@ -118,12 +121,27 @@ export const InspectionFormColumns: ColumnDef<InspectionFormDT, unknown>[] = [
         header: () => <Label>ATA Dest.</Label>,
         cell: ({ row }) => (
             <div className="flex w-full justify-center">
-                <Badge variant={'outline'}>{row.getValue('use_ata_dest') ? 'Yes' : 'No'}</Badge>
+                <Badge variant={row.getValue('use_ata_dest') ? 'info' : 'outline'}>{row.getValue('use_ata_dest') ? 'Yes' : 'No'}</Badge>
             </div>
         ),
     },
     {
-        accessorKey: 'inspection_vehicle_form_sections_count',
+        accessorKey: 'use_duration',
+        enableResizing: true,
+        meta: {
+            headerClassName: 'w-[40px] text-center',
+            columnDisplayName: 'Duration', // Column display name
+            columnDisplay: true, // hide column after init
+        },
+        header: () => <Label>Duration</Label>,
+        cell: ({ row }) => (
+            <div className="flex w-full justify-center">
+                <Badge variant={row.getValue('use_duration') ? 'info' : 'outline'}>{row.getValue('use_duration') ? 'Yes' : 'No'}</Badge>
+            </div>
+        ),
+    },
+    {
+        accessorKey: 'total_sections',
         enableResizing: true,
         meta: {
             headerClassName: 'w-[40px] text-center',
@@ -131,10 +149,10 @@ export const InspectionFormColumns: ColumnDef<InspectionFormDT, unknown>[] = [
             columnDisplay: true, // hide column after init
         },
         header: () => <Label>Sections</Label>,
-        cell: ({ row }) => <Label className="flex justify-center">{row.getValue('inspection_vehicle_form_sections_count')}</Label>,
+        cell: ({ row }) => <Label className="flex justify-center">{row.getValue('total_sections')}</Label>,
     },
     {
-        accessorKey: 'inspection_vehicle_form_items_count',
+        accessorKey: 'total_items',
         enableResizing: true,
         meta: {
             headerClassName: 'w-[40px] text-center',
@@ -142,7 +160,7 @@ export const InspectionFormColumns: ColumnDef<InspectionFormDT, unknown>[] = [
             columnDisplay: true, // hide column after init
         },
         header: () => <Label>Items</Label>,
-        cell: ({ row }) => <Label className="flex justify-center">{row.getValue('inspection_vehicle_form_items_count')}</Label>,
+        cell: ({ row }) => <Label className="flex justify-center">{row.getValue('total_items')}</Label>,
     },
     {
         accessorKey: 'is_publish',

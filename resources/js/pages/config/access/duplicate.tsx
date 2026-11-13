@@ -13,7 +13,7 @@ import { refactorErrorMessage } from '@/lib/refactorMessages';
 import { type Access, type SharedData, type SiteOption, type UserOption } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { CheckIcon, Loader2, XIcon } from 'lucide-react';
-import { FormEventHandler, ReactNode, useRef } from 'react';
+import { ReactNode, SubmitEvent, useRef } from 'react';
 import { toast } from 'sonner';
 
 type UserAccessDuplicateForm = {
@@ -45,7 +45,7 @@ const Duplicate = ({ accesses, onFormClosed, onCreated, onError }: DuplicateProp
     const excludeSiteComboBoxRef = useRef<ComboBoxAjaxMultipleRef>(null);
 
     /*** events ***/
-    const submitForm: FormEventHandler = async (e: React.FormEvent<Element>) => {
+    const submitForm = async (e: SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         post(route('config.access.duplicate'), {

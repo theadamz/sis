@@ -1,6 +1,7 @@
 import { compareItems, rankItem } from '@tanstack/match-sorter-utils';
 import { FilterFn, SortingFn, sortingFns } from '@tanstack/react-table';
 import { type ClassValue, clsx } from 'clsx';
+import { DateTime } from 'luxon';
 import { twMerge } from 'tailwind-merge';
 
 export function cn(...inputs: ClassValue[]) {
@@ -36,4 +37,15 @@ export const sortHandler = (direction: boolean | 'asc' | 'desc'): boolean | unde
     if (direction === 'desc') return undefined;
     if (direction === false) return false;
     if (direction === 'asc') return true;
+};
+
+export const generateRandomNumber = (digit: number = 6) => {
+    const start: number = Number('1'.padEnd(digit - 1, '0'));
+    const end: number = Number('9'.padEnd(digit - 1, '0'));
+    return Math.floor(start + Math.random() * end);
+};
+
+export const generateRandomId = (): string => {
+    const milisecond = new Date().getMilliseconds();
+    return `${DateTime.now().toFormat('yyyyMMddHHmmss')}${milisecond.toString()}`;
 };

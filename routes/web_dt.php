@@ -11,11 +11,6 @@ Route::prefix("configs")->group(function () {
         Route::get('/gates', [\App\Http\Controllers\Config\Setup\GateController::class, 'datatable'])->name('dt.config.setup.gate');
     });
 
-    // inspection
-    Route::prefix("inspection")->group(function () {
-        Route::get('/forms', [\App\Http\Controllers\Inspection\InspectionFormController::class, 'datatable'])->name('dt.basic.inspection-form.vehicle');
-    });
-
     Route::get('/users', [\App\Http\Controllers\Config\UserController::class, 'datatable'])->name('dt.config.user');
 });
 

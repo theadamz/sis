@@ -3,6 +3,7 @@ import { ComboBoxSiteOption, ComboBoxSiteOptionSelected } from '@/components/com
 import { ComboBoxUserOption, ComboBoxUserOptionSelected } from '@/components/combo-box-templates/user';
 import { confirmDialog } from '@/components/confirm-dialog';
 import { errorDialog } from '@/components/error-dialog';
+import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
@@ -11,9 +12,8 @@ import { refactorErrorMessage } from '@/lib/refactorMessages';
 import { SiteOption, UserOption, type Access, type SharedData } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { CheckIcon, Loader2, XIcon } from 'lucide-react';
-import { FormEventHandler, ReactNode, useRef } from 'react';
+import { ReactNode, SubmitEvent, useRef } from 'react';
 import { toast } from 'sonner';
-import InputError from '../../../components/input-error';
 
 type UserAccessForm = {
     site: string;
@@ -41,7 +41,7 @@ const Create = ({ accesses, onFormClosed, onCreated, onError }: CreateProps): Re
     const userComboBoxRef = useRef<ComboBoxAjaxRef>(null);
 
     /*** events ***/
-    const submitForm: FormEventHandler = async (e: React.FormEvent<Element>) => {
+    const submitForm = async (e: SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         post(route('config.access.store'), {

@@ -6,7 +6,7 @@ type SelectProps = {
     className?: string;
     placeholder?: string;
     selectLabel?: string;
-    items: Array<{ value: string; label: string }>;
+    items?: Array<{ value: string; label: string }>;
     value: string | undefined;
     onValueChange?: (value: string) => void;
     error?: string;
@@ -32,11 +32,12 @@ const Select = ({
                 <SelectContent>
                     <SelectGroup>
                         <SelectLabel>{selectLabel}</SelectLabel>
-                        {items.map((item) => (
-                            <SelectItem key={item.value} value={item.value}>
-                                {item.label}
-                            </SelectItem>
-                        ))}
+                        {items &&
+                            items.map((item) => (
+                                <SelectItem key={item.value} value={item.value}>
+                                    {item.label}
+                                </SelectItem>
+                            ))}
                     </SelectGroup>
                 </SelectContent>
             </SelectRoot>

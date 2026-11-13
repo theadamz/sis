@@ -15,7 +15,7 @@ import { EntityDT, type SharedData, type SiteDT, type Timezone } from '@/types';
 import { useForm } from '@inertiajs/react';
 import axios, { HttpStatusCode } from 'axios';
 import { CheckIcon, Loader2 } from 'lucide-react';
-import { FormEventHandler, ReactNode, useEffect, useRef } from 'react';
+import { ReactNode, SubmitEvent, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
 type SiteForm = {
@@ -78,7 +78,7 @@ const Edit = ({ id, timezones, onUpdated, onError }: EditProps): ReactNode => {
         });
     };
 
-    const submitForm: FormEventHandler = (e: React.FormEvent<Element>) => {
+    const submitForm = async (e: SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         put(route('config.setup.site.update', { id: id }), {

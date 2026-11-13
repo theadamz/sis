@@ -10,11 +10,16 @@ use App\Http\Controllers\Controller;
 use App\Models\Inspection\InspectionForm;
 use App\Models\Inspection\InspectionFormItem;
 use App\Models\Inspection\InspectionFormSection;
+use App\Models\Inspection\InspectionVehicleForm;
+use App\Models\Inspection\InspectionVehicleFormItem;
+use App\Models\Inspection\InspectionVehicleFormSection;
+use CalebDW\Laraflake\Rules\Snowflake;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -66,8 +71,11 @@ class InspectionFormController extends Controller
 
         // prepare paginate and order by
         $data = InspectionForm::query()->selectRaw("id, type, code, name, is_publish")->where('type', InspectionType::VEHICLE)
-            ->with('inspection_vehicle_forms')
-            ->withCount(['inspection_vehicle_form_sections', 'inspection_vehicle_form_items']);
+            ->with(['inspection_vehicle_form:id,inspection_form_id,use_eta_dest,use_ata_dest,use_duration,stage'])
+            ->withCount('inspection_vehicle_form_sections as total_sections')
+            ->with(['inspection_vehicle_form' => function ($q) {
+                $q->withCount('inspection_vehicle_form_items as total_items');
+            }]);
 
         // filter with search
         $data->when(!empty(str($search)->trim()), function ($query) use ($search) {
@@ -88,6 +96,12 @@ class InspectionFormController extends Controller
             $query->where('use_eta_dest', filter_var($request->query('eta_dest'), FILTER_VALIDATE_BOOLEAN));
         });
 
+        $data->when($request->has('use_duration') && is_bool(filter_var($request->query('use_duration'), FILTER_VALIDATE_BOOLEAN)), function ($query) use ($request) {
+            $query->whereHas('inspection_vehicle_form', function (Builder $query) use ($request) {
+                $query->where('use_duration', filter_var($request->query('use_duration'), FILTER_VALIDATE_BOOLEAN));
+            });
+        });
+
         $data->when($request->has('ata_dest') && is_bool(filter_var($request->query('ata_dest'), FILTER_VALIDATE_BOOLEAN)), function ($query) use ($request) {
             $query->where('use_ata_dest', filter_var($request->query('ata_dest'), FILTER_VALIDATE_BOOLEAN));
         });
@@ -105,12 +119,13 @@ class InspectionFormController extends Controller
                 'id' => $rec->id,
                 'code' => $rec->code,
                 'name' => $rec->name,
-                'stage' => $rec->inspection_vehicle_forms->stage,
-                'use_eta_dest' => $rec->inspection_vehicle_forms->use_eta_dest,
-                'use_ata_dest' => $rec->inspection_vehicle_forms->use_ata_dest,
-                'is_publish' => $rec->inspection_vehicle_forms->is_publish,
-                'inspection_vehicle_form_sections_count' => $rec->inspection_vehicle_form_sections_count,
-                'inspection_vehicle_form_items_count' => $rec->inspection_vehicle_form_items_count,
+                'stage' => $rec->inspection_vehicle_form->stage,
+                'use_eta_dest' => $rec->inspection_vehicle_form->use_eta_dest,
+                'use_ata_dest' => $rec->inspection_vehicle_form->use_ata_dest,
+                'use_duration' => $rec->inspection_vehicle_form->use_duration,
+                'is_publish' => $rec->is_publish,
+                'total_sections' => $rec->total_sections,
+                'total_items' => $rec->inspection_vehicle_form->total_items,
             ]);
 
         return $data;
@@ -144,22 +159,26 @@ class InspectionFormController extends Controller
 
             // insert inspection form
             $inspectionForm = InspectionForm::create([
-                'flow' => $validated->flow,
-                'inspection_type' => $validated->inspection_type,
+                'type' => InspectionType::VEHICLE,
                 'code' => $validated->code,
                 'name' => $validated->name,
+                'is_publish' => $validated->is_publish,
+            ]);
+
+            // insert inspection vehicle form
+            $inspectionVehicleForm = InspectionVehicleForm::create([
+                'inspection_form_id' => $inspectionForm->id,
                 'use_eta_dest' => $validated->use_eta_dest,
                 'use_ata_dest' => $validated->use_ata_dest,
-                'is_publish' => $validated->is_publish,
-                'required_stages' => json_encode($validated->required_stages),
+                'use_duration' => $validated->use_duration,
+                'stage' => $validated->stage,
             ]);
 
             // loop inspection
             foreach ($validated->inspections as $section) {
-                // insert inspection form section
-                $inspectionFormSection = InspectionFormSection::create([
-                    'inspection_form_id' => $inspectionForm->id,
-                    'stage' => $section['stage'],
+                // insert inspection vehicle form section
+                $inspectionVehicleFormSection = InspectionVehicleFormSection::create([
+                    'inspection_vehicle_form_id' => $inspectionVehicleForm->id,
                     'description' => $section['description'],
                     'seq' => $section['seq'],
                     'is_separate_page' => $section['is_separate_page'],
@@ -167,11 +186,11 @@ class InspectionFormController extends Controller
 
                 // loop section items
                 foreach ($section['items'] as $item) {
-                    // insert into inspection form items
-                    InspectionFormItem::create([
-                        'inspection_form_section_id' => $inspectionFormSection->id,
+                    // insert into inspection vehicle form items
+                    InspectionVehicleFormItem::create([
+                        'inspection_vehicle_form_section_id' => $inspectionVehicleFormSection->id,
                         'description' => $item['description'],
-                        'type' => $item['type'],
+                        'item_type' => $item['item_type'],
                         'seq' => $item['seq'],
                     ]);
                 }
@@ -192,8 +211,11 @@ class InspectionFormController extends Controller
             // rollback
             DB::rollBack();
 
+            // log error
+            Log::channel('app-track')->error('500 - Internal Server Error', ['trace' => get_class($this), 'message' => $e->getMessage(), 'uri' => request()->getUri(), 'body' => $validated, 'header' => request()->headers->all(), 'throwable' => $e]);
+
             return back()->withErrors([
-                "message" => $e->getMessage(),
+                "message" => '500 - Internal Server Error',
             ]);
         }
     }
@@ -202,7 +224,7 @@ class InspectionFormController extends Controller
     {
         // create validator
         $validator = Validator::make(['id' => $id], [
-            'id' => ['required', "uuid", Rule::exists('inspection_forms', 'id')],
+            'id' => ['required', new Snowflake, Rule::exists('inspection_forms', 'id')],
         ]);
 
         // check if validator valid
@@ -213,8 +235,12 @@ class InspectionFormController extends Controller
         $validated = $validator->validated();
 
         // get data
-        $data = InspectionForm::where('id', $validated['id'])
-            ->with(['inspection_form_sections', 'inspection_form_sections.inspection_form_items']);
+        $data = InspectionForm::query()->selectRaw("id, code, name, is_publish")->where('id', $validated['id'])->where('type', InspectionType::VEHICLE)
+            ->with([
+                'inspection_vehicle_form:id,inspection_form_id,use_eta_dest,use_ata_dest,use_duration,stage',
+                'inspection_vehicle_form_sections:id,inspection_vehicle_form_id,description,seq,is_separate_page',
+                'inspection_vehicle_form_sections.inspection_vehicle_form_items:id,inspection_vehicle_form_section_id,description,item_type,seq',
+            ]);
 
         // check if data exist
         if (!$data->exists()) {
@@ -222,27 +248,26 @@ class InspectionFormController extends Controller
         }
 
         // get data
-        $data = $data->first(DB::raw("id, flow, inspection_type, code, name, use_eta_dest, use_ata_dest, is_publish, required_stages"));
+        $data = $data->first();
 
         // refactor
         $inspections = collect();
-        $sections = collect($data->inspection_form_sections->toArray())->sortBy('seq');
+        $sections = collect($data->inspection_vehicle_form_sections->toArray())->sortBy('seq');
 
         foreach ($sections as $section) {
             // push to inspections
             $inspections->push([
                 'id' => $section['id'],
-                'inspection_form_id' => $section['inspection_form_id'],
-                'stage' => $section['stage'],
+                'inspection_vehicle_form_id' => $section['inspection_vehicle_form_id'],
                 'description' => $section['description'],
                 'seq' => $section['seq'],
                 'is_separate_page' => $section['is_separate_page'],
-                'items' => collect($section['inspection_form_items'])->transform(function (array $item) {
+                'items' => collect($section['inspection_vehicle_form_items'])->transform(function (array $item) {
                     return [
                         'id' => $item['id'],
-                        'inspection_form_section_id' => $item['inspection_form_section_id'],
+                        'inspection_vehicle_form_section_id' => $item['inspection_vehicle_form_section_id'],
                         'description' => $item['description'],
-                        'type' => $item['type'],
+                        'item_type' => $item['item_type'],
                         'seq' => $item['seq'],
                     ];
                 })->sortBy('seq')->values()->all(),
@@ -252,18 +277,17 @@ class InspectionFormController extends Controller
         // prepare data to send
         $data2edit = [
             'id' => $data->id,
-            'flow' => $data->flow,
-            'inspection_type' => $data->inspection_type,
             'code' => $data->code,
             'name' => $data->name,
-            'use_eta_dest' => $data->use_eta_dest,
-            'use_ata_dest' => $data->use_ata_dest,
             'is_publish' => $data->is_publish,
-            'required_stages' => json_decode($data->required_stages),
+            'use_eta_dest' => $data->inspection_vehicle_form->use_eta_dest,
+            'use_ata_dest' => $data->inspection_vehicle_form->use_ata_dest,
+            'use_duration' => $data->inspection_vehicle_form->use_duration,
+            'stage' => $data->inspection_vehicle_form->stage,
             'inspections' => $inspections->all(),
         ];
 
-        return Inertia::render("inspection/form/edit")->with([
+        return Inertia::render("basic/inspection-form/vehicle/edit")->with([
             'inspectionStages' => $this->inspectionStages,
             'data2edit' => $data2edit
         ]);
@@ -291,25 +315,34 @@ class InspectionFormController extends Controller
             // update inspection form
             $inspectionForm = InspectionForm::find($validated->id);
             $inspectionForm->fill([
-                'flow' => $validated->flow,
-                'inspection_type' => $validated->inspection_type,
                 'code' => $validated->code,
                 'name' => $validated->name,
-                'use_eta_dest' => $validated->use_eta_dest,
-                'use_ata_dest' => $validated->use_ata_dest,
                 'is_publish' => $validated->is_publish,
-                'required_stages' => json_encode($validated->required_stages),
             ]);
             $inspectionForm->save();
 
+            // get inspection vehicle form id from relationship
+            $inspectionVehicleFormId = $inspectionForm->inspection_vehicle_form->id;
+
+            // update inspection vehicle form
+            $inspectionVehicleForm = InspectionVehicleForm::find($inspectionVehicleFormId);
+            $inspectionVehicleForm->fill([
+                'inspection_form_id' => $inspectionForm->id,
+                'use_eta_dest' => $validated->use_eta_dest,
+                'use_ata_dest' => $validated->use_ata_dest,
+                'use_duration' => $validated->use_duration,
+                'stage' => $validated->stage,
+            ]);
+            $inspectionVehicleForm->save();
+
             // delete any section that not in the list
             $sectionIds = collect($validated->inspections)->pluck('id')->all();
-            InspectionFormSection::where('inspection_form_id', $validated->id)->whereNotIn('id', $sectionIds)->lazyById(200, column: 'id')->each->delete();
+            InspectionVehicleFormSection::where('inspection_vehicle_form_id', $inspectionVehicleFormId)->whereNotIn('id', $sectionIds)->lazyById(200, column: 'id')->each->delete();
 
             // loop inspection
             foreach ($validated->inspections as $section) {
                 // get section
-                $inspectionFormSection = InspectionFormSection::where('id', $section['id']);
+                $inspectionFormSection = InspectionVehicleFormSection::where('id', $section['id']);
 
                 // if section exist then update
                 if ($inspectionFormSection->exists()) {
@@ -317,8 +350,7 @@ class InspectionFormController extends Controller
                     $inspectionFormSection = $inspectionFormSection->first();
 
                     // update data
-                    $inspectionFormSection->inspection_form_id = $inspectionForm->id;
-                    $inspectionFormSection->stage = $section['stage'];
+                    $inspectionFormSection->inspection_vehicle_form_id = $inspectionVehicleFormId;
                     $inspectionFormSection->description = $section['description'];
                     $inspectionFormSection->seq = $section['seq'];
                     $inspectionFormSection->is_separate_page = $section['is_separate_page'];
@@ -326,8 +358,7 @@ class InspectionFormController extends Controller
                 } else {
                     // create data
                     $inspectionFormSection = $inspectionFormSection->create([
-                        'inspection_form_id' => $inspectionForm->id,
-                        'stage' => $section['stage'],
+                        'inspection_vehicle_form_id' => $inspectionVehicleFormId,
                         'description' => $section['description'],
                         'seq' => $section['seq'],
                         'is_separate_page' => $section['is_separate_page'],
@@ -336,12 +367,12 @@ class InspectionFormController extends Controller
 
                 // delete any section items that not in the list
                 $sectionIds = collect($section['items'])->pluck('id')->all();
-                InspectionFormItem::where('inspection_form_section_id', $inspectionFormSection->id)->whereNotIn('id', $sectionIds)->lazyById(200, column: 'id')->each->delete();
+                InspectionVehicleFormItem::where('inspection_vehicle_form_section_id', $inspectionFormSection->id)->whereNotIn('id', $sectionIds)->lazyById(200, column: 'id')->each->delete();
 
                 // loop section items
                 foreach (collect($section['items'])->sortBy('seq')->all() as $item) {
                     // get section
-                    $inspectionFormItem = InspectionFormItem::where('id', $item['id']);
+                    $inspectionFormItem = InspectionVehicleFormItem::where('id', $item['id']);
 
                     // if inspection item exist then update
                     if ($inspectionFormItem->exists()) {
@@ -349,16 +380,16 @@ class InspectionFormController extends Controller
                         $inspectionFormItem = $inspectionFormItem->first();
 
                         // update data
-                        $inspectionFormItem->inspection_form_section_id = $inspectionFormSection->id;
+                        $inspectionFormItem->inspection_vehicle_form_section_id = $inspectionFormSection->id;
                         $inspectionFormItem->description = $item['description'];
-                        $inspectionFormItem->type = $item['type'];
+                        $inspectionFormItem->item_type = $item['item_type'];
                         $inspectionFormItem->seq = $item['seq'];
                         $inspectionFormItem->save();
                     } else {
                         $inspectionFormItem->create([
-                            'inspection_form_section_id' => $inspectionFormSection->id,
+                            'inspection_vehicle_form_section_id' => $inspectionFormSection->id,
                             'description' => $item['description'],
-                            'type' => $item['type'],
+                            'item_type' => $item['item_type'],
                             'seq' => $item['seq'],
                         ]);
                     }
@@ -380,6 +411,9 @@ class InspectionFormController extends Controller
             // rollback
             DB::rollBack();
 
+            // log error
+            Log::channel('app-track')->error('500 - Internal Server Error', ['trace' => get_class($this), 'message' => $e->getMessage(), 'uri' => request()->getUri(), 'body' => $validated, 'header' => request()->headers->all(), 'throwable' => $e]);
+
             return back()->withErrors([
                 "message" => $e->getMessage(),
             ]);
@@ -391,7 +425,7 @@ class InspectionFormController extends Controller
         // validate request
         $validated = Validator::make($request->post(), [
             'ids' => ['required', "array"],
-            'ids.*' => ['required', 'string', "uuid", Rule::exists('inspection_forms', 'id')],
+            'ids.*' => ['required', 'string', new Snowflake, Rule::exists('inspection_forms', 'id')->where('type', InspectionType::VEHICLE)],
         ])->validated();
 
         try {
@@ -408,6 +442,9 @@ class InspectionFormController extends Controller
 
             return back();
         } catch (\Exception $e) {
+            // log error
+            Log::channel('app-track')->error('500 - Internal Server Error', ['trace' => get_class($this), 'message' => $e->getMessage(), 'uri' => request()->getUri(), 'body' => $validated, 'header' => request()->headers->all(), 'throwable' => $e]);
+
             return back()->withErrors([
                 "error" => $e->getMessage(),
             ]);

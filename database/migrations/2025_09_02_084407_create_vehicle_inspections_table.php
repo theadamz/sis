@@ -30,9 +30,18 @@ return new class extends Migration
             $table->timestamp('depart_time_from_fty')->nullable()->comment("Time depart from factory to export");
             $table->timestamp('eta_to_dest')->nullable()->comment("Estimation time to destination harbour / airport");
             $table->timestamp('ata_to_dest')->nullable()->comment("Actual time arrived at destination harbour / airport");
+            $table->timestamp('duration_start')->nullable();
+            $table->timestamp('duration_end')->nullable();
             $table->string('export_notified_by', 100)->nullable()->comment("Notified to Export Departure by (name)");
             $table->string('remarks')->nullable();
             $table->string('stage', 20)->default(InspectionStage::CHECKED_IN)->index()->comment("CHECKED_IN/LOADING/CHECKED_OUT");
+            $table->timestamp('inspection_started_at')->nullable();
+            $table->timestamp('inspection_ended_at')->nullable();
+            $table->jsonb('coordinate_start')->nullable();
+            $table->jsonb('coordinate_end')->nullable();
+            $table->unsignedBigInteger('reviewed_by')->nullable();
+            $table->timestamp('reviewed_at')->nullable();
+            $table->text('reviewed_comment')->nullable();
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();

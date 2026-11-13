@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils';
 import { type Menu, type SharedData, type SiteDT } from '@/types';
 import { useForm } from '@inertiajs/react';
 import { CheckIcon, EyeClosedIcon, EyeIcon, Loader2, XIcon } from 'lucide-react';
-import { FormEventHandler, ReactNode, useRef, useState } from 'react';
+import { ReactNode, SubmitEvent, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 type UserForm = {
@@ -55,7 +55,7 @@ const Create = ({ routes, onFormClosed, onCreated, onError }: CreateProps): Reac
     const lovCommon = useRef<DataTablePaginationAjaxRef>(null);
 
     /*** events ***/
-    const submitForm: FormEventHandler = async (e: React.FormEvent<Element>) => {
+    const submitForm = async (e: SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         post(route('config.user.store'), {

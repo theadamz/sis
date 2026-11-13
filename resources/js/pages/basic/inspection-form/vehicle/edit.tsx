@@ -2,9 +2,9 @@ import { confirmDialog } from '@/components/confirm-dialog';
 import DialogContainer, { DialogContainerRef } from '@/components/dialog-container';
 import { errorDialog } from '@/components/error-dialog';
 import Select from '@/components/select';
+import TooltipWrapper from '@/components/tooltip';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -13,20 +13,23 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Field, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { refactorErrorMessage } from '@/lib/refactorMessages';
+import { generateRandomId } from '@/lib/utils';
 import { type BreadcrumbItem, type InspectionFormItem, type InspectionFormSection, type InspectionType, type SharedData } from '@/types';
-import { getInspectionStage, InspectionStage } from '@/types/enum';
+import { InspectionStage } from '@/types/enum';
 import { Head, router, useForm } from '@inertiajs/react';
 import _ from 'lodash';
-import { CheckIcon, EditIcon, Loader2, MenuIcon, PlusIcon, XIcon } from 'lucide-react';
-import { FormEventHandler, Fragment, ReactNode, useEffect, useRef, useState } from 'react';
+import { ArrowLeftRight, CheckIcon, EditIcon, Loader2, MenuIcon, PlusIcon, XIcon } from 'lucide-react';
+import { Fragment, ReactNode, SubmitEvent, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import FormSection from './form-section';
 import FormSectionItem from './form-section-item';
+import FormSectionItemMove from './form-section-item-move';
 
 const breadcrumbsData: BreadcrumbItem[] = [
     {
@@ -50,40 +53,39 @@ type Inspection = InspectionFormSection & {
 
 type InspectionForm = {
     id: string;
-    inspection_type: string;
     code: string;
     name: string;
+    is_publish: boolean;
     use_eta_dest: boolean;
     use_ata_dest: boolean;
-    is_publish: boolean;
-    required_stages: string[];
+    use_duration: boolean;
+    stage: InspectionStage;
     inspections: Inspection[];
 };
 
-const stages = Object.values(InspectionStage);
-
-interface CreateProps {
-    inspectionTypes: InspectionType[];
+interface EditProps {
     data2edit: InspectionForm;
+    inspectionStages: InspectionType[];
 }
 
-const Edit = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
+const Edit = ({ inspectionStages, data2edit }: EditProps): ReactNode => {
     /*** inertia js ***/
     const { data, setData, put, processing, errors, reset, clearErrors, isDirty } = useForm<Required<InspectionForm>>({
         id: data2edit.id,
-        inspection_type: data2edit.inspection_type,
         code: data2edit.code,
         name: data2edit.name,
+        is_publish: data2edit.is_publish,
         use_eta_dest: data2edit.use_eta_dest,
         use_ata_dest: data2edit.use_ata_dest,
-        is_publish: data2edit.is_publish,
-        required_stages: data2edit.required_stages,
+        use_duration: data2edit.use_duration,
+        stage: data2edit.stage,
         inspections: data2edit.inspections,
     });
 
     /*** references ***/
     const sectionForm = useRef<DialogContainerRef>(null);
     const sectionItemForm = useRef<DialogContainerRef>(null);
+    const sectionItemMoveForm = useRef<DialogContainerRef>(null);
 
     /*** states ***/
     const [sectionFormTitle, setSectionFormTitle] = useState<string>('Create Section');
@@ -91,6 +93,7 @@ const Edit = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
     const [itemCount, setItemCount] = useState<number>(0);
     const [inspectionFormSectionData, setInspectionFormSectionData] = useState<InspectionFormSection>();
     const [inspectionFormSectionItemData, setInspectionFormSectionItemData] = useState<InspectionFormItem>();
+    const [inspectionFormSectionItemMoveData, setInspectionFormSectionItemMoveData] = useState<InspectionFormItem>();
 
     /*** effects ***/
     useEffect(() => {
@@ -104,7 +107,7 @@ const Edit = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
     }, [data.inspections]);
 
     /*** events ***/
-    const submitForm: FormEventHandler = async (e: React.FormEvent<Element>) => {
+    const submitForm = async (e: SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         put(route('basic.inspection-form.vehicle.update', { id: data2edit.id }), {
@@ -130,26 +133,6 @@ const Edit = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
         });
     };
 
-    const resetForm = () => {
-        reset(); // clear form to initial values
-        clearErrors(); // clear errors
-        setData({
-            inspection_type: '',
-            code: '',
-            name: '',
-            use_eta_dest: false,
-            use_ata_dest: false,
-            is_publish: true,
-            required_stages: [InspectionStage.CHECKED_IN, InspectionStage.LOADING, InspectionStage.CHECKED_OUT],
-            inspections: [],
-        });
-        setSectionFormTitle('Create Section');
-        setSectionItemFormTitle('Create Section Item');
-        setItemCount(0);
-        setInspectionFormSectionData(undefined);
-        setInspectionFormSectionItemData(undefined);
-    };
-
     const handleCancel = async () => {
         if (isDirty) {
             // confirmation
@@ -163,28 +146,6 @@ const Edit = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
         router.visit(route('basic.inspection-form.vehicle.index'), {
             replace: true,
         });
-    };
-
-    const handleStageChange = (checked: boolean, value: InspectionStage) => {
-        if (!checked) {
-            setData((prevData) => {
-                return {
-                    ...prevData,
-                    required_stages: prevData.required_stages.filter((item) => value !== item),
-                };
-            });
-        } else {
-            setData((prevData) => {
-                return {
-                    ...prevData,
-                    ...{ required_stages: [...prevData.required_stages, value] },
-                };
-            });
-        }
-    };
-
-    const handleStageSort = (element: Inspection) => {
-        return _.indexOf(stages, element.stage);
     };
 
     const handleInspectionFormSectionSubmit = (inspectionFormSection: InspectionFormSection) => {
@@ -207,14 +168,14 @@ const Edit = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
                 // merge inspection with sort
                 return {
                     ...prevData,
-                    ...{ inspections: _.sortBy([...inspections, updatedInspection], [handleStageSort, 'seq']) },
+                    ...{ inspections: _.sortBy([...inspections, updatedInspection], ['seq']) },
                 };
             });
         } else {
             const inspection: Inspection = {
                 ...inspectionFormSection,
-                id: window.crypto.randomUUID(),
-                inspection_form_id: window.crypto.randomUUID(),
+                id: generateRandomId(),
+                inspection_vehicle_form_id: data.id,
                 items: [],
             };
 
@@ -222,12 +183,54 @@ const Edit = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
             setData((prevData) => {
                 return {
                     ...prevData,
-                    ...{ inspections: _.sortBy([...prevData.inspections, inspection], [handleStageSort, 'seq']) },
+                    ...{ inspections: _.sortBy([...prevData.inspections, inspection], ['seq']) },
                 };
             });
         }
 
         sectionForm.current?.close();
+    };
+
+    const handleInspectionFormSectionItemMoveSubmit = (inspectionFormSectionItem: InspectionFormItem) => {
+        setData((prevData) => {
+            // get sections / inspections without selected data
+            const sections = prevData.inspections
+                .filter((section) => section.id !== inspectionFormSectionItem.inspection_vehicle_form_section_id)
+                .map((section) => {
+                    return {
+                        ...section,
+                        ...{
+                            items: section.items.filter((item) => {
+                                return item.id !== inspectionFormSectionItem.id;
+                            }),
+                        },
+                    };
+                });
+
+            // get new section with selected data
+            const newSection = prevData.inspections.find((item) => item.id === inspectionFormSectionItem.inspection_vehicle_form_section_id);
+            if (!newSection) return prevData;
+
+            // get new section existing items without selected data
+            const newSectionExistingItems = newSection.items.filter((item) => item.id !== inspectionFormSectionItem.id);
+
+            // update inspection items by add it
+            const updatedInspection: Inspection = {
+                ...newSection,
+                items:
+                    newSection.items.length <= 0
+                        ? [inspectionFormSectionItem]
+                        : _.sortBy([...newSectionExistingItems, inspectionFormSectionItem], ['seq']),
+            };
+
+            // merge inspection with sort
+            return {
+                ...prevData,
+                ...{ inspections: _.sortBy([...sections, updatedInspection], ['seq']) },
+            };
+        });
+
+        sectionItemMoveForm.current?.close();
     };
 
     const handleSectionEdit = (id: string) => {
@@ -258,7 +261,7 @@ const Edit = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
                 ...prevData,
                 inspections: _.sortBy(
                     prevData.inspections.filter((item) => item.id !== section.id),
-                    [handleStageSort, 'seq'],
+                    ['seq'],
                 ),
             };
         });
@@ -275,10 +278,12 @@ const Edit = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
         if (inspectionFormSectionItem.id) {
             setData((prevData) => {
                 // get sections / inspections without selected data
-                const sections = prevData.inspections.filter((section) => section.id !== inspectionFormSectionItem.inspection_form_section_id);
+                const sections = prevData.inspections.filter(
+                    (section) => section.id !== inspectionFormSectionItem.inspection_vehicle_form_section_id,
+                );
 
                 // get previous section with seelcted data
-                const prevSection = prevData.inspections.find((item) => item.id === inspectionFormSectionItem.inspection_form_section_id);
+                const prevSection = prevData.inspections.find((item) => item.id === inspectionFormSectionItem.inspection_vehicle_form_section_id);
                 if (!prevSection) return prevData;
 
                 // get prev items without selected data
@@ -294,22 +299,22 @@ const Edit = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
                 // merge inspection with sort
                 return {
                     ...prevData,
-                    ...{ inspections: _.sortBy([...sections, updatedInspection], [handleStageSort, 'seq']) },
+                    ...{ inspections: _.sortBy([...sections, updatedInspection], ['seq']) },
                 };
             });
         } else {
             setData((prevData) => {
                 // get previous data without selected data
-                const inspections = prevData.inspections.filter((item) => item.id !== inspectionFormSectionItem.inspection_form_section_id);
+                const inspections = prevData.inspections.filter((item) => item.id !== inspectionFormSectionItem.inspection_vehicle_form_section_id);
 
                 // get previous data and replace values
-                const prevInspection = prevData.inspections.find((item) => item.id === inspectionFormSectionItem.inspection_form_section_id);
+                const prevInspection = prevData.inspections.find((item) => item.id === inspectionFormSectionItem.inspection_vehicle_form_section_id);
 
                 // if prevInspection is undefined
                 if (!prevInspection) return prevData;
 
                 // set id
-                inspectionFormSectionItem.id = window.crypto.randomUUID();
+                inspectionFormSectionItem.id = generateRandomId();
 
                 // update inspection items by add it
                 const updatedInspection: Inspection = {
@@ -323,7 +328,7 @@ const Edit = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
                 // merge inspection with sort
                 return {
                     ...prevData,
-                    ...{ inspections: _.sortBy([...inspections, updatedInspection], [handleStageSort, 'seq']) },
+                    ...{ inspections: _.sortBy([...inspections, updatedInspection], ['seq']) },
                 };
             });
         }
@@ -387,10 +392,31 @@ const Edit = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
         });
     };
 
+    const handleItemMove = async (sectionId: string, itemId: string) => {
+        const section = data.inspections.find((section) => section.id === sectionId);
+        if (!section) {
+            toast.error('Error', { description: 'Section not found.' });
+            return;
+        }
+        // find section item
+        const item = section.items.find((item) => item.id === itemId);
+
+        if (!item) {
+            toast.error('Error', { description: 'Item not found.' });
+            return;
+        }
+
+        setInspectionFormSectionData(section);
+        setInspectionFormSectionItemMoveData(item);
+
+        sectionItemMoveForm.current?.open();
+    };
+
     return (
         <>
             <Head title="Edit Inspection Form" />
 
+            {/* Section */}
             <DialogContainer
                 title={sectionFormTitle}
                 ref={sectionForm}
@@ -407,6 +433,7 @@ const Edit = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
                 />
             </DialogContainer>
 
+            {/* Item */}
             <DialogContainer
                 title={sectionItemFormTitle}
                 ref={sectionItemForm}
@@ -425,124 +452,151 @@ const Edit = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
                 />
             </DialogContainer>
 
+            {/* Item Move */}
+            <DialogContainer
+                title={'Move Item To Other Section'}
+                ref={sectionItemMoveForm}
+                className="min-w-3xl"
+                onClose={() => {
+                    setInspectionFormSectionData(undefined);
+                    setInspectionFormSectionItemMoveData(undefined);
+                }}
+            >
+                <FormSectionItemMove
+                    onSubmit={handleInspectionFormSectionItemMoveSubmit}
+                    inspectionFormSectionData={inspectionFormSectionData}
+                    inspectionFormSectionItemData={inspectionFormSectionItemMoveData}
+                    itemCount={data.inspections.find((inspection) => inspection.id === inspectionFormSectionItemMoveData?.id)?.items.length}
+                    sections={data.inspections}
+                />
+            </DialogContainer>
+
             {/* main content */}
             <form onSubmit={submitForm} className="mx-auto w-full p-4">
-                <div className="grid grid-cols-12 gap-4">
-                    <div className="col-span-2 grid gap-2">
-                        <Label htmlFor="inspection_type">
-                            Inspection Type <Label className="text-red-500">*</Label>
-                        </Label>
-                        <Select
-                            className="w-full"
-                            placeholder="Inspection Type"
-                            selectLabel="Inspection Type"
-                            value={data.inspection_type ? data.inspection_type : ''}
-                            onValueChange={(value) => setData('inspection_type', value)}
-                            items={inspectionTypes.map((item) => {
-                                return { value: item.value, label: item.label };
-                            })}
-                        />
-                    </div>
-                    <div className="col-span-4 grid gap-2">
-                        <Label htmlFor="code">
-                            Code <Label className="text-red-500">*</Label>
-                        </Label>
-                        <Input
-                            id="code"
-                            name="code"
-                            type="text"
-                            placeholder="Code"
-                            required
-                            onChange={(e) => setData('code', e.target.value)}
-                            value={data.code}
-                            error={errors.code}
-                        />
-                    </div>
-                    <div className="col-span-4 grid gap-2">
-                        <Label htmlFor="name">
-                            Name <Label className="text-red-500">*</Label>
-                        </Label>
-                        <Input
-                            id="name"
-                            name="name"
-                            type="text"
-                            placeholder="Name"
-                            required
-                            onChange={(e) => setData('name', e.target.value)}
-                            value={data.name}
-                            error={errors.name}
-                        />
-                    </div>
-                    <div className="col-span-2 grid gap-2">
-                        <Label htmlFor="use_eta_dest">Use Estimation Time Arrival (ETA Date)</Label>
-                        <div className="flex items-center space-x-2">
-                            <Checkbox
-                                id="use_eta_dest"
-                                name="use_eta_dest"
-                                defaultChecked={data.use_eta_dest}
-                                checked={data.use_eta_dest}
-                                onCheckedChange={(e) => setData('use_eta_dest', e.valueOf() as boolean)}
-                            />
-                            <Label htmlFor="use_eta_dest" className="text-muted-foreground text-sm">
-                                Yes
-                            </Label>
-                        </div>
-                    </div>
-                    <div className="col-span-2 grid gap-2">
-                        <Label htmlFor="use_ata_dest">Use Actual Time Arrival (ATA Date)</Label>
-                        <div className="flex items-center space-x-2">
-                            <Checkbox
-                                id="use_ata_dest"
-                                name="use_ata_dest"
-                                defaultChecked={data.use_ata_dest}
-                                checked={data.use_ata_dest}
-                                onCheckedChange={(e) => setData('use_ata_dest', e.valueOf() as boolean)}
-                            />
-                            <Label htmlFor="use_ata_dest" className="text-muted-foreground text-sm">
-                                Yes
-                            </Label>
-                        </div>
-                    </div>
-                    <div className="col-span-4 grid gap-2">
-                        <Label htmlFor="is_publish">
-                            Stages <Label className="text-red-500">*</Label>
-                        </Label>
-                        <div className="flex items-center space-x-2">
-                            {Object.entries(InspectionStage).map(([label, value]) => {
-                                return (
-                                    <div className="flex items-center justify-around" key={value}>
-                                        <Checkbox
-                                            className="mr-1"
-                                            id={`stage_check_${value}`}
-                                            name={`stage_check_${value}`}
-                                            defaultChecked={data.required_stages.includes(value)}
-                                            checked={data.required_stages.includes(value)}
-                                            onCheckedChange={(e) => handleStageChange(e.valueOf() as boolean, value)}
-                                        />
-                                        <Label htmlFor={`stage_check_${value}`} className="text-muted-foreground mr-2 text-sm">
-                                            {label.replace('_', ' ')}
-                                        </Label>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                    <div className="col-span-4 grid gap-2">
-                        <Label htmlFor="is_publish">Publish</Label>
-                        <div className="flex items-center space-x-2">
-                            <Checkbox
-                                id="is_publish"
-                                name="is_publish"
-                                defaultChecked={data.is_publish}
-                                checked={data.is_publish}
-                                onCheckedChange={(e) => setData('is_publish', e.valueOf() as boolean)}
-                            />
-                            <Label htmlFor="is_publish" className="text-muted-foreground text-sm">
-                                Yes
-                            </Label>
-                        </div>
-                    </div>
-                </div>
+                <FieldGroup>
+                    <FieldSet className="grid grid-cols-2 gap-x-4">
+                        <FieldGroup className="grid grid-cols-2 gap-4">
+                            <Field>
+                                <FieldLabel>
+                                    Code <Label className="text-red-500">*</Label>
+                                </FieldLabel>
+                                <Input
+                                    id="code"
+                                    name="code"
+                                    type="text"
+                                    placeholder="Code"
+                                    required
+                                    maxLength={50}
+                                    onChange={(e) => setData('code', e.target.value)}
+                                    value={data.code}
+                                    error={errors.code}
+                                />
+                            </Field>
+                            <Field>
+                                <FieldLabel>
+                                    Name <Label className="text-red-500">*</Label>
+                                </FieldLabel>
+                                <Input
+                                    id="name"
+                                    name="name"
+                                    type="text"
+                                    placeholder="Name"
+                                    required
+                                    maxLength={100}
+                                    onChange={(e) => setData('name', e.target.value)}
+                                    value={data.name}
+                                    error={errors.name}
+                                />
+                            </Field>
+                            <Field>
+                                <FieldLabel>
+                                    Stage <Label className="text-red-500">*</Label>
+                                </FieldLabel>
+                                <Select
+                                    placeholder="Stage"
+                                    selectLabel="Select Stage"
+                                    value={data.stage ?? null}
+                                    onValueChange={(value) => setData('stage', value as InspectionStage)}
+                                    items={inspectionStages}
+                                    error={errors.stage}
+                                />
+                            </Field>
+                            <Field>
+                                <FieldLabel>
+                                    Publish <Label className="text-red-500">*</Label>
+                                </FieldLabel>
+                                <Select
+                                    placeholder="Select"
+                                    selectLabel="Select Publish"
+                                    value={data.is_publish ? 'true' : 'false'}
+                                    onValueChange={(value) => setData('is_publish', Boolean(value))}
+                                    items={[
+                                        { value: 'true', label: 'Yes' },
+                                        { value: 'false', label: 'No' },
+                                    ]}
+                                    error={errors.is_publish}
+                                />
+                            </Field>
+                        </FieldGroup>
+                        <FieldGroup className="grid grid-cols-3 gap-4">
+                            <TooltipWrapper caption={`Estimation Time Arrival`}>
+                                <Field>
+                                    <FieldLabel>
+                                        Use ETA Date <Label className="text-red-500">*</Label>
+                                    </FieldLabel>
+                                    <Select
+                                        placeholder="Select"
+                                        selectLabel="Select ETA Date"
+                                        value={data.use_eta_dest ? 'true' : 'false'}
+                                        onValueChange={(value) => setData('use_eta_dest', Boolean(value))}
+                                        items={[
+                                            { value: 'true', label: 'Yes' },
+                                            { value: 'false', label: 'No' },
+                                        ]}
+                                        error={errors.use_eta_dest}
+                                    />
+                                </Field>
+                            </TooltipWrapper>
+                            <TooltipWrapper caption={`Actual Time Arrival`}>
+                                <Field>
+                                    <FieldLabel>
+                                        Use ATA Date <Label className="text-red-500">*</Label>
+                                    </FieldLabel>
+                                    <Select
+                                        placeholder="Select"
+                                        selectLabel="Select ATA Date"
+                                        value={data.use_ata_dest ? 'true' : 'false'}
+                                        onValueChange={(value) => setData('use_ata_dest', Boolean(value))}
+                                        items={[
+                                            { value: 'true', label: 'Yes' },
+                                            { value: 'false', label: 'No' },
+                                        ]}
+                                        error={errors.use_ata_dest}
+                                    />
+                                </Field>
+                            </TooltipWrapper>
+                            <TooltipWrapper caption={`Time Start & End`}>
+                                <Field>
+                                    <FieldLabel>
+                                        Use Duration <Label className="text-red-500">*</Label>
+                                    </FieldLabel>
+                                    <Select
+                                        placeholder="Select"
+                                        selectLabel="Select Duration"
+                                        value={data.use_duration ? 'true' : 'false'}
+                                        onValueChange={(value) => setData('use_duration', Boolean(value))}
+                                        items={[
+                                            { value: 'true', label: 'Yes' },
+                                            { value: 'false', label: 'No' },
+                                        ]}
+                                        error={errors.use_duration}
+                                    />
+                                </Field>
+                            </TooltipWrapper>
+                        </FieldGroup>
+                    </FieldSet>
+                </FieldGroup>
+
                 <div className="col-span-12 mt-5 grid gap-2">
                     <div className="flex items-center justify-between">
                         <div>
@@ -561,7 +615,7 @@ const Edit = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
                     </div>
 
                     <div className="w-full">
-                        <ScrollArea className="h-[calc(100vh-24.9rem)] rounded-sm border p-2 pe-4 shadow">
+                        <ScrollArea className="h-[calc(100vh-26rem)] rounded-sm border p-2 pe-4 shadow">
                             {data.inspections.length <= 0 ? (
                                 <div className="w-full items-center text-center">
                                     <Label>No data found, please add section and item.</Label>
@@ -577,10 +631,9 @@ const Edit = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
                                                             {section.description}
                                                         </Label>
                                                         <div className="flex space-x-2">
-                                                            <Badge variant={getInspectionStage(section.stage, 'variant') as any}>
-                                                                {getInspectionStage(section.stage, 'label')}
-                                                            </Badge>
-                                                            <Badge variant={'outline'}>{section.seq}</Badge>
+                                                            <TooltipWrapper caption={`Order: ${section.seq}`}>
+                                                                <Badge variant={'outline'}>{section.seq}</Badge>
+                                                            </TooltipWrapper>
                                                             <Badge variant={'outline'}>
                                                                 {section.is_separate_page ? 'Separate Page' : 'Same Page'}
                                                             </Badge>
@@ -615,14 +668,14 @@ const Edit = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
                                                     </div>
                                                 </div>
                                                 <div className="rounded-sm border">
-                                                    <ScrollArea className="h-[20rem] w-full">
+                                                    <ScrollArea className="h-80 w-full">
                                                         <Table>
                                                             <TableHeader className="sticky top-0 z-10 table-fixed shadow-sm backdrop-blur-sm">
                                                                 <TableRow>
                                                                     <TableHead className="w-auto">Description</TableHead>
-                                                                    <TableHead className="w-[100px]">Type</TableHead>
-                                                                    <TableHead className="w-[100px] text-center">Seq / Order</TableHead>
-                                                                    <TableHead className="w-[40px]"></TableHead>
+                                                                    <TableHead className="w-25">Type</TableHead>
+                                                                    <TableHead className="w-25 text-center">Seq / Order</TableHead>
+                                                                    <TableHead className="w-10"></TableHead>
                                                                 </TableRow>
                                                             </TableHeader>
                                                             <TableBody>
@@ -634,7 +687,7 @@ const Edit = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
                                                                     section.items.map((item) => (
                                                                         <TableRow key={item.id}>
                                                                             <TableCell>{item.description}</TableCell>
-                                                                            <TableCell>{item.type.replaceAll('_', ' + ')}</TableCell>
+                                                                            <TableCell>{item.item_type.replaceAll('_', ' + ')}</TableCell>
                                                                             <TableCell className="text-center">{item.seq}</TableCell>
                                                                             <TableCell className="text-right">
                                                                                 <DropdownMenu>
@@ -655,6 +708,11 @@ const Edit = ({ inspectionTypes, data2edit }: CreateProps): ReactNode => {
                                                                                             onClick={() => handleItemRemove(section.id, item.id)}
                                                                                         >
                                                                                             <XIcon className="size-4" /> Remove
+                                                                                        </DropdownMenuItem>
+                                                                                        <DropdownMenuItem
+                                                                                            onClick={() => handleItemMove(section.id, item.id)}
+                                                                                        >
+                                                                                            <ArrowLeftRight className="size-4" /> Move
                                                                                         </DropdownMenuItem>
                                                                                     </DropdownMenuContent>
                                                                                 </DropdownMenu>

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('inspection_form_id')->unique();
             $table->boolean('use_eta_dest')->default(false);
             $table->boolean('use_ata_dest')->default(false);
+            $table->boolean('use_duration')->default(false);
             $table->string('stage', 20)->default(InspectionStage::CHECKED_IN->value)->index();
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();

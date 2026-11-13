@@ -1,6 +1,6 @@
 import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
-import { InspectionItemType, InspectionStage } from './enum';
+import { InspectionItemType } from './enum';
 
 export interface Auth {
     user: User;
@@ -131,8 +131,7 @@ export interface UserAccess {
 
 export interface InspectionFormSection {
     id: string;
-    inspection_form_id: string;
-    stage: InspectionStage;
+    inspection_vehicle_form_id: string;
     description: string;
     seq: number;
     is_separate_page: boolean;
@@ -140,9 +139,17 @@ export interface InspectionFormSection {
 
 export interface InspectionFormItem {
     id: string;
-    inspection_form_section_id: string;
+    inspection_vehicle_form_section_id: string;
     description: string;
-    type: InspectionItemType;
+    item_type: InspectionItemType;
+    seq: number;
+}
+
+export interface InspectionFormItemMove {
+    inspection_vehicle_form_section_id: string;
+    to_inspection_vehicle_form_section_id: string;
+    description: string;
+    item_type: InspectionItemType;
     seq: number;
 }
 
