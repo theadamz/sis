@@ -19,6 +19,8 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             AccessSeeder::class,
             AccessTemplateSeeder::class,
+            InspectionCategorySeeder::class,
+            InspectionFlowSeeder::class,
         ]);
     }
 }

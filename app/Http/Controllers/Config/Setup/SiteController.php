@@ -22,6 +22,8 @@ use Inertia\Response;
 
 class SiteController extends Controller
 {
+    private string $cacheStore = 'file';
+
     public function index(): Response
     {
         return Inertia::render("config/setup/site/index", [
@@ -36,8 +38,8 @@ class SiteController extends Controller
         $request = app(Request::class);
 
         // check if cache exist
-        if (Cache::has(CacheKey::SITE->getKey())) {
-            return Cache::get(CacheKey::SITE->getKey());
+        if (Cache::store($this->cacheStore)->has(CacheKey::SITE->getKey())) {
+            return Cache::store($this->cacheStore)->get(CacheKey::SITE->getKey());
         }
 
         // prepare filters
@@ -85,7 +87,7 @@ class SiteController extends Controller
             ]);
 
         // set cache
-        Cache::put(CacheKey::SITE->getKey(), $data, config('setting.cache_time'));
+        Cache::store($this->cacheStore)->put(CacheKey::SITE->getKey(), $data, config('setting.cache_time'));
 
         return $data;
     }
@@ -217,8 +219,8 @@ class SiteController extends Controller
         $isActive = $request->has('is_active') ? filter_var($request->query('is_active'), FILTER_VALIDATE_INT) : null;
 
         // check if cache exist
-        if (Cache::has(CacheKey::SITE->getKey())) {
-            return response()->json(['data' => Cache::get(CacheKey::SITE->getKey()), 'message' => "OK"], 200);
+        if (Cache::store($this->cacheStore)->has(CacheKey::SITE->getKey())) {
+            return response()->json(['data' => Cache::store($this->cacheStore)->get(CacheKey::SITE->getKey()), 'message' => "OK"], 200);
         }
 
         // query
@@ -258,7 +260,7 @@ class SiteController extends Controller
         $query = $query->get();
 
         // set cache
-        Cache::put(CacheKey::SITE->getKey(), $query, 30); // cache for 30 seconds
+        Cache::store($this->cacheStore)->put(CacheKey::SITE->getKey(), $query, 30); // cache for 30 seconds
 
         return response()->json(['data' => $query, 'message' => "OK"], 200);
     }

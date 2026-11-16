@@ -34,6 +34,45 @@ Route::prefix("setup")->group(function () {
     });
 });
 
+// inspections
+Route::prefix("inspections")->group(function () {
+    // category
+    Route::prefix("categories")->middleware(['can:cfg-ins-ctg', 'access:cfg-ins-ctg'])->group(function () {
+        Route::get('/', [\App\Http\Controllers\Inspection\InspectionCategoryController::class, 'index'])->name('config.inspection.category.index');
+        Route::get('/{id}/edit', [\App\Http\Controllers\Inspection\InspectionCategoryController::class, 'edit'])->can('cfg-ins-ctg-edit')->name('config.inspection.category.edit');
+        Route::get('/create', [\App\Http\Controllers\Inspection\InspectionCategoryController::class, 'create'])->can('cfg-ins-ctg-create')->name('config.inspection.category.create');
+        Route::get('/{id}', [\App\Http\Controllers\Inspection\InspectionCategoryController::class, 'show'])->name('config.inspection.category.show');
+        Route::post('/', [\App\Http\Controllers\Inspection\InspectionCategoryController::class, 'store'])->can('cfg-ins-ctg-create')->name('config.inspection.category.store');
+        Route::put('/{id}', [\App\Http\Controllers\Inspection\InspectionCategoryController::class, 'update'])->can('cfg-ins-ctg-edit')->name('config.inspection.category.update');
+        Route::delete('/', [\App\Http\Controllers\Inspection\InspectionCategoryController::class, 'destroy'])->can('cfg-ins-ctg-delete')->name('config.inspection.category.destroy');
+    });
+
+    // flow
+    Route::prefix("flows")->middleware(['can:cfg-ins-flw', 'access:cfg-ins-flw'])->group(function () {
+        Route::get('/', [\App\Http\Controllers\Inspection\InspectionFlowController::class, 'index'])->name('config.inspection.flow.index');
+        Route::get('/{id}/edit', [\App\Http\Controllers\Inspection\InspectionFlowController::class, 'edit'])->can('cfg-ins-flw-edit')->name('config.inspection.flow.edit');
+        Route::get('/create', [\App\Http\Controllers\Inspection\InspectionFlowController::class, 'create'])->can('cfg-ins-flw-create')->name('config.inspection.flow.create');
+        Route::get('/{id}', [\App\Http\Controllers\Inspection\InspectionFlowController::class, 'show'])->name('config.inspection.flow.show');
+        Route::post('/', [\App\Http\Controllers\Inspection\InspectionFlowController::class, 'store'])->can('cfg-ins-flw-create')->name('config.inspection.flow.store');
+        Route::put('/{id}', [\App\Http\Controllers\Inspection\InspectionFlowController::class, 'update'])->can('cfg-ins-flw-edit')->name('config.inspection.flow.update');
+        Route::delete('/', [\App\Http\Controllers\Inspection\InspectionFlowController::class, 'destroy'])->can('cfg-ins-flw-delete')->name('config.inspection.flow.destroy');
+    });
+
+    // forms
+    Route::prefix("forms")->group(function () {
+        // vehicle
+        Route::middleware(['can:cfg-ins-frm-vch', 'access:cfg-ins-frm-vch'])->group(function () {
+            Route::get('/vehicles', [\App\Http\Controllers\Inspection\InspectionFormController::class, 'index'])->name('config.inspection.form.vehicle.index');
+            Route::get('/vehicles/{id}/edit', [\App\Http\Controllers\Inspection\InspectionFormController::class, 'edit'])->can('cfg-ins-frm-vch-edit')->name('config.inspection.form.vehicle.edit');
+            Route::get('/vehicles/create', [\App\Http\Controllers\Inspection\InspectionFormController::class, 'create'])->can('cfg-ins-frm-vch-create')->name('config.inspection.form.vehicle.create');
+            // Route::get('/vehicles/{id}', [\App\Http\Controllers\Inspection\InspectionFormController::class, 'show'])->name('config.inspection.form.vehicle.show');
+            Route::post('/vehicles', [\App\Http\Controllers\Inspection\InspectionFormController::class, 'store'])->can('cfg-ins-frm-vch-create')->name('config.inspection.form.vehicle.store');
+            Route::put('/vehicles/{id}', [\App\Http\Controllers\Inspection\InspectionFormController::class, 'update'])->can('cfg-ins-frm-vch-edit')->name('config.inspection.form.vehicle.update');
+            Route::delete('/vehicles', [\App\Http\Controllers\Inspection\InspectionFormController::class, 'destroy'])->can('cfg-ins-frm-vch-delete')->name('config.inspection.form.vehicle.destroy');
+        });
+    });
+});
+
 // user
 Route::middleware(['can:cfg-user', 'access:cfg-user'])->group(function () {
     Route::get('/users', [\App\Http\Controllers\Config\UserController::class, 'index'])->name('config.user.index');

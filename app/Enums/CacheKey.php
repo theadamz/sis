@@ -14,6 +14,8 @@ enum CacheKey: string
     case SITE = 'SITE';
     case GATE = 'GATE';
     case USER = 'USER';
+    case INSPECTION_CATEGORY = 'INSPECTION_CATEGORY';
+    case INSPECTION_FLOW = 'INSPECTION_FLOW';
 
     public function getKey(?string ...$additionalKeys): string
     {

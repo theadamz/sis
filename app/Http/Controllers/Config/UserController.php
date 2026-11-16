@@ -24,6 +24,8 @@ use Inertia\Response;
 
 class UserController extends Controller
 {
+    private string $cacheStore = 'file';
+
     public function index(): Response
     {
         // route list
@@ -40,8 +42,8 @@ class UserController extends Controller
         $request = app(Request::class);
 
         // check if cache exist
-        if (Cache::has(CacheKey::USER->getKey())) {
-            return Cache::get(CacheKey::USER->getKey());
+        if (Cache::store($this->cacheStore)->has(CacheKey::USER->getKey())) {
+            return Cache::store($this->cacheStore)->get(CacheKey::USER->getKey());
         }
 
         // prepare filters
@@ -95,7 +97,7 @@ class UserController extends Controller
             ]);
 
         // set cache
-        Cache::put(CacheKey::USER->getKey(), $data, config('setting.cache_time'));
+        Cache::store($this->cacheStore)->put(CacheKey::USER->getKey(), $data, config('setting.cache_time'));
 
         return $data;
     }
@@ -194,7 +196,7 @@ class UserController extends Controller
         // validate request
         $validated = Validator::make($request->post(), [
             'ids' => ['required', "array"],
-            'ids.*' => ['required', "uuid", Rule::exists('users', 'id')],
+            'ids.*' => ['required', Rule::snowflake(), Rule::exists('users', 'id')],
         ])->validated();
 
         try {
@@ -231,8 +233,8 @@ class UserController extends Controller
         $lastId = $pagingType === PagingType::ID && $request->has('id') ? $request->query('id') : null;
 
         // check if cache exist
-        if (Cache::has(CacheKey::USER->getKey())) {
-            return response()->json(['data' => Cache::get(CacheKey::USER->getKey()), 'message' => "OK"], 200);
+        if (Cache::store($this->cacheStore)->has(CacheKey::USER->getKey())) {
+            return response()->json(['data' => Cache::store($this->cacheStore)->get(CacheKey::USER->getKey()), 'message' => "OK"], 200);
         }
 
         // query
@@ -266,7 +268,7 @@ class UserController extends Controller
         $query = $query->get();
 
         // set cache
-        Cache::put(CacheKey::USER->getKey(), $query, 30); // cache for 30 seconds
+        Cache::store($this->cacheStore)->put(CacheKey::USER->getKey(), $query, 30); // cache for 30 seconds
 
         return response()->json(['data' => $query, 'message' => "OK"], 200);
     }

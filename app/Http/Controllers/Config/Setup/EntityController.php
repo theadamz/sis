@@ -20,6 +20,8 @@ use Inertia\Response;
 
 class EntityController extends Controller
 {
+    private string $cacheStore = 'file';
+
     public function index(): Response
     {
         return Inertia::render("config/setup/entity/index", [
@@ -33,8 +35,8 @@ class EntityController extends Controller
         $request = app(Request::class);
 
         // check if cache exist
-        if (Cache::has(CacheKey::ENTITY->getKey())) {
-            return Cache::get(CacheKey::ENTITY->getKey());
+        if (Cache::store($this->cacheStore)->has(CacheKey::ENTITY->getKey())) {
+            return Cache::store($this->cacheStore)->get(CacheKey::ENTITY->getKey());
         }
 
         // prepare filters
@@ -79,7 +81,7 @@ class EntityController extends Controller
             ]);
 
         // set cache
-        Cache::put(CacheKey::ENTITY->getKey(), $data, config('setting.cache_time'));
+        Cache::store($this->cacheStore)->put(CacheKey::ENTITY->getKey(), $data, config('setting.cache_time'));
 
         return $data;
     }

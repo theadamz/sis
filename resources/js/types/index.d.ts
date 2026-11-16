@@ -211,6 +211,19 @@ export interface GateDT {
     is_active: boolean;
 }
 
+export interface InspectionCategoryDT {
+    id: string;
+    code: string;
+    name: string;
+    is_visible: boolean;
+}
+
+export interface InspectionFlowDT {
+    id: string;
+    name: string;
+    description?: string;
+}
+
 export interface InspectionTypeDT {
     id: string;
     code: string;

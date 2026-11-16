@@ -2,8 +2,9 @@
 // database structure : Security Information System (SIS)
 // author : theadamz91@gmail.com
 
-// core
+// config
 
+// config - setup
 Table entities {
     id bigint [primary key, not null]
     code varchar(3) [not null, unique]
@@ -131,22 +132,90 @@ Table sign_in_histories {
 // relation sign_in_histories
 Ref: sign_in_histories.user_id > users.id [delete: restrict, update: cascade]
 
-// ./ core
+// ./ config - setup
 
-// basic
+// config - inspection
+Table inspection_categories {
+    id bigint [pk, not null]
+    code varchar(50) [unique, not null]
+    name varchar(100) [not null]
+    is_active bool [not null, default: true]
+}
+
+// records inspection_categories
+Records inspection_categories(id, code, name) {
+    1, 'MT', 'Motor'
+    2, 'WB', 'Wingbox'
+    3, 'TR', 'Trailer'
+    4, 'GU', 'Gudang'
+    5, 'RG', 'Ruangan'
+    6, 'GE', 'Gedung'
+}
+
+Table inspection_flows {
+    id bigint [pk, not null]
+    inspection_category_id bigint [not null]
+    name varchar(100) [not null]
+    description varchar(255)
+}
+
+// relation inspection_flows
+Ref: inspection_flows.inspection_category_id > inspection_categories.id
+
+// records inspection_flows
+Records inspection_flows(id, inspection_category_id, name) {
+    1, 1, 'Motor Muat Barang'
+    2, 2, 'Wingbox Bongkar Barang'
+    3, 3, 'Trailer Muat Barang'
+    4, 4, 'Pemeriksaan Gudang'
+}
+
+Table inspection_flow_stages {
+    id bigint [pk, not null]
+    inspection_flow_id bigint [not null]
+    name varchar(100) [not null]
+    order smallint
+
+    indexes {
+        inspection_flow_id
+        order
+        (inspection_flow_id, order) [unique]
+    }
+
+}
+
+// relation inspection_flow_stages
+Ref: inspection_flow_stages.inspection_flow_id > inspection_flows.id
+
+// records inspection_flow_stages
+Records inspection_flow_stages(id, inspection_flow_id, name, order) {
+    1, 1, 'Loading', 1
+    2, 2, 'Check in', 1
+    3, 2, 'Unloading', 2
+    4, 2, 'Check out', 3
+    5, 3, 'Check in', 1
+    6, 3, 'Loading', 2
+    7, 3, 'Check out', 3
+    8, 4, 'Patroli', 1
+}
 
 Table inspection_forms {
     id bigint [primary key, not null]
+    inspection_flow_stage_id bigint [not null]
     type varchar(20) [not null, default: 'VEHICLE']
     code varchar(50) [unique, not null, note: "INS/24/001"]
     name varchar(100) [not null]
     is_publish bool [default: true]
 
     indexes {
+        inspection_flow_stage_id
         type
     }
 
 }
+
+// relation inspection_forms
+Ref: inspection_forms.inspection_flow_stage_id > inspection_flow_stages.id [delete: cascade, update: cascade]
 
 Table inspection_vehicle_forms {
     id bigint [primary key, not null]
@@ -203,9 +272,9 @@ Table inspection_vehicle_form_items {
 // relation inspection_vehicle_form_items
 Ref: inspection_vehicle_form_items.inspection_vehicle_form_section_id > inspection_vehicle_form_sections.id [delete: cascade, update: cascade]
 
-// ./ basic
+// ./ config
 
-// transaction
+// inspection
 
 Table vehicle_inspections {
     id bigint [primary key, not null]
@@ -308,4 +377,4 @@ Table document_sequences {
 // relation document_sequences
 Ref: document_sequences.site_id > sites.id [delete: cascade, update: cascade]
 
-// ./ transaction
+// ./ inspection

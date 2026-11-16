@@ -45,7 +45,7 @@ class InspectionFormController extends Controller
 
     public function index(): Response
     {
-        return Inertia::render("basic/inspection-form/vehicle/index")->with([
+        return Inertia::render("config/inspection/form/vehicle/index")->with([
             'inspectionStages' => $this->inspectionStages
         ]);
     }
@@ -133,7 +133,7 @@ class InspectionFormController extends Controller
 
     public function create(): Response
     {
-        return Inertia::render("basic/inspection-form/vehicle/create")->with([
+        return Inertia::render("config/inspection/form/vehicle/create")->with([
             'inspectionStages' => $this->inspectionStages
         ]);
     }
@@ -287,7 +287,7 @@ class InspectionFormController extends Controller
             'inspections' => $inspections->all(),
         ];
 
-        return Inertia::render("basic/inspection-form/vehicle/edit")->with([
+        return Inertia::render("config/inspection/form/vehicle/edit")->with([
             'inspectionStages' => $this->inspectionStages,
             'data2edit' => $data2edit
         ]);

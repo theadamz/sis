@@ -74,7 +74,7 @@ const Index = ({ inspectionTypes }: IndexProps): JSX.Element => {
         const ids = data!.map((item) => item.id);
 
         // delete
-        router.delete(route('basic.inspection-form.vehicle.destroy'), {
+        router.delete(route('config.inspection.form.vehicle.destroy'), {
             data: { ids: ids },
             onSuccess: (response) => {
                 loadingDialog.hide();
@@ -103,7 +103,7 @@ const Index = ({ inspectionTypes }: IndexProps): JSX.Element => {
     };
 
     const handleEdit = (data: InspectionFormDT) => {
-        router.visit(route('basic.inspection-form.vehicle.edit', { id: data.id }));
+        router.visit(route('config.inspection.form.vehicle.edit', { id: data.id }));
     };
 
     return (
@@ -168,7 +168,7 @@ const Index = ({ inspectionTypes }: IndexProps): JSX.Element => {
                     {/* actions */}
                     {access.permissions.create && (
                         <Button type="button" variant={'outline'} asChild>
-                            <Link href={route('basic.inspection-form.vehicle.create')}>
+                            <Link href={route('config.inspection.form.vehicle.create')}>
                                 <PlusIcon />
                                 <Label className="hidden md:flex">Create</Label>
                             </Link>
@@ -176,7 +176,7 @@ const Index = ({ inspectionTypes }: IndexProps): JSX.Element => {
                     )}
                 </div>
                 <DataTablePaginationAjax
-                    url={route('dt.basic.inspection-form.vehicle')}
+                    url={route('dt.config.inspection.form.vehicle')}
                     additionalQueryStrings={queryStrings}
                     ref={dataTable}
                     columnDefs={InspectionFormColumns}

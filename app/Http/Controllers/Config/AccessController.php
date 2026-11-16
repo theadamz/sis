@@ -394,7 +394,7 @@ class AccessController extends Controller
         // if menuData null
         if (empty($menuData)) {
             // delete cache
-            Cache::forget($cacheKey);
+            Cache::store($this->cacheStore)->forget($cacheKey);
 
             // get access menu codes
             $menuData = $this->service->getUserAccesses(siteId: Session::get('site_id'), userId: Auth::id());

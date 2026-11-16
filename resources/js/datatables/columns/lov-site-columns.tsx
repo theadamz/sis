@@ -2,11 +2,11 @@ import { Button } from '@/components//ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import CaretColumn from '@/datatables/components/caret-column';
 import { sortHandler } from '@/lib/utils';
-import { type Site } from '@/types';
+import { type SiteDT } from '@/types';
 import { ColumnDef } from '@tanstack/react-table';
 import { MousePointer2Icon } from 'lucide-react';
 
-export const LovSiteColumns: ColumnDef<Site, unknown>[] = [
+export const LovSiteColumns: ColumnDef<SiteDT, unknown>[] = [
     {
         id: 'select', // set to checkbox for multiselect
         meta: {

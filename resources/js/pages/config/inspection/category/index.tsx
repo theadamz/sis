@@ -1,43 +1,50 @@
 import { confirmDialog } from '@/components/confirm-dialog';
+import DialogContainer, { DialogContainerRef } from '@/components/dialog-container';
 import { DialogSheetRef } from '@/components/dialog-sheet';
 import { errorDialog } from '@/components/error-dialog';
 import { loadingDialog } from '@/components/loading-dialog';
 import Select from '@/components/select';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { InspectionFormColumns } from '@/datatables/columns/inspection-form-columns';
+import { InspectionCategoryColumns } from '@/datatables/columns/inspection-category-columns';
 import DataTablePaginationAjax, { DataTablePaginationAjaxRef } from '@/datatables/components/data-table-pagination-ajax';
 import { refactorErrorMessage } from '@/lib/refactorMessages';
-import { type BreadcrumbItem, type InspectionFormDT, type SharedData } from '@/types';
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { type BreadcrumbItem, type SharedData, type UserDT } from '@/types';
+import { Head, router, usePage } from '@inertiajs/react';
 import { PlusIcon, XIcon } from 'lucide-react';
 import { JSX, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import Create from './create';
+import Edit from './edit';
 
 const breadcrumbsData: BreadcrumbItem[] = [
     {
         title: 'Config',
     },
     {
-        title: 'Inspection Forms',
+        title: 'Inspections',
     },
     {
-        title: 'Vehicle',
-        href: route('basic.inspection-form.vehicle.index'),
+        title: 'Categories',
+        href: route('config.inspection.category.index'),
     },
 ];
 
-interface IndexProps {}
+interface IndexProps {
+    //
+}
 
 const Index = ({}: IndexProps): JSX.Element => {
     /*** inertia js ***/
     const { access } = usePage<SharedData>().props;
 
     /*** state ***/
+    const [id, setId] = useState<string | null>(null);
     const [queryStrings, setQueryStrings] = useState<{ [field: string]: any } | undefined>(undefined);
 
     /*** references ***/
     const dataTable = useRef<DataTablePaginationAjaxRef>(null);
+    const createForm = useRef<DialogContainerRef>(null);
     const editForm = useRef<DialogSheetRef>(null);
 
     /*** effect ***/
@@ -48,24 +55,13 @@ const Index = ({}: IndexProps): JSX.Element => {
     }, [queryStrings]);
 
     /*** events ***/
-    const handleFilters = (field: string, value: any) => {
-        setQueryStrings({
-            ...queryStrings,
-            ...{ [field]: value },
-        });
-    };
-
-    const handleFilterClear = () => {
-        setQueryStrings(undefined);
-        dataTable.current?.resetFilters();
-    };
-
-    const handleDelete = async (data: Array<InspectionFormDT>) => {
+    const handleDelete = async (data: Array<UserDT>) => {
         // confirmation
         const confirmation = await confirmDialog.YesNo({
             message: `Are you sure want to delete ${data.length} data?`,
             ConfirmButtonvariant: 'destructive',
         });
+
         if (!confirmation) return;
 
         // show progress
@@ -75,7 +71,7 @@ const Index = ({}: IndexProps): JSX.Element => {
         const ids = data!.map((item) => item.id);
 
         // delete
-        router.delete(route('basic.inspection-form.vehicle.destroy'), {
+        router.delete(route('config.inspection.category.destroy'), {
             data: { ids: ids },
             onSuccess: (response) => {
                 loadingDialog.hide();
@@ -103,58 +99,47 @@ const Index = ({}: IndexProps): JSX.Element => {
         });
     };
 
-    const handleEdit = (data: InspectionFormDT) => {
-        router.visit(route('basic.inspection-form.vehicle.edit', { id: data.id }));
+    const handleFilters = (field: string, value: any) => {
+        setQueryStrings({
+            ...queryStrings,
+            ...{ [field]: value },
+        });
+    };
+
+    const handleFilterClear = () => {
+        setQueryStrings(undefined);
+        dataTable.current?.resetFilters();
     };
 
     return (
         <>
-            <Head title="Inspection Form" />
+            <Head title="Inspection Category" />
+
+            {/* create */}
+            {access.permissions.create && (
+                <DialogContainer title="Create Inspection Category" ref={createForm} className="min-w-3xl">
+                    <Create onFormClosed={() => createForm.current?.close()} onCreated={() => dataTable.current?.refresh()} />
+                </DialogContainer>
+            )}
+
+            {/* edit */}
+            {access.permissions.edit && (
+                <DialogContainer title="Edit Inspection Category" ref={editForm} className="min-w-3xl">
+                    <Edit id={id} onFormClosed={() => editForm.current?.close()} onUpdated={() => dataTable.current?.refresh()} />
+                </DialogContainer>
+            )}
 
             {/* main content */}
-            <section className="mx-auto w-full p-4">
+            <section className="mx-auto w-full max-w-7xl p-4">
                 <div className="flex items-center justify-between">
                     {/* filters */}
                     <div className="flex space-x-2">
                         <Select
-                            className="w-27.5"
-                            placeholder="ETA Dest"
-                            selectLabel="Filter ETA Dest"
-                            value={queryStrings ? queryStrings['eta_dest'] : ''}
-                            onValueChange={(value) => handleFilters('eta_dest', value)}
-                            items={[
-                                { value: 'true', label: 'Yes' },
-                                { value: 'false', label: 'No' },
-                            ]}
-                        />
-                        <Select
-                            className="w-27.5"
-                            placeholder="ATA Dest"
-                            selectLabel="Filter ATA Dest"
-                            value={queryStrings ? queryStrings['ata_dest'] : ''}
-                            onValueChange={(value) => handleFilters('ata_dest', value)}
-                            items={[
-                                { value: 'true', label: 'Yes' },
-                                { value: 'false', label: 'No' },
-                            ]}
-                        />
-                        <Select
-                            className="w-27.5"
-                            placeholder="Duration"
-                            selectLabel="Filter Duration"
-                            value={queryStrings ? queryStrings['use_duration'] : ''}
-                            onValueChange={(value) => handleFilters('use_duration', value)}
-                            items={[
-                                { value: 'true', label: 'Yes' },
-                                { value: 'false', label: 'No' },
-                            ]}
-                        />
-                        <Select
-                            className="w-27.5"
-                            placeholder="Publish"
-                            selectLabel="Filter Publish"
-                            value={queryStrings ? queryStrings['is_publish'] : ''}
-                            onValueChange={(value) => handleFilters('is_publish', value)}
+                            className="w-30"
+                            placeholder="Active"
+                            selectLabel="Filter Active"
+                            value={queryStrings ? queryStrings['active'] : ''}
+                            onValueChange={(value) => handleFilters('active', value)}
                             items={[
                                 { value: 'true', label: 'Yes' },
                                 { value: 'false', label: 'No' },
@@ -167,25 +152,24 @@ const Index = ({}: IndexProps): JSX.Element => {
                             </Button>
                         )}
                     </div>
-                    {/* actions */}
                     {access.permissions.create && (
-                        <Button type="button" variant={'outline'} asChild>
-                            <Link href={route('basic.inspection-form.vehicle.create')}>
-                                <PlusIcon />
-                                <Label className="hidden md:flex">Create</Label>
-                            </Link>
+                        <Button type="button" variant={'outline'} onClick={() => createForm.current?.open()}>
+                            <PlusIcon />
+                            <Label className="hidden md:flex">Create</Label>
                         </Button>
                     )}
                 </div>
                 <DataTablePaginationAjax
-                    url={route('dt.basic.inspection-form.vehicle')}
+                    url={route('dt.config.inspection.category')}
                     additionalQueryStrings={queryStrings}
                     ref={dataTable}
-                    columnDefs={InspectionFormColumns}
+                    columnDefs={InspectionCategoryColumns}
                     containerClass="rounded-sm border"
-                    scrollAreaClass="h-[calc(100vh-19rem)]"
-                    rowId="id"
-                    onEdit={handleEdit}
+                    scrollAreaClass="h-[calc(100vh-18rem)]"
+                    onEdit={(data) => {
+                        setId(data.id);
+                        editForm.current?.open();
+                    }}
                     onDeleteClicked={handleDelete}
                 />
             </section>

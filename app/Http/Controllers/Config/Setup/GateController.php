@@ -20,6 +20,8 @@ use Inertia\Response;
 
 class GateController extends Controller
 {
+    private string $cacheStore = 'file';
+
     public function index(): Response
     {
         return Inertia::render("config/setup/gate/index");
@@ -31,8 +33,8 @@ class GateController extends Controller
         $request = app(Request::class);
 
         // check if cache exist
-        if (Cache::has(CacheKey::GATE->getKey())) {
-            return Cache::get(CacheKey::GATE->getKey());
+        if (Cache::store($this->cacheStore)->has(CacheKey::GATE->getKey())) {
+            return Cache::store($this->cacheStore)->get(CacheKey::GATE->getKey());
         }
 
         // prepare filters
@@ -78,7 +80,7 @@ class GateController extends Controller
             ]);
 
         // set cache
-        Cache::put(CacheKey::SITE->getKey(), $data, config('setting.cache_time'));
+        Cache::store($this->cacheStore)->put(CacheKey::SITE->getKey(), $data, config('setting.cache_time'));
 
         return $data;
     }

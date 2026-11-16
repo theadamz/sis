@@ -21,11 +21,10 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { refactorErrorMessage } from '@/lib/refactorMessages';
 import { generateRandomId } from '@/lib/utils';
 import { type BreadcrumbItem, type InspectionFormItem, type InspectionFormSection, type InspectionType, type SharedData } from '@/types';
-import { InspectionStage } from '@/types/enum';
 import { Head, router, useForm } from '@inertiajs/react';
 import _ from 'lodash';
 import { ArrowLeftRight, CheckIcon, EditIcon, Loader2, MenuIcon, PlusIcon, XIcon } from 'lucide-react';
-import { Fragment, ReactNode, SubmitEvent, useEffect, useRef, useState } from 'react';
+import { Fragment, ReactNode, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import FormSection from './form-section';
 import FormSectionItem from './form-section-item';
@@ -33,17 +32,18 @@ import FormSectionItemMove from './form-section-item-move';
 
 const breadcrumbsData: BreadcrumbItem[] = [
     {
-        title: 'Config',
+        title: 'Basic',
     },
     {
-        title: 'Inspection',
+        title: 'Inspection Form',
     },
     {
-        title: 'Form',
-        href: route('basic.inspection-form.vehicle.index'),
+        title: 'Vehicles',
+        href: route('config.inspection.form.vehicle.index'),
     },
     {
-        title: 'Edit',
+        title: 'Create',
+        href: route('config.inspection.form.vehicle.create'),
     },
 ];
 
@@ -52,34 +52,33 @@ type Inspection = InspectionFormSection & {
 };
 
 type InspectionForm = {
-    id: string;
     code: string;
     name: string;
-    is_publish: boolean;
     use_eta_dest: boolean;
     use_ata_dest: boolean;
     use_duration: boolean;
-    stage: InspectionStage;
+    is_publish: boolean;
+    stage: string;
     inspections: Inspection[];
 };
 
-interface EditProps {
-    data2edit: InspectionForm;
+interface CreateProps {
     inspectionStages: InspectionType[];
 }
 
-const Edit = ({ inspectionStages, data2edit }: EditProps): ReactNode => {
+const inspectionId = generateRandomId();
+
+const Create = ({ inspectionStages }: CreateProps): ReactNode => {
     /*** inertia js ***/
-    const { data, setData, put, processing, errors, reset, clearErrors, isDirty } = useForm<Required<InspectionForm>>({
-        id: data2edit.id,
-        code: data2edit.code,
-        name: data2edit.name,
-        is_publish: data2edit.is_publish,
-        use_eta_dest: data2edit.use_eta_dest,
-        use_ata_dest: data2edit.use_ata_dest,
-        use_duration: data2edit.use_duration,
-        stage: data2edit.stage,
-        inspections: data2edit.inspections,
+    const { data, setData, post, processing, errors, reset, clearErrors, isDirty } = useForm<Required<InspectionForm>>({
+        code: '',
+        name: '',
+        use_eta_dest: false,
+        use_ata_dest: false,
+        use_duration: false,
+        is_publish: true,
+        stage: '',
+        inspections: [],
     });
 
     /*** references ***/
@@ -107,14 +106,24 @@ const Edit = ({ inspectionStages, data2edit }: EditProps): ReactNode => {
     }, [data.inspections]);
 
     /*** events ***/
-    const submitForm = async (e: SubmitEvent<HTMLFormElement>) => {
+    const submitForm = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        put(route('basic.inspection-form.vehicle.update', { id: data2edit.id }), {
+        post(route('config.inspection.form.vehicle.store'), {
             onSuccess: async (response) => {
                 const props = response.props as unknown as SharedData;
                 const flash = props.flash;
                 if (flash.toast) toast.success(flash.toast.title, { description: flash.toast.message });
+
+                // confirmation create new data
+                const confirmation = await confirmDialog.YesNo({ message: 'Create new inspection form?' });
+                if (confirmation) {
+                    resetForm();
+                } else {
+                    router.visit(route('config.inspection.form.vehicle.index'), {
+                        replace: true,
+                    });
+                }
             },
             onError: async (errors) => {
                 if (errors.error) {
@@ -133,6 +142,26 @@ const Edit = ({ inspectionStages, data2edit }: EditProps): ReactNode => {
         });
     };
 
+    const resetForm = () => {
+        reset(); // clear form to initial values
+        clearErrors(); // clear errors
+        setData({
+            code: '',
+            name: '',
+            use_eta_dest: false,
+            use_ata_dest: false,
+            use_duration: false,
+            is_publish: true,
+            stage: '',
+            inspections: [],
+        });
+        setSectionFormTitle('Create Section');
+        setSectionItemFormTitle('Create Section Item');
+        setItemCount(0);
+        setInspectionFormSectionData(undefined);
+        setInspectionFormSectionItemData(undefined);
+    };
+
     const handleCancel = async () => {
         if (isDirty) {
             // confirmation
@@ -143,7 +172,7 @@ const Edit = ({ inspectionStages, data2edit }: EditProps): ReactNode => {
             if (!confirmation) return;
         }
 
-        router.visit(route('basic.inspection-form.vehicle.index'), {
+        router.visit(route('config.inspection.form.vehicle.index'), {
             replace: true,
         });
     };
@@ -175,7 +204,7 @@ const Edit = ({ inspectionStages, data2edit }: EditProps): ReactNode => {
             const inspection: Inspection = {
                 ...inspectionFormSection,
                 id: generateRandomId(),
-                inspection_vehicle_form_id: data.id,
+                inspection_vehicle_form_id: inspectionId,
                 items: [],
             };
 
@@ -189,48 +218,6 @@ const Edit = ({ inspectionStages, data2edit }: EditProps): ReactNode => {
         }
 
         sectionForm.current?.close();
-    };
-
-    const handleInspectionFormSectionItemMoveSubmit = (inspectionFormSectionItem: InspectionFormItem) => {
-        setData((prevData) => {
-            // get sections / inspections without selected data
-            const sections = prevData.inspections
-                .filter((section) => section.id !== inspectionFormSectionItem.inspection_vehicle_form_section_id)
-                .map((section) => {
-                    return {
-                        ...section,
-                        ...{
-                            items: section.items.filter((item) => {
-                                return item.id !== inspectionFormSectionItem.id;
-                            }),
-                        },
-                    };
-                });
-
-            // get new section with selected data
-            const newSection = prevData.inspections.find((item) => item.id === inspectionFormSectionItem.inspection_vehicle_form_section_id);
-            if (!newSection) return prevData;
-
-            // get new section existing items without selected data
-            const newSectionExistingItems = newSection.items.filter((item) => item.id !== inspectionFormSectionItem.id);
-
-            // update inspection items by add it
-            const updatedInspection: Inspection = {
-                ...newSection,
-                items:
-                    newSection.items.length <= 0
-                        ? [inspectionFormSectionItem]
-                        : _.sortBy([...newSectionExistingItems, inspectionFormSectionItem], ['seq']),
-            };
-
-            // merge inspection with sort
-            return {
-                ...prevData,
-                ...{ inspections: _.sortBy([...sections, updatedInspection], ['seq']) },
-            };
-        });
-
-        sectionItemMoveForm.current?.close();
     };
 
     const handleSectionEdit = (id: string) => {
@@ -282,7 +269,7 @@ const Edit = ({ inspectionStages, data2edit }: EditProps): ReactNode => {
                     (section) => section.id !== inspectionFormSectionItem.inspection_vehicle_form_section_id,
                 );
 
-                // get previous section with seelcted data
+                // get previous section with selected data
                 const prevSection = prevData.inspections.find((item) => item.id === inspectionFormSectionItem.inspection_vehicle_form_section_id);
                 if (!prevSection) return prevData;
 
@@ -334,6 +321,48 @@ const Edit = ({ inspectionStages, data2edit }: EditProps): ReactNode => {
         }
 
         sectionItemForm.current?.close();
+    };
+
+    const handleInspectionFormSectionItemMoveSubmit = (inspectionFormSectionItem: InspectionFormItem) => {
+        setData((prevData) => {
+            // get sections / inspections without selected data
+            const sections = prevData.inspections
+                .filter((section) => section.id !== inspectionFormSectionItem.inspection_vehicle_form_section_id)
+                .map((section) => {
+                    return {
+                        ...section,
+                        ...{
+                            items: section.items.filter((item) => {
+                                return item.id !== inspectionFormSectionItem.id;
+                            }),
+                        },
+                    };
+                });
+
+            // get new section with selected data
+            const newSection = prevData.inspections.find((item) => item.id === inspectionFormSectionItem.inspection_vehicle_form_section_id);
+            if (!newSection) return prevData;
+
+            // get new section existing items without selected data
+            const newSectionExistingItems = newSection.items.filter((item) => item.id !== inspectionFormSectionItem.id);
+
+            // update inspection items by add it
+            const updatedInspection: Inspection = {
+                ...newSection,
+                items:
+                    newSection.items.length <= 0
+                        ? [inspectionFormSectionItem]
+                        : _.sortBy([...newSectionExistingItems, inspectionFormSectionItem], ['seq']),
+            };
+
+            // merge inspection with sort
+            return {
+                ...prevData,
+                ...{ inspections: _.sortBy([...sections, updatedInspection], ['seq']) },
+            };
+        });
+
+        sectionItemMoveForm.current?.close();
     };
 
     const handleItemEdit = (sectionId: string, itemId: string) => {
@@ -414,7 +443,7 @@ const Edit = ({ inspectionStages, data2edit }: EditProps): ReactNode => {
 
     return (
         <>
-            <Head title="Edit Inspection Form" />
+            <Head title="Create Inspection Form" />
 
             {/* Section */}
             <DialogContainer
@@ -516,7 +545,7 @@ const Edit = ({ inspectionStages, data2edit }: EditProps): ReactNode => {
                                     placeholder="Stage"
                                     selectLabel="Select Stage"
                                     value={data.stage ?? null}
-                                    onValueChange={(value) => setData('stage', value as InspectionStage)}
+                                    onValueChange={(value) => setData('stage', value)}
                                     items={inspectionStages}
                                     error={errors.stage}
                                 />
@@ -597,7 +626,7 @@ const Edit = ({ inspectionStages, data2edit }: EditProps): ReactNode => {
                     </FieldSet>
                 </FieldGroup>
 
-                <div className="col-span-12 mt-5 grid gap-2">
+                <div className="col-span-12 mt-5">
                     <div className="flex items-center justify-between">
                         <div>
                             <Label className="scroll-m-20 text-xl font-semibold tracking-tight">Inspection Items</Label>
@@ -607,14 +636,16 @@ const Edit = ({ inspectionStages, data2edit }: EditProps): ReactNode => {
                             </div>
                         </div>
                         <div className="space-x-2">
-                            <Button type="button" variant={'normal'} onClick={() => sectionForm.current?.open()}>
-                                <PlusIcon className="size-4" />
-                                <Label className="hidden md:flex">Section</Label>
-                            </Button>
+                            <TooltipWrapper caption={`Create new section`}>
+                                <Button type="button" variant={'normal'} onClick={() => sectionForm.current?.open()}>
+                                    <PlusIcon className="size-4" />
+                                    <Label className="hidden md:flex">Section</Label>
+                                </Button>
+                            </TooltipWrapper>
                         </div>
                     </div>
 
-                    <div className="w-full">
+                    <div className="my-2 w-full">
                         <ScrollArea className="h-[calc(100vh-26rem)] rounded-sm border p-2 pe-4 shadow">
                             {data.inspections.length <= 0 ? (
                                 <div className="w-full items-center text-center">
@@ -661,10 +692,16 @@ const Edit = ({ inspectionStages, data2edit }: EditProps): ReactNode => {
                                                                 </DropdownMenuItem>
                                                             </DropdownMenuContent>
                                                         </DropdownMenu>
-                                                        <Button type="button" variant={'outline'} onClick={() => handleSectionItemCreate(section)}>
-                                                            <PlusIcon className="size-4" />
-                                                            Item
-                                                        </Button>
+                                                        <TooltipWrapper caption={`Create new item`}>
+                                                            <Button
+                                                                type="button"
+                                                                variant={'outline'}
+                                                                onClick={() => handleSectionItemCreate(section)}
+                                                            >
+                                                                <PlusIcon className="size-4" />
+                                                                Item
+                                                            </Button>
+                                                        </TooltipWrapper>
                                                     </div>
                                                 </div>
                                                 <div className="rounded-sm border">
@@ -748,5 +785,5 @@ const Edit = ({ inspectionStages, data2edit }: EditProps): ReactNode => {
     );
 };
 
-Edit.breadcrumbs = breadcrumbsData;
-export default Edit;
+Create.breadcrumbs = breadcrumbsData;
+export default Create;
