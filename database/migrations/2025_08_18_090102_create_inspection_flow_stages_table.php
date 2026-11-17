@@ -24,7 +24,7 @@ return new class extends Migration
             $table->unique(['inspection_flow_id', 'order']);
 
             // FK
-            $table->foreign('inspection_flow_id')->on('inspection_flows')->references('id')->restrictOnDelete()->cascadeOnUpdate();
+            $table->foreign('inspection_flow_id')->on('inspection_flows')->references('id')->cascadeOnDelete()->cascadeOnUpdate();
         });
     }
 

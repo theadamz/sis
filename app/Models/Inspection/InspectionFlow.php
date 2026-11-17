@@ -22,6 +22,7 @@ class InspectionFlow extends Model
     protected $guarded = ['created_by', 'updated_by'];
     protected $casts = [
         'id' => AsSnowflake::class,
+        'inspection_category_id' => AsSnowflake::class,
     ];
 
     protected static function boot()

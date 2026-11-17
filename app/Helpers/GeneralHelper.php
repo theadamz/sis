@@ -7,6 +7,7 @@ use Carbon\CarbonTimeZone;
 use DateTimeZone;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -60,24 +61,23 @@ class GeneralHelper
         }
     }
 
-    public static function removeCaches(string $keyword): void
+    public static function removeCaches(string $keyword, ?string $cacheStore = 'file'): void
     {
         // get all cache from redis
-        if (config('cache.default') === 'database') {
+        if ($cacheStore === 'database') {
             $cachePrefix = Cache::getPrefix();
-
             DB::table('cache')->where('key', 'like', $cachePrefix . $keyword . "%")->delete();
-        } else {
+        } else if ($cacheStore === 'redis') {
             $keys = Redis::connection('cache')->keys('*' . Cache::getPrefix() . $keyword . '*');
-
             if (!empty($keys)) {
                 foreach ($keys as $key) {
                     // refactor key name
                     $key = Str::chopStart($key, config('database.redis.options.prefix') . Cache::getPrefix());
-
-                    Cache::forget($key);
+                    Cache::store($cacheStore)->forget($key);
                 }
             }
+        } else {
+            Artisan::call('cache:clear file');
         }
     }
 

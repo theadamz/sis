@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { InspectionFlowColumns } from '@/datatables/columns/inspection-flow-columns';
 import DataTablePaginationAjax, { DataTablePaginationAjaxRef } from '@/datatables/components/data-table-pagination-ajax';
 import { refactorErrorMessage } from '@/lib/refactorMessages';
-import { type BreadcrumbItem, type SharedData, type UserDT } from '@/types';
+import { type BreadcrumbItem, type InspectionFlow, type InspectionFlowDT, type SharedData } from '@/types';
 import { Deferred, Head, router, usePage } from '@inertiajs/react';
 import { PlusIcon, XIcon } from 'lucide-react';
 import { JSX, useEffect, useRef, useState } from 'react';
@@ -33,9 +33,10 @@ const breadcrumbsData: BreadcrumbItem[] = [
 
 interface IndexProps {
     inspectionCategories: Array<{ id: string; code: string; name: string }>;
+    rec?: InspectionFlow;
 }
 
-const Index = ({ inspectionCategories }: IndexProps): JSX.Element => {
+const Index = ({ inspectionCategories, rec }: IndexProps): JSX.Element => {
     /*** inertia js ***/
     const { access } = usePage<SharedData>().props;
 
@@ -56,7 +57,7 @@ const Index = ({ inspectionCategories }: IndexProps): JSX.Element => {
     }, [queryStrings]);
 
     /*** events ***/
-    const handleDelete = async (data: Array<UserDT>) => {
+    const handleDelete = async (data: Array<InspectionFlowDT>) => {
         // confirmation
         const confirmation = await confirmDialog.YesNo({
             message: `Are you sure want to delete ${data.length} data?`,
@@ -112,21 +113,26 @@ const Index = ({ inspectionCategories }: IndexProps): JSX.Element => {
         dataTable.current?.resetFilters();
     };
 
+    const handleEdit = (data: InspectionFlowDT) => {
+        if (!access.permissions.edit) return;
+        router.visit(route('config.inspection.flow.edit', { id: data.id }), { preserveUrl: true });
+    };
+
     return (
         <>
             <Head title="Inspection Flow" />
 
             {/* create */}
             {access.permissions.create && (
-                <DialogContainer title="Create Inspection Flow" ref={createForm} className="min-w-3xl">
+                <DialogContainer title="Create Inspection Flow" ref={createForm} className="min-w-5xl">
                     <Create onFormClosed={() => createForm.current?.close()} onCreated={() => dataTable.current?.refresh()} />
                 </DialogContainer>
             )}
 
             {/* edit */}
             {access.permissions.edit && (
-                <DialogContainer title="Edit Inspection Flow" ref={editForm} className="min-w-3xl">
-                    <Edit id={id} onFormClosed={() => editForm.current?.close()} onUpdated={() => dataTable.current?.refresh()} />
+                <DialogContainer title="Edit Inspection Flow" ref={editForm} className="min-w-5xl" open={rec ? true : false}>
+                    <Edit rec={rec} onFormClosed={() => editForm.current?.close()} onUpdated={() => dataTable.current?.refresh()} />
                 </DialogContainer>
             )}
 
@@ -170,10 +176,7 @@ const Index = ({ inspectionCategories }: IndexProps): JSX.Element => {
                     columnDefs={InspectionFlowColumns}
                     containerClass="rounded-sm border"
                     scrollAreaClass="h-[calc(100vh-18rem)]"
-                    onEdit={(data) => {
-                        setId(data.id);
-                        editForm.current?.open();
-                    }}
+                    onEdit={handleEdit}
                     onDeleteClicked={handleDelete}
                 />
             </section>

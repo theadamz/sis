@@ -153,6 +153,22 @@ export interface InspectionFormItemMove {
     seq: number;
 }
 
+export interface InspectionFlowStage {
+    id: string;
+    inspection_flow_id: string;
+    name: string;
+    order: number;
+}
+
+export interface InspectionFlow {
+    id: string;
+    inspection_category_id: string;
+    inspection_category_name: string;
+    name: string;
+    description?: string;
+    stages: Array<InspectionFlowStage>;
+}
+
 /* enum */
 
 export interface InspectionType {

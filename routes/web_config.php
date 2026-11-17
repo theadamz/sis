@@ -39,7 +39,6 @@ Route::prefix("inspections")->group(function () {
     // category
     Route::prefix("categories")->middleware(['can:cfg-ins-ctg', 'access:cfg-ins-ctg'])->group(function () {
         Route::get('/', [\App\Http\Controllers\Inspection\InspectionCategoryController::class, 'index'])->name('config.inspection.category.index');
-        Route::get('/{id}/edit', [\App\Http\Controllers\Inspection\InspectionCategoryController::class, 'edit'])->can('cfg-ins-ctg-edit')->name('config.inspection.category.edit');
         Route::get('/create', [\App\Http\Controllers\Inspection\InspectionCategoryController::class, 'create'])->can('cfg-ins-ctg-create')->name('config.inspection.category.create');
         Route::get('/{id}', [\App\Http\Controllers\Inspection\InspectionCategoryController::class, 'show'])->name('config.inspection.category.show');
         Route::post('/', [\App\Http\Controllers\Inspection\InspectionCategoryController::class, 'store'])->can('cfg-ins-ctg-create')->name('config.inspection.category.store');

@@ -293,7 +293,7 @@ class InspectionFormController extends Controller
         ]);
     }
 
-    public function update(InspectionFormUpdateData $validated)
+    public function update(InspectionFormUpdateData $validated): RedirectResponse
     {
         // check for duplicate
         $exist = InspectionForm::where(function (Builder $query) use ($validated) {
