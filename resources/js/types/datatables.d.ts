@@ -6,6 +6,7 @@ declare module '@tanstack/react-table' {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     interface TableMeta<TData extends RowData> {
         onEdit?: (row: any) => void;
+        onCustomEvent?: (row: any, event: string) => void;
         onSelect?: (row: any) => void;
         onChecked?: (row: any, isChecked: boolean) => void;
         onHeaderChecked?: (isChecked: boolean) => void;

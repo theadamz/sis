@@ -39,7 +39,7 @@ class InspectionFlowController extends Controller
     public function index(): InertiaResponse
     {
         return Inertia::render("config/inspection/flow/index", [
-            'inspectionCategories' => Inertia::defer(fn() => $this->getInspectionCategories())
+            'inspectionCategories' => Inertia::defer(fn() => $this->getInspectionCategories()),
         ]);
     }
 
@@ -178,6 +178,41 @@ class InspectionFlowController extends Controller
         return Inertia::render("config/inspection/flow/index", [
             'inspectionCategories' => Inertia::defer(fn() => $this->getInspectionCategories()),
             'rec' => $rec,
+            'action' => 'edit'
+        ]);
+    }
+
+    public function duplicate(string $id): InertiaResponse
+    {
+        // query
+        $data = InspectionFlow::query()->selectRaw("id, inspection_category_id, name, description")->where('id', $id)
+            ->with([
+                'inspection_category:id,code,name',
+                'inspection_flow_stages:id,inspection_flow_id,name,order'
+            ]);
+
+        // check if data exist
+        if (!$data->exists()) {
+            return abort(Response::HTTP_NOT_FOUND);
+        }
+
+        // get data
+        $data = $data->first();
+
+        // prepare data to send
+        $rec = [
+            'id' => $data->id,
+            'inspection_category_id' => $data->inspection_category_id,
+            'inspection_category_name' => $data->inspection_category->name,
+            'name' => $data->name,
+            'description' => $data->description,
+            'stages' => collect($data->inspection_flow_stages->toArray())->sortBy('order')->all(),
+        ];
+
+        return Inertia::render("config/inspection/flow/index", [
+            'inspectionCategories' => Inertia::defer(fn() => $this->getInspectionCategories()),
+            'rec' => $rec,
+            'action' => 'duplicate'
         ]);
     }
 
@@ -230,7 +265,7 @@ class InspectionFlowController extends Controller
             Session::flash('toast', [
                 'variant' => 'success',
                 'title' => 'Success',
-                'message' => "Data successfully created.",
+                'message' => "Data successfully saved.",
             ]);
 
             return to_route('config.inspection.flow.index');

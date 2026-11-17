@@ -16,6 +16,7 @@ import { PlusIcon, XIcon } from 'lucide-react';
 import { JSX, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import Create from './create';
+import Duplicate from './duplicate';
 import Edit from './edit';
 
 const breadcrumbsData: BreadcrumbItem[] = [
@@ -34,9 +35,10 @@ const breadcrumbsData: BreadcrumbItem[] = [
 interface IndexProps {
     inspectionCategories: Array<{ id: string; code: string; name: string }>;
     rec?: InspectionFlow;
+    action?: 'create' | 'edit' | 'duplicate';
 }
 
-const Index = ({ inspectionCategories, rec }: IndexProps): JSX.Element => {
+const Index = ({ inspectionCategories, rec, action = 'create' }: IndexProps): JSX.Element => {
     /*** inertia js ***/
     const { access } = usePage<SharedData>().props;
 
@@ -118,6 +120,11 @@ const Index = ({ inspectionCategories, rec }: IndexProps): JSX.Element => {
         router.visit(route('config.inspection.flow.edit', { id: data.id }), { preserveUrl: true });
     };
 
+    const handleDupicate = (data: InspectionFlowDT) => {
+        if (!access.permissions.create) return;
+        router.visit(route('config.inspection.flow.duplicate', { id: data.id }), { preserveUrl: true });
+    };
+
     return (
         <>
             <Head title="Inspection Flow" />
@@ -131,8 +138,15 @@ const Index = ({ inspectionCategories, rec }: IndexProps): JSX.Element => {
 
             {/* edit */}
             {access.permissions.edit && (
-                <DialogContainer title="Edit Inspection Flow" ref={editForm} className="min-w-5xl" open={rec ? true : false}>
+                <DialogContainer title="Edit Inspection Flow" ref={editForm} className="min-w-5xl" open={action === 'edit'}>
                     <Edit rec={rec} onFormClosed={() => editForm.current?.close()} onUpdated={() => dataTable.current?.refresh()} />
+                </DialogContainer>
+            )}
+
+            {/* edit */}
+            {access.permissions.edit && (
+                <DialogContainer title="Duplicate Inspection Flow" ref={editForm} className="min-w-5xl" open={action === 'duplicate'}>
+                    <Duplicate rec={rec} onFormClosed={() => editForm.current?.close()} onCreated={() => dataTable.current?.refresh()} />
                 </DialogContainer>
             )}
 
@@ -177,6 +191,9 @@ const Index = ({ inspectionCategories, rec }: IndexProps): JSX.Element => {
                     containerClass="rounded-sm border"
                     scrollAreaClass="h-[calc(100vh-18rem)]"
                     onEdit={handleEdit}
+                    onCustomEvent={(data: InspectionFlowDT, event: string) => {
+                        if (event === 'duplicate') handleDupicate(data);
+                    }}
                     onDeleteClicked={handleDelete}
                 />
             </section>

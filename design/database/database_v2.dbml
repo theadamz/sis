@@ -201,8 +201,8 @@ Records inspection_flow_stages(id, inspection_flow_id, name, order) {
 
 Table inspection_forms {
     id bigint [primary key, not null]
-    inspection_flow_stage_id bigint [not null]
     type varchar(20) [not null, default: 'VEHICLE']
+    inspection_flow_stage_id bigint [not null]
     code varchar(50) [unique, not null, note: "INS/24/001"]
     name varchar(100) [not null]
     is_publish bool [default: true]

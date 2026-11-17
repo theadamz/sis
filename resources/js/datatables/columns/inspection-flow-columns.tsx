@@ -14,7 +14,7 @@ import { sortHandler } from '@/lib/utils';
 import { type InspectionFlowDT, type SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
-import { EllipsisVerticalIcon, PencilIcon } from 'lucide-react';
+import { CopyIcon, EllipsisVerticalIcon, PencilIcon } from 'lucide-react';
 
 export const InspectionFlowColumns: ColumnDef<InspectionFlowDT, unknown>[] = [
     {
@@ -115,6 +115,13 @@ export const InspectionFlowColumns: ColumnDef<InspectionFlowDT, unknown>[] = [
                         {permissions.edit && (
                             <DropdownMenuItem onClick={() => table.options.meta?.onEdit && table.options.meta.onEdit(item as any)}>
                                 <PencilIcon /> Edit
+                            </DropdownMenuItem>
+                        )}
+                        {permissions.create && (
+                            <DropdownMenuItem
+                                onClick={() => table.options.meta?.onCustomEvent && table.options.meta.onCustomEvent(item as any, 'duplicate')}
+                            >
+                                <CopyIcon /> Dulicate
                             </DropdownMenuItem>
                         )}
                     </DropdownMenuContent>

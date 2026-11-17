@@ -46,6 +46,7 @@ type DataTablePaginationAjaxProps<TData, TValue> = {
     useFirstAndLastPage?: boolean;
     additionalQueryStrings?: AddiotionalQueryString;
     onEdit?: (data: any) => void;
+    onCustomEvent?: (data: any, event: string) => void;
     onRowSelected?: (data: any) => void;
     onRowsSelected?: (data: any[]) => void;
     onDeleteClicked?: (data: any[]) => void;
@@ -72,6 +73,7 @@ const DataTablePaginationAjax = <TData, TValue>(
         useFirstAndLastPage = true,
         additionalQueryStrings,
         onEdit,
+        onCustomEvent,
         onRowSelected,
         onRowsSelected,
         onDeleteClicked,
@@ -119,6 +121,9 @@ const DataTablePaginationAjax = <TData, TValue>(
         meta: {
             onEdit: (data: any) => {
                 if (onEdit) onEdit(data);
+            },
+            onCustomEvent: (data: any, event: string) => {
+                if (onCustomEvent) onCustomEvent(data, event);
             },
             onSelect: (row: any) => {
                 if (onRowSelected) onRowSelected(row);
@@ -430,7 +435,7 @@ const DataTablePaginationAjax = <TData, TValue>(
 
             {/* Footer */}
             {onCancel && (
-                <div className="flex grow-1 justify-between pt-2">
+                <div className="flex grow justify-between pt-2">
                     <Button variant="outline" onClick={() => onCancel && onCancel()}>
                         <XIcon /> Cancel
                     </Button>

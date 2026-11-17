@@ -49,6 +49,7 @@ Route::prefix("inspections")->group(function () {
     // flow
     Route::prefix("flows")->middleware(['can:cfg-ins-flw', 'access:cfg-ins-flw'])->group(function () {
         Route::get('/', [\App\Http\Controllers\Inspection\InspectionFlowController::class, 'index'])->name('config.inspection.flow.index');
+        Route::get('/{id}/duplicate', [\App\Http\Controllers\Inspection\InspectionFlowController::class, 'duplicate'])->can('cfg-ins-flw-create')->name('config.inspection.flow.duplicate');
         Route::get('/{id}/edit', [\App\Http\Controllers\Inspection\InspectionFlowController::class, 'edit'])->can('cfg-ins-flw-edit')->name('config.inspection.flow.edit');
         Route::get('/create', [\App\Http\Controllers\Inspection\InspectionFlowController::class, 'create'])->can('cfg-ins-flw-create')->name('config.inspection.flow.create');
         Route::get('/{id}', [\App\Http\Controllers\Inspection\InspectionFlowController::class, 'show'])->name('config.inspection.flow.show');
