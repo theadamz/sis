@@ -10,13 +10,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Inspection\InspectionCategory;
 use App\Models\Inspection\InspectionFlow;
 use App\Models\Inspection\InspectionFlowStage;
-use DB;
-use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
@@ -30,9 +29,9 @@ class InspectionFlowController extends Controller
 
     private function getInspectionCategories()
     {
-        if (Cache::store($this->cacheStore)->has(CacheKey::INSPECTION_CATEGORY->getKey())) return Cache::get(CacheKey::INSPECTION_CATEGORY->getKey());
+        if (Cache::store($this->cacheStore)->has(CacheKey::INSPECTION_CATEGORY->getKey())) return Cache::store($this->cacheStore)->get(CacheKey::INSPECTION_CATEGORY->getKey());
         $data = InspectionCategory::query()->where('is_active', true)->get(['id', 'code', 'name']);
-        Cache::store($this->cacheStore)->put(CacheKey::INSPECTION_CATEGORY->getKey(), $data, now()->addDays(1)); // cache for 1 day
+        if (!empty($data)) Cache::store($this->cacheStore)->put(CacheKey::INSPECTION_CATEGORY->getKey(), $data->toArray(), now()->addDays(1));
         return $data;
     }
 
@@ -101,6 +100,13 @@ class InspectionFlowController extends Controller
         Cache::store($this->cacheStore)->put(CacheKey::INSPECTION_FLOW->getKey(), $data, config('setting.cache_time'));
 
         return $data;
+    }
+
+    public function create(): InertiaResponse
+    {
+        return Inertia::render("config/inspection/flow/index", [
+            'action' => 'create'
+        ]);
     }
 
     public function store(InspectionFlowCreateData $validated): RedirectResponse
@@ -176,7 +182,6 @@ class InspectionFlowController extends Controller
         ];
 
         return Inertia::render("config/inspection/flow/index", [
-            'inspectionCategories' => Inertia::defer(fn() => $this->getInspectionCategories()),
             'rec' => $rec,
             'action' => 'edit'
         ]);
@@ -210,7 +215,6 @@ class InspectionFlowController extends Controller
         ];
 
         return Inertia::render("config/inspection/flow/index", [
-            'inspectionCategories' => Inertia::defer(fn() => $this->getInspectionCategories()),
             'rec' => $rec,
             'action' => 'duplicate'
         ]);

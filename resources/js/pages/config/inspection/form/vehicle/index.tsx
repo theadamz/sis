@@ -19,10 +19,13 @@ const breadcrumbsData: BreadcrumbItem[] = [
         title: 'Config',
     },
     {
-        title: 'Inspection Forms',
+        title: 'Inspection',
     },
     {
-        title: 'Vehicle',
+        title: 'Forms',
+    },
+    {
+        title: 'Vehicles',
         href: route('config.inspection.form.vehicle.index'),
     },
 ];
@@ -107,6 +110,11 @@ const Index = ({}: IndexProps): JSX.Element => {
         router.visit(route('config.inspection.form.vehicle.edit', { id: data.id }));
     };
 
+    const handleDupicate = (data: InspectionFormDT) => {
+        if (!access.permissions.create) return;
+        router.visit(route('config.inspection.form.vehicle.duplicate', { id: data.id }), { preserveState: true });
+    };
+
     return (
         <>
             <Head title="Inspection Form" />
@@ -186,6 +194,9 @@ const Index = ({}: IndexProps): JSX.Element => {
                     scrollAreaClass="h-[calc(100vh-19rem)]"
                     rowId="id"
                     onEdit={handleEdit}
+                    onCustomEvent={(data: InspectionFormDT, event: string) => {
+                        if (event === 'duplicate') handleDupicate(data);
+                    }}
                     onDeleteClicked={handleDelete}
                 />
             </section>

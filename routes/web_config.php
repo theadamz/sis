@@ -63,6 +63,7 @@ Route::prefix("inspections")->group(function () {
         // vehicle
         Route::middleware(['can:cfg-ins-frm-vch', 'access:cfg-ins-frm-vch'])->group(function () {
             Route::get('/vehicles', [\App\Http\Controllers\Inspection\InspectionFormController::class, 'index'])->name('config.inspection.form.vehicle.index');
+            Route::get('/vehicles/{id}/duplicate', [\App\Http\Controllers\Inspection\InspectionFormController::class, 'duplicate'])->can('cfg-ins-frm-vch-create')->name('config.inspection.form.vehicle.duplicate');
             Route::get('/vehicles/{id}/edit', [\App\Http\Controllers\Inspection\InspectionFormController::class, 'edit'])->can('cfg-ins-frm-vch-edit')->name('config.inspection.form.vehicle.edit');
             Route::get('/vehicles/create', [\App\Http\Controllers\Inspection\InspectionFormController::class, 'create'])->can('cfg-ins-frm-vch-create')->name('config.inspection.form.vehicle.create');
             // Route::get('/vehicles/{id}', [\App\Http\Controllers\Inspection\InspectionFormController::class, 'show'])->name('config.inspection.form.vehicle.show');

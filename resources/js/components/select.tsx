@@ -11,6 +11,7 @@ type SelectProps = {
     onValueChange?: (value: string) => void;
     error?: string;
     showErrorMessage?: boolean;
+    disabled?: boolean;
 };
 
 const Select = ({
@@ -22,10 +23,11 @@ const Select = ({
     onValueChange,
     error,
     showErrorMessage = true,
+    disabled,
 }: SelectProps): ReactNode => {
     return (
         <Fragment>
-            <SelectRoot value={value} onValueChange={onValueChange}>
+            <SelectRoot value={value} onValueChange={onValueChange} disabled={disabled}>
                 <SelectTrigger className={cn(className, error ? 'border-red-500' : '')}>
                     <SelectValue placeholder={placeholder} />
                 </SelectTrigger>

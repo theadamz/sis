@@ -1,4 +1,5 @@
 import { Button } from '@/components//ui/button';
+import TooltipWrapper from '@/components/tooltip';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -13,10 +14,9 @@ import { Label } from '@/components/ui/label';
 import CaretColumn from '@/datatables/components/caret-column';
 import { sortHandler } from '@/lib/utils';
 import { type InspectionFormDT, type SharedData } from '@/types';
-import { getInspectionStage } from '@/types/enum';
 import { usePage } from '@inertiajs/react';
 import { ColumnDef } from '@tanstack/react-table';
-import { EllipsisVerticalIcon, PencilIcon } from 'lucide-react';
+import { CopyIcon, EllipsisVerticalIcon, PencilIcon } from 'lucide-react';
 
 export const InspectionFormColumns: ColumnDef<InspectionFormDT, unknown>[] = [
     {
@@ -79,19 +79,22 @@ export const InspectionFormColumns: ColumnDef<InspectionFormDT, unknown>[] = [
         },
     },
     {
-        accessorKey: 'stage',
+        accessorKey: 'inspection_flow_name',
         meta: {
             columnDisplay: true, // hide column after init
-            headerClassName: 'w-[150px] text-center',
+            columnDisplayName: 'Inspection',
         },
-        header: () => <Label>Stage</Label>,
+        header: () => (
+            <TooltipWrapper caption={`Inspection Category > Flow > Stage`}>
+                <Label>Inspection</Label>
+            </TooltipWrapper>
+        ),
         cell: ({ row }) => {
-            const stage = row.getValue('stage') as string;
             return (
-                <div className="flex w-full justify-center">
-                    <Badge key={stage} variant={getInspectionStage(stage, 'variant') as any} className="me-1">
-                        {getInspectionStage(stage, 'label')}
-                    </Badge>
+                <div className="flex flex-col gap-1">
+                    <Badge>Category : {row.original.inspection_category_name}</Badge>
+                    <Badge>Flow : {row.original.inspection_flow_name}</Badge>
+                    <Badge>Stage : {row.original.inspection_flow_stage_name}</Badge>
                 </div>
             );
         },
@@ -199,6 +202,13 @@ export const InspectionFormColumns: ColumnDef<InspectionFormDT, unknown>[] = [
                         {permissions.edit && (
                             <DropdownMenuItem onClick={() => table.options.meta?.onEdit && table.options.meta.onEdit(item as any)}>
                                 <PencilIcon /> Edit
+                            </DropdownMenuItem>
+                        )}
+                        {permissions.create && (
+                            <DropdownMenuItem
+                                onClick={() => table.options.meta?.onCustomEvent && table.options.meta.onCustomEvent(item as any, 'duplicate')}
+                            >
+                                <CopyIcon /> Dulicate
                             </DropdownMenuItem>
                         )}
                     </DropdownMenuContent>

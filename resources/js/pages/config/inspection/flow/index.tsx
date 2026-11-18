@@ -10,8 +10,8 @@ import { Label } from '@/components/ui/label';
 import { InspectionFlowColumns } from '@/datatables/columns/inspection-flow-columns';
 import DataTablePaginationAjax, { DataTablePaginationAjaxRef } from '@/datatables/components/data-table-pagination-ajax';
 import { refactorErrorMessage } from '@/lib/refactorMessages';
-import { type BreadcrumbItem, type InspectionFlow, type InspectionFlowDT, type SharedData } from '@/types';
-import { Deferred, Head, router, usePage } from '@inertiajs/react';
+import type { BreadcrumbItem, InspectionCategory, InspectionFlow, InspectionFlowDT, SharedData } from '@/types';
+import { Deferred, Head, Link, router, usePage } from '@inertiajs/react';
 import { PlusIcon, XIcon } from 'lucide-react';
 import { JSX, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
@@ -33,12 +33,12 @@ const breadcrumbsData: BreadcrumbItem[] = [
 ];
 
 interface IndexProps {
-    inspectionCategories: Array<{ id: string; code: string; name: string }>;
+    inspectionCategories: Array<InspectionCategory>;
     rec?: InspectionFlow;
     action?: 'create' | 'edit' | 'duplicate';
 }
 
-const Index = ({ inspectionCategories, rec, action = 'create' }: IndexProps): JSX.Element => {
+const Index = ({ inspectionCategories, rec, action }: IndexProps): JSX.Element => {
     /*** inertia js ***/
     const { access } = usePage<SharedData>().props;
 
@@ -50,6 +50,7 @@ const Index = ({ inspectionCategories, rec, action = 'create' }: IndexProps): JS
     const dataTable = useRef<DataTablePaginationAjaxRef>(null);
     const createForm = useRef<DialogContainerRef>(null);
     const editForm = useRef<DialogSheetRef>(null);
+    const duplicateForm = useRef<DialogSheetRef>(null);
 
     /*** effect ***/
     useEffect(() => {
@@ -117,12 +118,12 @@ const Index = ({ inspectionCategories, rec, action = 'create' }: IndexProps): JS
 
     const handleEdit = (data: InspectionFlowDT) => {
         if (!access.permissions.edit) return;
-        router.visit(route('config.inspection.flow.edit', { id: data.id }), { preserveUrl: true });
+        router.visit(route('config.inspection.flow.edit', { id: data.id }), { only: ['rec', 'action'], preserveUrl: true });
     };
 
     const handleDupicate = (data: InspectionFlowDT) => {
         if (!access.permissions.create) return;
-        router.visit(route('config.inspection.flow.duplicate', { id: data.id }), { preserveUrl: true });
+        router.visit(route('config.inspection.flow.duplicate', { id: data.id }), { only: ['rec', 'action'], preserveUrl: true });
     };
 
     return (
@@ -131,7 +132,7 @@ const Index = ({ inspectionCategories, rec, action = 'create' }: IndexProps): JS
 
             {/* create */}
             {access.permissions.create && (
-                <DialogContainer title="Create Inspection Flow" ref={createForm} className="min-w-5xl">
+                <DialogContainer title="Create Inspection Flow" ref={createForm} className="min-w-5xl" open={action === 'create'}>
                     <Create onFormClosed={() => createForm.current?.close()} onCreated={() => dataTable.current?.refresh()} />
                 </DialogContainer>
             )}
@@ -143,10 +144,10 @@ const Index = ({ inspectionCategories, rec, action = 'create' }: IndexProps): JS
                 </DialogContainer>
             )}
 
-            {/* edit */}
-            {access.permissions.edit && (
-                <DialogContainer title="Duplicate Inspection Flow" ref={editForm} className="min-w-5xl" open={action === 'duplicate'}>
-                    <Duplicate rec={rec} onFormClosed={() => editForm.current?.close()} onCreated={() => dataTable.current?.refresh()} />
+            {/* duplicate */}
+            {access.permissions.create && (
+                <DialogContainer title="Duplicate Inspection Flow" ref={duplicateForm} className="min-w-5xl" open={action === 'duplicate'}>
+                    <Duplicate rec={rec} onFormClosed={() => duplicateForm.current?.close()} onCreated={() => dataTable.current?.refresh()} />
                 </DialogContainer>
             )}
 
@@ -177,10 +178,12 @@ const Index = ({ inspectionCategories, rec, action = 'create' }: IndexProps): JS
                         </Deferred>
                     </div>
                     {access.permissions.create && (
-                        <Button type="button" variant={'outline'} onClick={() => createForm.current?.open()}>
-                            <PlusIcon />
-                            <Label className="hidden md:flex">Create</Label>
-                        </Button>
+                        <Link href={route('config.inspection.flow.create')} preserveUrl only={['action']}>
+                            <Button type="button" variant={'outline'}>
+                                <PlusIcon />
+                                <Label className="hidden md:flex">Create</Label>
+                            </Button>
+                        </Link>
                     )}
                 </div>
                 <DataTablePaginationAjax

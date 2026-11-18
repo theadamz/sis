@@ -49,7 +49,7 @@ class InspectionFlowStage extends Model
         $activity->properties = $activity->properties->merge(GeneralHelper::getAgentInfo());
     }
 
-    public function inspection_category(): BelongsTo
+    public function inspection_flow(): BelongsTo
     {
         return $this->belongsTo(InspectionFlow::class);
     }

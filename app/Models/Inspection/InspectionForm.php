@@ -6,6 +6,7 @@ use App\Helpers\GeneralHelper;
 use CalebDW\Laraflake\Casts\AsSnowflake;
 use CalebDW\Laraflake\Concerns\HasSnowflakes;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\Auth;
@@ -22,6 +23,7 @@ class InspectionForm extends Model
     protected $guarded = ['created_by', 'updated_by'];
     protected $casts = [
         'id' => AsSnowflake::class,
+        'inspection_flow_stage_id' => AsSnowflake::class,
         'is_publish' => 'boolean',
     ];
 
@@ -48,6 +50,11 @@ class InspectionForm extends Model
     public function beforeActivityLogged(Activity $activity, string $eventName)
     {
         $activity->properties = $activity->properties->merge(GeneralHelper::getAgentInfo());
+    }
+
+    public function inspection_flow_stage(): BelongsTo
+    {
+        return $this->belongsTo(InspectionFlowStage::class);
     }
 
     public function inspection_vehicle_form(): HasOne

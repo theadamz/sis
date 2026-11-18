@@ -3,7 +3,6 @@
 namespace App\Data\Inspection;
 
 use App\Enums\InspectionItemType;
-use App\Enums\InspectionStage;
 use CalebDW\Laraflake\Rules\Snowflake;
 use Illuminate\Support\Facades\Auth;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
@@ -21,13 +20,13 @@ class InspectionFormUpdateData extends Data
 {
     public function __construct(
         public string $id,
+        public string $inspection_flow_stage,
         public string $code,
         public string $name,
         public bool $use_eta_dest,
         public bool $use_ata_dest,
         public bool $use_duration,
         public bool $is_publish,
-        public string $stage,
         public array $inspections,
     ) {}
 
@@ -40,13 +39,13 @@ class InspectionFormUpdateData extends Data
     {
         return [
             "id" => [new Required, new Snowflake, new Exists("inspection_forms", "id")],
+            "inspection_flow_stage" => [new Required, new Snowflake, new Exists("inspection_flow_stages", "id")],
             "code" => [new Required, new StringType, new Max(20), new Regex(config('setting.regxp.forCode'))],
             "name" => [new Required, new StringType, new Max(50)],
             "use_eta_dest" => [new Required, new BooleanType],
             "use_ata_dest" => [new Required, new BooleanType],
             "use_duration" => [new Required, new BooleanType],
             "is_publish" => [new Required, new BooleanType],
-            "stage" => [new Required, new In(collect(InspectionStage::cases())->pluck('value')->toArray())],
             "inspections" => [new Required, new ArrayType],
             "inspections.*.id" => [new Required, new Snowflake],
             "inspections.*.inspection_vehicle_form_id" => [new Required, new Snowflake],

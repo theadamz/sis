@@ -16,15 +16,16 @@ enum CacheKey: string
     case USER = 'USER';
     case INSPECTION_CATEGORY = 'INSPECTION_CATEGORY';
     case INSPECTION_FLOW = 'INSPECTION_FLOW';
+    case INSPECTION_FLOW_STAGE = 'INSPECTION_FLOW_STAGE';
 
     public function getKey(?string ...$additionalKeys): string
     {
-        return $this->value . "::" . (!empty($additionalKeys) ? '.' . Arr::join($additionalKeys, '.') : '') . (empty(request()->getQueryString()) ? '' : '?' . request()->getQueryString());
+        return $this->value . "::" . (!empty($additionalKeys) ? Arr::join($additionalKeys, '.') : '') . (empty(request()->getQueryString()) ? '' : '?' . request()->getQueryString());
     }
 
     public function getKeyWithoutRequest(?string ...$additionalKeys): string
     {
-        return $this->value  . "::" . (!empty($additionalKeys) ? '.' . Arr::join($additionalKeys, '.') : '');
+        return $this->value  . "::" . (!empty($additionalKeys) ? Arr::join($additionalKeys, '.') : '');
     }
 
     public static function getKeyAccess(?string ...$additionalKeys): string

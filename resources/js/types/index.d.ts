@@ -153,6 +153,13 @@ export interface InspectionFormItemMove {
     seq: number;
 }
 
+export interface InspectionCategory {
+    id: string;
+    code: string;
+    name: string;
+    is_active: boolean;
+}
+
 export interface InspectionFlowStage {
     id: string;
     inspection_flow_id: string;
@@ -249,17 +256,20 @@ export interface InspectionTypeDT {
 
 export interface InspectionFormDT {
     id: string;
-    flow: string;
-    inspection_type: string;
-    inspection_type_name: string;
+    inspection_flow_stage: string;
+    inspection_flow_stage_name: string;
+    inspection_flow: string;
+    inspection_flow_name: string;
+    inspection_category: string;
+    inspection_category_name: string;
     code: string;
     name: string;
     use_eta_dest: boolean;
     use_ata_dest: boolean;
-    is_public: boolean;
-    required_stages: string[];
-    inspection_form_categories_count: number;
-    inspection_form_checks_count: number;
+    use_duration: boolean;
+    is_publish: boolean;
+    total_sections: number;
+    total_items: number;
 }
 
 export interface UserDT {

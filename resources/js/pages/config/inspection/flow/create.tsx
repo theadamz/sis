@@ -15,12 +15,13 @@ import { Field, FieldGroup, FieldLabel, FieldLegend, FieldSeparator, FieldSet } 
 import { Input } from '@/components/ui/input';
 import { InputLOV } from '@/components/ui/input-lov';
 import { Label } from '@/components/ui/label';
-import { Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { LovInspectionCategoryColumns } from '@/datatables/columns/lov-inspection-category-columns';
 import DataTablePaginationAjax, { DataTablePaginationAjaxRef } from '@/datatables/components/data-table-pagination-ajax';
 import { refactorErrorMessage } from '@/lib/refactorMessages';
 import { generateRandomId } from '@/lib/utils';
 import { type InspectionCategoryDT, type InspectionFlowStage, type SharedData } from '@/types';
+import { Fieldset } from '@headlessui/react';
 import { useForm } from '@inertiajs/react';
 import _ from 'lodash';
 import { CheckIcon, EllipsisVerticalIcon, Loader2, PencilIcon, SaveIcon, X, XIcon } from 'lucide-react';
@@ -208,10 +209,10 @@ const Create = ({ onFormClosed, onCreated, onError }: CreateProps): ReactNode =>
     return (
         <>
             <form onSubmit={submitForm}>
-                <FieldGroup className="gap-4">
+                <Fieldset className="gap-4">
                     <FieldGroup className="grid grid-cols-2">
                         <FieldGroup id="inputContainer">
-                            <FieldSet className="grid gap-2">
+                            <Field className="grid gap-2">
                                 <FieldLabel htmlFor="inspection_category">
                                     Inspection Category <Label className="text-red-500">*</Label>
                                 </FieldLabel>
@@ -224,8 +225,8 @@ const Create = ({ onFormClosed, onCreated, onError }: CreateProps): ReactNode =>
                                     error={errors.inspection_category_id}
                                     onSearchClick={() => lovDialog.current?.open()}
                                 />
-                            </FieldSet>
-                            <FieldSet className="grid gap-2">
+                            </Field>
+                            <Field className="grid gap-2">
                                 <FieldLabel htmlFor="name">
                                     Name <Label className="text-red-500">*</Label>
                                 </FieldLabel>
@@ -240,8 +241,8 @@ const Create = ({ onFormClosed, onCreated, onError }: CreateProps): ReactNode =>
                                     error={errors.name}
                                     maxLength={100}
                                 />
-                            </FieldSet>
-                            <FieldSet className="grid gap-2">
+                            </Field>
+                            <Field className="grid gap-2">
                                 <FieldLabel htmlFor="description">Description</FieldLabel>
                                 <Input
                                     id="description"
@@ -254,12 +255,13 @@ const Create = ({ onFormClosed, onCreated, onError }: CreateProps): ReactNode =>
                                     error={errors.description}
                                     maxLength={255}
                                 />
-                            </FieldSet>
+                            </Field>
                         </FieldGroup>
-                        <FieldGroup id="stageContainer">
-                            <FieldLegend className="m-0 border-b pb-2">Stages</FieldLegend>
-                            <Field orientation={'horizontal'} className="items-end">
-                                <FieldSet className="grid gap-2">
+                        <FieldSet id="stageContainer">
+                            <FieldLegend>Stages</FieldLegend>
+                            <FieldSeparator className="h-2" />
+                            <FieldGroup className="flex-row items-end gap-2">
+                                <Field className="grid gap-2">
                                     <FieldLabel htmlFor="stage_name">
                                         Stage Name <Label className="text-red-500">*</Label>
                                     </FieldLabel>
@@ -275,8 +277,8 @@ const Create = ({ onFormClosed, onCreated, onError }: CreateProps): ReactNode =>
                                             if (e.key === 'Enter') e.preventDefault();
                                         }}
                                     />
-                                </FieldSet>
-                                <FieldSet className="grid gap-2">
+                                </Field>
+                                <Field className="grid gap-2">
                                     <FieldLabel htmlFor="stage_order">
                                         Order <Label className="text-red-500">*</Label>
                                     </FieldLabel>
@@ -291,13 +293,13 @@ const Create = ({ onFormClosed, onCreated, onError }: CreateProps): ReactNode =>
                                             if (e.key === 'Enter') e.preventDefault();
                                         }}
                                     />
-                                </FieldSet>
+                                </Field>
                                 <TooltipWrapper caption={`Submit stage`}>
-                                    <Button type="button" variant={'outline'} size={'icon'} onClick={handleStageSubmit}>
+                                    <Button type="button" variant={'normal'} size={'sm'} onClick={handleStageSubmit}>
                                         <SaveIcon />
                                     </Button>
                                 </TooltipWrapper>
-                            </Field>
+                            </FieldGroup>
                             <FieldGroup>
                                 <Table>
                                     <TableHeader className="border-t">
@@ -311,7 +313,7 @@ const Create = ({ onFormClosed, onCreated, onError }: CreateProps): ReactNode =>
                                     <TableBody>
                                         {data.stages.length <= 0 && (
                                             <TableRow>
-                                                <TableCell colSpan={3} className="text-center">
+                                                <TableCell colSpan={4} className="text-center">
                                                     <Label className="text-muted-foreground">Stage not found</Label>
                                                 </TableCell>
                                             </TableRow>
@@ -345,14 +347,11 @@ const Create = ({ onFormClosed, onCreated, onError }: CreateProps): ReactNode =>
                                                 </TableRow>
                                             ))}
                                     </TableBody>
-                                    <TableFooter>
-                                        <TableRow></TableRow>
-                                    </TableFooter>
                                 </Table>
                             </FieldGroup>
-                        </FieldGroup>
+                        </FieldSet>
                     </FieldGroup>
-                    <FieldSeparator />
+                    <FieldSeparator className="py-5" />
                     <Field orientation={'horizontal'} className="flex justify-between">
                         <Button type="button" disabled={processing} variant={'default'} onClick={() => onFormClosed && onFormClosed()}>
                             <XIcon className="mr-2 size-4" />
@@ -363,7 +362,7 @@ const Create = ({ onFormClosed, onCreated, onError }: CreateProps): ReactNode =>
                             Save
                         </Button>
                     </Field>
-                </FieldGroup>
+                </Fieldset>
             </form>
 
             {/* lov - Inspection Category */}

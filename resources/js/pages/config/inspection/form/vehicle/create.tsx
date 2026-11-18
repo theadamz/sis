@@ -2,6 +2,7 @@ import { confirmDialog } from '@/components/confirm-dialog';
 import DialogContainer, { DialogContainerRef } from '@/components/dialog-container';
 import { errorDialog } from '@/components/error-dialog';
 import Select from '@/components/select';
+import { Spinner } from '@/components/spinner';
 import TooltipWrapper from '@/components/tooltip';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,17 +14,26 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Field, FieldGroup, FieldLabel, FieldSet } from '@/components/ui/field';
+import { Field, FieldGroup, FieldLabel, FieldLegend, FieldSeparator, FieldSet } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { refactorErrorMessage } from '@/lib/refactorMessages';
-import { generateRandomId } from '@/lib/utils';
-import { type BreadcrumbItem, type InspectionFormItem, type InspectionFormSection, type InspectionType, type SharedData } from '@/types';
-import { Head, router, useForm } from '@inertiajs/react';
+import { cn, generateRandomId } from '@/lib/utils';
+import type {
+    BreadcrumbItem,
+    InspectionCategory,
+    InspectionFlow,
+    InspectionFlowStage,
+    InspectionFormItem,
+    InspectionFormSection,
+    SharedData,
+} from '@/types';
+import { Deferred, Head, router, useForm } from '@inertiajs/react';
 import _ from 'lodash';
-import { ArrowLeftRight, CheckIcon, EditIcon, Loader2, MenuIcon, PlusIcon, XIcon } from 'lucide-react';
+import { ArrowLeftRight, CheckIcon, ChevronRight, EditIcon, Loader2, MenuIcon, PlusIcon, XIcon } from 'lucide-react';
 import { Fragment, ReactNode, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import FormSection from './form-section';
@@ -32,10 +42,13 @@ import FormSectionItemMove from './form-section-item-move';
 
 const breadcrumbsData: BreadcrumbItem[] = [
     {
-        title: 'Basic',
+        title: 'Config',
     },
     {
-        title: 'Inspection Form',
+        title: 'Inspection',
+    },
+    {
+        title: 'Forms',
     },
     {
         title: 'Vehicles',
@@ -43,7 +56,6 @@ const breadcrumbsData: BreadcrumbItem[] = [
     },
     {
         title: 'Create',
-        href: route('config.inspection.form.vehicle.create'),
     },
 ];
 
@@ -52,32 +64,36 @@ type Inspection = InspectionFormSection & {
 };
 
 type InspectionForm = {
+    inspection_flow_stage: string;
+    inspection_flow_stage_name: string;
     code: string;
     name: string;
     use_eta_dest: boolean;
     use_ata_dest: boolean;
     use_duration: boolean;
     is_publish: boolean;
-    stage: string;
     inspections: Inspection[];
 };
 
 interface CreateProps {
-    inspectionStages: InspectionType[];
+    inspectionCategories?: Array<InspectionCategory>;
+    inspectionFlows?: Array<InspectionFlow>;
+    inspectionFlowStages?: Array<InspectionFlowStage>;
 }
 
 const inspectionId = generateRandomId();
 
-const Create = ({ inspectionStages }: CreateProps): ReactNode => {
+const Create = ({ inspectionCategories, inspectionFlows, inspectionFlowStages }: CreateProps): ReactNode => {
     /*** inertia js ***/
     const { data, setData, post, processing, errors, reset, clearErrors, isDirty } = useForm<Required<InspectionForm>>({
+        inspection_flow_stage: '',
+        inspection_flow_stage_name: '',
         code: '',
         name: '',
         use_eta_dest: false,
         use_ata_dest: false,
         use_duration: false,
         is_publish: true,
-        stage: '',
         inspections: [],
     });
 
@@ -93,6 +109,9 @@ const Create = ({ inspectionStages }: CreateProps): ReactNode => {
     const [inspectionFormSectionData, setInspectionFormSectionData] = useState<InspectionFormSection>();
     const [inspectionFormSectionItemData, setInspectionFormSectionItemData] = useState<InspectionFormItem>();
     const [inspectionFormSectionItemMoveData, setInspectionFormSectionItemMoveData] = useState<InspectionFormItem>();
+    const [loadingState, setLoadingState] = useState<string>('');
+    const [inspectionCategory, setInspectionCategory] = useState<{ id: string; name: string }>();
+    const [inspectionFlow, setInspectionFlow] = useState<{ id: string; name: string }>();
 
     /*** effects ***/
     useEffect(() => {
@@ -146,13 +165,14 @@ const Create = ({ inspectionStages }: CreateProps): ReactNode => {
         reset(); // clear form to initial values
         clearErrors(); // clear errors
         setData({
+            inspection_flow_stage: '',
+            inspection_flow_stage_name: '',
             code: '',
             name: '',
             use_eta_dest: false,
             use_ata_dest: false,
             use_duration: false,
             is_publish: true,
-            stage: '',
             inspections: [],
         });
         setSectionFormTitle('Create Section');
@@ -441,6 +461,17 @@ const Create = ({ inspectionStages }: CreateProps): ReactNode => {
         sectionItemMoveForm.current?.open();
     };
 
+    const handleRetrivingOptions = async (loadingState: string, onlyRetrives: string[], data: any) => {
+        router.visit(window.location.pathname, {
+            only: onlyRetrives,
+            data: data,
+            preserveUrl: true,
+            preserveState: true,
+            onStart: () => setLoadingState(loadingState),
+            onFinish: () => setLoadingState(''),
+        });
+    };
+
     return (
         <>
             <Head title="Create Inspection Form" />
@@ -502,282 +533,408 @@ const Create = ({ inspectionStages }: CreateProps): ReactNode => {
 
             {/* main content */}
             <form onSubmit={submitForm} className="mx-auto w-full p-4">
-                <FieldGroup>
-                    <FieldSet className="grid grid-cols-2 gap-x-4">
-                        <FieldGroup className="grid grid-cols-2 gap-4">
-                            <Field>
-                                <FieldLabel>
-                                    Code <Label className="text-red-500">*</Label>
-                                </FieldLabel>
-                                <Input
-                                    id="code"
-                                    name="code"
-                                    type="text"
-                                    placeholder="Code"
-                                    required
-                                    maxLength={50}
-                                    onChange={(e) => setData('code', e.target.value)}
-                                    value={data.code}
-                                    error={errors.code}
-                                />
-                            </Field>
-                            <Field>
-                                <FieldLabel>
-                                    Name <Label className="text-red-500">*</Label>
-                                </FieldLabel>
-                                <Input
-                                    id="name"
-                                    name="name"
-                                    type="text"
-                                    placeholder="Name"
-                                    required
-                                    maxLength={100}
-                                    onChange={(e) => setData('name', e.target.value)}
-                                    value={data.name}
-                                    error={errors.name}
-                                />
-                            </Field>
-                            <Field>
-                                <FieldLabel>
-                                    Stage <Label className="text-red-500">*</Label>
-                                </FieldLabel>
-                                <Select
-                                    placeholder="Stage"
-                                    selectLabel="Select Stage"
-                                    value={data.stage ?? null}
-                                    onValueChange={(value) => setData('stage', value)}
-                                    items={inspectionStages}
-                                    error={errors.stage}
-                                />
-                            </Field>
-                            <Field>
-                                <FieldLabel>
-                                    Publish <Label className="text-red-500">*</Label>
-                                </FieldLabel>
-                                <Select
-                                    placeholder="Select"
-                                    selectLabel="Select Publish"
-                                    value={data.is_publish ? 'true' : 'false'}
-                                    onValueChange={(value) => setData('is_publish', Boolean(value))}
-                                    items={[
-                                        { value: 'true', label: 'Yes' },
-                                        { value: 'false', label: 'No' },
-                                    ]}
-                                    error={errors.is_publish}
-                                />
-                            </Field>
-                        </FieldGroup>
-                        <FieldGroup className="grid grid-cols-3 gap-4">
-                            <TooltipWrapper caption={`Estimation Time Arrival`}>
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <FieldSet className="grid grid-cols-2 gap-x-4">
+                            <FieldGroup className="gap-4">
+                                <FieldLegend className="m-0">Form Info</FieldLegend>
+                                <FieldSeparator className="h-2" />
                                 <Field>
                                     <FieldLabel>
-                                        Use ETA Date <Label className="text-red-500">*</Label>
+                                        Inspection Flow <Label className="text-red-500">*</Label>
                                     </FieldLabel>
-                                    <Select
-                                        placeholder="Select"
-                                        selectLabel="Select ETA Date"
-                                        value={data.use_eta_dest ? 'true' : 'false'}
-                                        onValueChange={(value) => setData('use_eta_dest', Boolean(value))}
-                                        items={[
-                                            { value: 'true', label: 'Yes' },
-                                            { value: 'false', label: 'No' },
-                                        ]}
-                                        error={errors.use_eta_dest}
-                                    />
-                                </Field>
-                            </TooltipWrapper>
-                            <TooltipWrapper caption={`Actual Time Arrival`}>
-                                <Field>
-                                    <FieldLabel>
-                                        Use ATA Date <Label className="text-red-500">*</Label>
-                                    </FieldLabel>
-                                    <Select
-                                        placeholder="Select"
-                                        selectLabel="Select ATA Date"
-                                        value={data.use_ata_dest ? 'true' : 'false'}
-                                        onValueChange={(value) => setData('use_ata_dest', Boolean(value))}
-                                        items={[
-                                            { value: 'true', label: 'Yes' },
-                                            { value: 'false', label: 'No' },
-                                        ]}
-                                        error={errors.use_ata_dest}
-                                    />
-                                </Field>
-                            </TooltipWrapper>
-                            <TooltipWrapper caption={`Time Start & End`}>
-                                <Field>
-                                    <FieldLabel>
-                                        Use Duration <Label className="text-red-500">*</Label>
-                                    </FieldLabel>
-                                    <Select
-                                        placeholder="Select"
-                                        selectLabel="Select Duration"
-                                        value={data.use_duration ? 'true' : 'false'}
-                                        onValueChange={(value) => setData('use_duration', Boolean(value))}
-                                        items={[
-                                            { value: 'true', label: 'Yes' },
-                                            { value: 'false', label: 'No' },
-                                        ]}
-                                        error={errors.use_duration}
-                                    />
-                                </Field>
-                            </TooltipWrapper>
-                        </FieldGroup>
-                    </FieldSet>
-                </FieldGroup>
+                                    <Popover>
+                                        <PopoverTrigger asChild>
+                                            <Button variant="secondary" className={cn(data.inspection_flow_stage_name === '' ? '' : 'px-2 py-8')}>
+                                                {data.inspection_flow_stage_name === '' ? (
+                                                    <Label>Not Selected</Label>
+                                                ) : (
+                                                    <div className="flex flex-wrap items-center gap-1">
+                                                        <Badge>{inspectionCategory?.name}</Badge>
+                                                        <ChevronRight />
+                                                        <Badge>{inspectionFlow?.name}</Badge>
+                                                        <ChevronRight />
+                                                        <Badge>{data.inspection_flow_stage_name}</Badge>
+                                                    </div>
+                                                )}
+                                            </Button>
+                                        </PopoverTrigger>
+                                        <PopoverContent className="w-(--radix-popover-trigger-width)">
+                                            <div className="grid gap-4">
+                                                <div className="flex flex-col space-y-1.5 text-center sm:text-left">
+                                                    <Label className="leading-none font-medium">Select Inspection Flow</Label>
+                                                    <Label className="text-muted-foreground text-xs">
+                                                        This form only will be used for selected stage
+                                                    </Label>
+                                                </div>
+                                                <FieldGroup className="gap-4">
+                                                    <Field>
+                                                        <FieldLabel>Inspection Category</FieldLabel>
+                                                        <Deferred data={['inspectionCategories']} fallback={<Spinner />}>
+                                                            <Select
+                                                                placeholder="Inspection Category"
+                                                                selectLabel="Select Inspection Category"
+                                                                value={inspectionCategory ? inspectionCategory.id : undefined}
+                                                                onValueChange={(value) => {
+                                                                    if (!inspectionCategories) return;
+                                                                    const option = inspectionCategories.find((item) => item.id === value);
+                                                                    if (!option) return;
 
-                <div className="col-span-12 mt-5">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <Label className="scroll-m-20 text-xl font-semibold tracking-tight">Inspection Items</Label>
-                            <div className="flex space-x-2">
-                                <Label>Sections : {data.inspections.length}</Label>
-                                <Label>Items : {itemCount}</Label>
+                                                                    setInspectionCategory({
+                                                                        id: option.id,
+                                                                        name: option.name,
+                                                                    });
+
+                                                                    // clear
+                                                                    setInspectionFlow(undefined);
+                                                                    setData('inspection_flow_stage', '');
+                                                                    setData('inspection_flow_stage_name', '');
+
+                                                                    handleRetrivingOptions('flow', ['inspectionFlows'], {
+                                                                        inspection_category: option.id,
+                                                                    });
+                                                                }}
+                                                                items={
+                                                                    inspectionCategories &&
+                                                                    inspectionCategories.map((item) => {
+                                                                        return { value: item.id, label: item.name };
+                                                                    })
+                                                                }
+                                                            />
+                                                        </Deferred>
+                                                    </Field>
+                                                    <Field>
+                                                        <FieldLabel>Inspection Flow</FieldLabel>
+                                                        {loadingState === 'flow' ? (
+                                                            <Spinner />
+                                                        ) : (
+                                                            <Select
+                                                                placeholder="Inspection Flow"
+                                                                selectLabel="Select Inspection Flow"
+                                                                value={inspectionFlow ? inspectionFlow.id : undefined}
+                                                                onValueChange={(value) => {
+                                                                    if (!inspectionFlows) return;
+                                                                    const option = inspectionFlows.find((item) => item.id === value);
+                                                                    if (!option) return;
+
+                                                                    setInspectionFlow({
+                                                                        id: option.id,
+                                                                        name: option.name,
+                                                                    });
+
+                                                                    // clear
+                                                                    setData('inspection_flow_stage', '');
+                                                                    setData('inspection_flow_stage_name', '');
+
+                                                                    handleRetrivingOptions('flow_stage', ['inspectionFlowStages'], {
+                                                                        inspection_flow: option.id,
+                                                                    });
+                                                                }}
+                                                                items={
+                                                                    inspectionFlows &&
+                                                                    inspectionFlows.map((item) => {
+                                                                        return { value: item.id, label: item.name };
+                                                                    })
+                                                                }
+                                                                disabled={!inspectionCategory || !inspectionFlows || inspectionFlows.length <= 0}
+                                                            />
+                                                        )}
+                                                    </Field>
+                                                    <Field>
+                                                        <FieldLabel>Inspection Flow Stage</FieldLabel>
+                                                        {loadingState === 'flow_stage' ? (
+                                                            <Spinner />
+                                                        ) : (
+                                                            <Select
+                                                                placeholder="Inspection Flow Stage"
+                                                                selectLabel="Select Inspection Flow Stage"
+                                                                value={data.inspection_flow_stage}
+                                                                onValueChange={(value) => {
+                                                                    if (!inspectionFlowStages) return;
+                                                                    const stage = inspectionFlowStages.find((item) => item.id === value);
+                                                                    if (!stage) return;
+                                                                    setData('inspection_flow_stage', stage.id);
+                                                                    setData('inspection_flow_stage_name', stage.name);
+                                                                }}
+                                                                items={
+                                                                    inspectionFlowStages &&
+                                                                    inspectionFlowStages.map((item) => {
+                                                                        return { value: item.id, label: item.name };
+                                                                    })
+                                                                }
+                                                                disabled={
+                                                                    !inspectionFlow || !inspectionFlowStages || inspectionFlowStages.length <= 0
+                                                                }
+                                                            />
+                                                        )}
+                                                    </Field>
+                                                </FieldGroup>
+                                            </div>
+                                        </PopoverContent>
+                                    </Popover>
+                                </Field>
+                                <Field>
+                                    <FieldLabel>
+                                        Code <Label className="text-red-500">*</Label>
+                                    </FieldLabel>
+                                    <Input
+                                        id="code"
+                                        name="code"
+                                        type="text"
+                                        placeholder="Code"
+                                        required
+                                        maxLength={50}
+                                        onChange={(e) => setData('code', e.target.value)}
+                                        value={data.code}
+                                        error={errors.code}
+                                    />
+                                </Field>
+                                <Field>
+                                    <FieldLabel>
+                                        Name <Label className="text-red-500">*</Label>
+                                    </FieldLabel>
+                                    <Input
+                                        id="name"
+                                        name="name"
+                                        type="text"
+                                        placeholder="Name"
+                                        required
+                                        maxLength={100}
+                                        onChange={(e) => setData('name', e.target.value)}
+                                        value={data.name}
+                                        error={errors.name}
+                                    />
+                                </Field>
+                                <Field>
+                                    <FieldLabel>
+                                        Publish <Label className="text-red-500">*</Label>
+                                    </FieldLabel>
+                                    <Select
+                                        placeholder="Select"
+                                        selectLabel="Select Publish"
+                                        value={data.is_publish ? 'true' : 'false'}
+                                        onValueChange={(value) => setData('is_publish', Boolean(value))}
+                                        items={[
+                                            { value: 'true', label: 'Yes' },
+                                            { value: 'false', label: 'No' },
+                                        ]}
+                                        error={errors.is_publish}
+                                    />
+                                </Field>
+                            </FieldGroup>
+                            <FieldGroup className="gap-4">
+                                <FieldLegend className="m-0">Additional Flags</FieldLegend>
+                                <FieldSeparator className="h-2" />
+                                <TooltipWrapper caption={`Estimation Time Arrival`}>
+                                    <Field>
+                                        <FieldLabel>
+                                            Use ETA Date <Label className="text-red-500">*</Label>
+                                        </FieldLabel>
+                                        <Select
+                                            placeholder="Select"
+                                            selectLabel="Select ETA Date"
+                                            value={data.use_eta_dest ? 'true' : 'false'}
+                                            onValueChange={(value) => setData('use_eta_dest', Boolean(value))}
+                                            items={[
+                                                { value: 'true', label: 'Yes' },
+                                                { value: 'false', label: 'No' },
+                                            ]}
+                                            error={errors.use_eta_dest}
+                                        />
+                                    </Field>
+                                </TooltipWrapper>
+                                <TooltipWrapper caption={`Actual Time Arrival`}>
+                                    <Field>
+                                        <FieldLabel>
+                                            Use ATA Date <Label className="text-red-500">*</Label>
+                                        </FieldLabel>
+                                        <Select
+                                            placeholder="Select"
+                                            selectLabel="Select ATA Date"
+                                            value={data.use_ata_dest ? 'true' : 'false'}
+                                            onValueChange={(value) => setData('use_ata_dest', Boolean(value))}
+                                            items={[
+                                                { value: 'true', label: 'Yes' },
+                                                { value: 'false', label: 'No' },
+                                            ]}
+                                            error={errors.use_ata_dest}
+                                        />
+                                    </Field>
+                                </TooltipWrapper>
+                                <TooltipWrapper caption={`Time Start & End`}>
+                                    <Field>
+                                        <FieldLabel>
+                                            Use Duration <Label className="text-red-500">*</Label>
+                                        </FieldLabel>
+                                        <Select
+                                            placeholder="Select"
+                                            selectLabel="Select Duration"
+                                            value={data.use_duration ? 'true' : 'false'}
+                                            onValueChange={(value) => setData('use_duration', Boolean(value))}
+                                            items={[
+                                                { value: 'true', label: 'Yes' },
+                                                { value: 'false', label: 'No' },
+                                            ]}
+                                            error={errors.use_duration}
+                                        />
+                                    </Field>
+                                </TooltipWrapper>
+                            </FieldGroup>
+                        </FieldSet>
+                        <Field orientation={'horizontal'} className="justify-between pt-5">
+                            <Button type="button" disabled={processing} variant={'warning'} onClick={handleCancel}>
+                                <XIcon className="size-4" />
+                                Cancel
+                            </Button>
+                            <Button type="submit" disabled={processing} variant={'success'}>
+                                {processing ? <Loader2 className="size-4 animate-spin" /> : <CheckIcon className="size-4" />}
+                                Submit
+                            </Button>
+                        </Field>
+                    </div>
+
+                    <div>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <Label className="scroll-m-20 text-xl font-semibold tracking-tight">Inspection Items</Label>
+                                <div className="flex space-x-2">
+                                    <Label>Sections : {data.inspections.length}</Label>
+                                    <Label>Items : {itemCount}</Label>
+                                </div>
+                            </div>
+                            <div className="space-x-2">
+                                <TooltipWrapper caption={`Create new section`}>
+                                    <Button type="button" variant={'normal'} onClick={() => sectionForm.current?.open()}>
+                                        <PlusIcon className="size-4" />
+                                        <Label className="hidden md:flex">Section</Label>
+                                    </Button>
+                                </TooltipWrapper>
                             </div>
                         </div>
-                        <div className="space-x-2">
-                            <TooltipWrapper caption={`Create new section`}>
-                                <Button type="button" variant={'normal'} onClick={() => sectionForm.current?.open()}>
-                                    <PlusIcon className="size-4" />
-                                    <Label className="hidden md:flex">Section</Label>
-                                </Button>
-                            </TooltipWrapper>
-                        </div>
-                    </div>
 
-                    <div className="my-2 w-full">
-                        <ScrollArea className="h-[calc(100vh-26rem)] rounded-sm border p-2 pe-4 shadow">
-                            {data.inspections.length <= 0 ? (
-                                <div className="w-full items-center text-center">
-                                    <Label>No data found, please add section and item.</Label>
-                                </div>
-                            ) : (
-                                data.inspections.map((section) => {
-                                    return (
-                                        <Fragment key={section.id}>
-                                            <div className="mb-5">
-                                                <div className="mb-3 flex items-end justify-between">
-                                                    <div className="flex flex-col gap-1">
-                                                        <Label className="text-md scroll-m-20 font-semibold tracking-tight">
-                                                            {section.description}
-                                                        </Label>
-                                                        <div className="flex space-x-2">
-                                                            <TooltipWrapper caption={`Order: ${section.seq}`}>
-                                                                <Badge variant={'outline'}>{section.seq}</Badge>
+                        <div className="my-2 w-full">
+                            <ScrollArea className="h-[calc(100vh-15rem)] rounded-sm border p-2 pe-4 shadow">
+                                {data.inspections.length <= 0 ? (
+                                    <div className="w-full items-center text-center">
+                                        <Label>No data found, please add section and item.</Label>
+                                    </div>
+                                ) : (
+                                    data.inspections.map((section) => {
+                                        return (
+                                            <Fragment key={section.id}>
+                                                <div className="mb-5">
+                                                    <div className="mb-3 flex items-end justify-between">
+                                                        <div className="flex flex-col gap-1">
+                                                            <Label className="text-md scroll-m-20 font-semibold tracking-tight">
+                                                                {section.description}
+                                                            </Label>
+                                                            <div className="flex space-x-2">
+                                                                <TooltipWrapper caption={`Order: ${section.seq}`}>
+                                                                    <Badge variant={'outline'}>{section.seq}</Badge>
+                                                                </TooltipWrapper>
+                                                                <Badge variant={'outline'}>
+                                                                    {section.is_separate_page ? 'Separate Page' : 'Same Page'}
+                                                                </Badge>
+                                                                <Badge variant={'outline'}>
+                                                                    {section.items.length} {section.items.length > 0 ? 'Items' : 'Item'}
+                                                                </Badge>
+                                                            </div>
+                                                        </div>
+                                                        <div className="space-x-2">
+                                                            <DropdownMenu>
+                                                                <DropdownMenuTrigger asChild>
+                                                                    <Button type="button" variant={'default'}>
+                                                                        <MenuIcon className="size-4" />
+                                                                        Section
+                                                                    </Button>
+                                                                </DropdownMenuTrigger>
+                                                                <DropdownMenuContent>
+                                                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                                    <DropdownMenuSeparator />
+                                                                    <DropdownMenuItem onClick={() => handleSectionEdit(section.id)}>
+                                                                        <EditIcon className="size-4" /> Edit
+                                                                    </DropdownMenuItem>
+                                                                    <DropdownMenuItem onClick={() => handleSectionRemove(section)}>
+                                                                        <XIcon className="size-4" /> Remove
+                                                                    </DropdownMenuItem>
+                                                                </DropdownMenuContent>
+                                                            </DropdownMenu>
+                                                            <TooltipWrapper caption={`Create new item`}>
+                                                                <Button
+                                                                    type="button"
+                                                                    variant={'outline'}
+                                                                    onClick={() => handleSectionItemCreate(section)}
+                                                                >
+                                                                    <PlusIcon className="size-4" />
+                                                                    Item
+                                                                </Button>
                                                             </TooltipWrapper>
-                                                            <Badge variant={'outline'}>
-                                                                {section.is_separate_page ? 'Separate Page' : 'Same Page'}
-                                                            </Badge>
-                                                            <Badge variant={'outline'}>
-                                                                {section.items.length} {section.items.length > 0 ? 'Items' : 'Item'}
-                                                            </Badge>
                                                         </div>
                                                     </div>
-                                                    <div className="space-x-2">
-                                                        <DropdownMenu>
-                                                            <DropdownMenuTrigger asChild>
-                                                                <Button type="button" variant={'default'}>
-                                                                    <MenuIcon className="size-4" />
-                                                                    Section
-                                                                </Button>
-                                                            </DropdownMenuTrigger>
-                                                            <DropdownMenuContent>
-                                                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                                <DropdownMenuSeparator />
-                                                                <DropdownMenuItem onClick={() => handleSectionEdit(section.id)}>
-                                                                    <EditIcon className="size-4" /> Edit
-                                                                </DropdownMenuItem>
-                                                                <DropdownMenuItem onClick={() => handleSectionRemove(section)}>
-                                                                    <XIcon className="size-4" /> Remove
-                                                                </DropdownMenuItem>
-                                                            </DropdownMenuContent>
-                                                        </DropdownMenu>
-                                                        <TooltipWrapper caption={`Create new item`}>
-                                                            <Button
-                                                                type="button"
-                                                                variant={'outline'}
-                                                                onClick={() => handleSectionItemCreate(section)}
-                                                            >
-                                                                <PlusIcon className="size-4" />
-                                                                Item
-                                                            </Button>
-                                                        </TooltipWrapper>
+                                                    <div className="rounded-sm border">
+                                                        <ScrollArea className="h-80 w-full">
+                                                            <Table>
+                                                                <TableHeader className="sticky top-0 z-10 table-fixed shadow-sm backdrop-blur-sm">
+                                                                    <TableRow>
+                                                                        <TableHead className="w-auto">Description</TableHead>
+                                                                        <TableHead className="w-25">Type</TableHead>
+                                                                        <TableHead className="w-25 text-center">Seq / Order</TableHead>
+                                                                        <TableHead className="w-10"></TableHead>
+                                                                    </TableRow>
+                                                                </TableHeader>
+                                                                <TableBody>
+                                                                    {section.items.length <= 0 ? (
+                                                                        <TableRow className="w-full text-center">
+                                                                            <TableCell colSpan={3}>Item not found.</TableCell>
+                                                                        </TableRow>
+                                                                    ) : (
+                                                                        section.items.map((item) => (
+                                                                            <TableRow key={item.id}>
+                                                                                <TableCell>{item.description}</TableCell>
+                                                                                <TableCell>{item.item_type.replaceAll('_', ' + ')}</TableCell>
+                                                                                <TableCell className="text-center">{item.seq}</TableCell>
+                                                                                <TableCell className="text-right">
+                                                                                    <DropdownMenu>
+                                                                                        <DropdownMenuTrigger asChild>
+                                                                                            <Button type="button" variant={'default'} size={'icon'}>
+                                                                                                <MenuIcon className="size-4" />
+                                                                                            </Button>
+                                                                                        </DropdownMenuTrigger>
+                                                                                        <DropdownMenuContent>
+                                                                                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                                                            <DropdownMenuSeparator />
+                                                                                            <DropdownMenuItem
+                                                                                                onClick={() => handleItemEdit(section.id, item.id)}
+                                                                                            >
+                                                                                                <EditIcon className="size-4" /> Edit
+                                                                                            </DropdownMenuItem>
+                                                                                            <DropdownMenuItem
+                                                                                                onClick={() => handleItemRemove(section.id, item.id)}
+                                                                                            >
+                                                                                                <XIcon className="size-4" /> Remove
+                                                                                            </DropdownMenuItem>
+                                                                                            <DropdownMenuItem
+                                                                                                onClick={() => handleItemMove(section.id, item.id)}
+                                                                                            >
+                                                                                                <ArrowLeftRight className="size-4" /> Move
+                                                                                            </DropdownMenuItem>
+                                                                                        </DropdownMenuContent>
+                                                                                    </DropdownMenu>
+                                                                                </TableCell>
+                                                                            </TableRow>
+                                                                        ))
+                                                                    )}
+                                                                </TableBody>
+                                                            </Table>
+                                                        </ScrollArea>
                                                     </div>
                                                 </div>
-                                                <div className="rounded-sm border">
-                                                    <ScrollArea className="h-80 w-full">
-                                                        <Table>
-                                                            <TableHeader className="sticky top-0 z-10 table-fixed shadow-sm backdrop-blur-sm">
-                                                                <TableRow>
-                                                                    <TableHead className="w-auto">Description</TableHead>
-                                                                    <TableHead className="w-25">Type</TableHead>
-                                                                    <TableHead className="w-25 text-center">Seq / Order</TableHead>
-                                                                    <TableHead className="w-10"></TableHead>
-                                                                </TableRow>
-                                                            </TableHeader>
-                                                            <TableBody>
-                                                                {section.items.length <= 0 ? (
-                                                                    <TableRow className="w-full text-center">
-                                                                        <TableCell colSpan={3}>Item not found.</TableCell>
-                                                                    </TableRow>
-                                                                ) : (
-                                                                    section.items.map((item) => (
-                                                                        <TableRow key={item.id}>
-                                                                            <TableCell>{item.description}</TableCell>
-                                                                            <TableCell>{item.item_type.replaceAll('_', ' + ')}</TableCell>
-                                                                            <TableCell className="text-center">{item.seq}</TableCell>
-                                                                            <TableCell className="text-right">
-                                                                                <DropdownMenu>
-                                                                                    <DropdownMenuTrigger asChild>
-                                                                                        <Button type="button" variant={'default'} size={'icon'}>
-                                                                                            <MenuIcon className="size-4" />
-                                                                                        </Button>
-                                                                                    </DropdownMenuTrigger>
-                                                                                    <DropdownMenuContent>
-                                                                                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                                                        <DropdownMenuSeparator />
-                                                                                        <DropdownMenuItem
-                                                                                            onClick={() => handleItemEdit(section.id, item.id)}
-                                                                                        >
-                                                                                            <EditIcon className="size-4" /> Edit
-                                                                                        </DropdownMenuItem>
-                                                                                        <DropdownMenuItem
-                                                                                            onClick={() => handleItemRemove(section.id, item.id)}
-                                                                                        >
-                                                                                            <XIcon className="size-4" /> Remove
-                                                                                        </DropdownMenuItem>
-                                                                                        <DropdownMenuItem
-                                                                                            onClick={() => handleItemMove(section.id, item.id)}
-                                                                                        >
-                                                                                            <ArrowLeftRight className="size-4" /> Move
-                                                                                        </DropdownMenuItem>
-                                                                                    </DropdownMenuContent>
-                                                                                </DropdownMenu>
-                                                                            </TableCell>
-                                                                        </TableRow>
-                                                                    ))
-                                                                )}
-                                                            </TableBody>
-                                                        </Table>
-                                                    </ScrollArea>
-                                                </div>
-                                            </div>
-                                        </Fragment>
-                                    );
-                                })
-                            )}
-                        </ScrollArea>
-                    </div>
-
-                    <div className="flex items-start justify-between">
-                        <Button type="button" disabled={processing} variant={'warning'} onClick={handleCancel}>
-                            <XIcon className="size-4" />
-                            Cancel
-                        </Button>
-                        <Button type="submit" disabled={processing} variant={'success'}>
-                            {processing ? <Loader2 className="size-4 animate-spin" /> : <CheckIcon className="size-4" />}
-                            Submit
-                        </Button>
+                                            </Fragment>
+                                        );
+                                    })
+                                )}
+                            </ScrollArea>
+                        </div>
                     </div>
                 </div>
             </form>
