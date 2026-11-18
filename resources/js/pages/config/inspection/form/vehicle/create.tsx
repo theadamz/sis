@@ -713,7 +713,7 @@ const Create = ({ inspectionCategories, inspectionFlows, inspectionFlowStages }:
                                         placeholder="Select"
                                         selectLabel="Select Publish"
                                         value={data.is_publish ? 'true' : 'false'}
-                                        onValueChange={(value) => setData('is_publish', Boolean(value))}
+                                        onValueChange={(value) => setData('is_publish', value === 'true')}
                                         items={[
                                             { value: 'true', label: 'Yes' },
                                             { value: 'false', label: 'No' },
@@ -734,7 +734,7 @@ const Create = ({ inspectionCategories, inspectionFlows, inspectionFlowStages }:
                                             placeholder="Select"
                                             selectLabel="Select ETA Date"
                                             value={data.use_eta_dest ? 'true' : 'false'}
-                                            onValueChange={(value) => setData('use_eta_dest', Boolean(value))}
+                                            onValueChange={(value) => setData('use_eta_dest', value === 'true')}
                                             items={[
                                                 { value: 'true', label: 'Yes' },
                                                 { value: 'false', label: 'No' },
@@ -752,7 +752,7 @@ const Create = ({ inspectionCategories, inspectionFlows, inspectionFlowStages }:
                                             placeholder="Select"
                                             selectLabel="Select ATA Date"
                                             value={data.use_ata_dest ? 'true' : 'false'}
-                                            onValueChange={(value) => setData('use_ata_dest', Boolean(value))}
+                                            onValueChange={(value) => setData('use_ata_dest', value === 'true')}
                                             items={[
                                                 { value: 'true', label: 'Yes' },
                                                 { value: 'false', label: 'No' },
@@ -770,7 +770,7 @@ const Create = ({ inspectionCategories, inspectionFlows, inspectionFlowStages }:
                                             placeholder="Select"
                                             selectLabel="Select Duration"
                                             value={data.use_duration ? 'true' : 'false'}
-                                            onValueChange={(value) => setData('use_duration', Boolean(value))}
+                                            onValueChange={(value) => setData('use_duration', value === 'true')}
                                             items={[
                                                 { value: 'true', label: 'Yes' },
                                                 { value: 'false', label: 'No' },
@@ -829,46 +829,48 @@ const Create = ({ inspectionCategories, inspectionFlows, inspectionFlowStages }:
                                                                 {section.description}
                                                             </Label>
                                                             <div className="flex space-x-2">
-                                                                <TooltipWrapper caption={`Order: ${section.seq}`}>
-                                                                    <Badge variant={'outline'}>{section.seq}</Badge>
-                                                                </TooltipWrapper>
-                                                                <Badge variant={'outline'}>
-                                                                    {section.is_separate_page ? 'Separate Page' : 'Same Page'}
-                                                                </Badge>
-                                                                <Badge variant={'outline'}>
-                                                                    {section.items.length} {section.items.length > 0 ? 'Items' : 'Item'}
-                                                                </Badge>
+                                                                <div className="flex space-x-2">
+                                                                    <TooltipWrapper caption={`Order: ${section.seq}`}>
+                                                                        <Badge variant={'outline'}>{section.seq}</Badge>
+                                                                    </TooltipWrapper>
+                                                                    <Badge variant={'outline'}>
+                                                                        {section.is_separate_page ? 'Separate Page' : 'Same Page'}
+                                                                    </Badge>
+                                                                    <Badge variant={'outline'}>
+                                                                        {section.items.length} {section.items.length > 0 ? 'Items' : 'Item'}
+                                                                    </Badge>
+                                                                </div>
+                                                                <div className="space-x-2">
+                                                                    <DropdownMenu>
+                                                                        <DropdownMenuTrigger asChild>
+                                                                            <Button type="button" variant={'default'}>
+                                                                                <MenuIcon className="size-4" />
+                                                                                Section
+                                                                            </Button>
+                                                                        </DropdownMenuTrigger>
+                                                                        <DropdownMenuContent>
+                                                                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                                            <DropdownMenuSeparator />
+                                                                            <DropdownMenuItem onClick={() => handleSectionEdit(section.id)}>
+                                                                                <EditIcon className="size-4" /> Edit
+                                                                            </DropdownMenuItem>
+                                                                            <DropdownMenuItem onClick={() => handleSectionRemove(section)}>
+                                                                                <XIcon className="size-4" /> Remove
+                                                                            </DropdownMenuItem>
+                                                                        </DropdownMenuContent>
+                                                                    </DropdownMenu>
+                                                                    <TooltipWrapper caption={`Create new item`}>
+                                                                        <Button
+                                                                            type="button"
+                                                                            variant={'outline'}
+                                                                            onClick={() => handleSectionItemCreate(section)}
+                                                                        >
+                                                                            <PlusIcon className="size-4" />
+                                                                            Item
+                                                                        </Button>
+                                                                    </TooltipWrapper>
+                                                                </div>
                                                             </div>
-                                                        </div>
-                                                        <div className="space-x-2">
-                                                            <DropdownMenu>
-                                                                <DropdownMenuTrigger asChild>
-                                                                    <Button type="button" variant={'default'}>
-                                                                        <MenuIcon className="size-4" />
-                                                                        Section
-                                                                    </Button>
-                                                                </DropdownMenuTrigger>
-                                                                <DropdownMenuContent>
-                                                                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                                                    <DropdownMenuSeparator />
-                                                                    <DropdownMenuItem onClick={() => handleSectionEdit(section.id)}>
-                                                                        <EditIcon className="size-4" /> Edit
-                                                                    </DropdownMenuItem>
-                                                                    <DropdownMenuItem onClick={() => handleSectionRemove(section)}>
-                                                                        <XIcon className="size-4" /> Remove
-                                                                    </DropdownMenuItem>
-                                                                </DropdownMenuContent>
-                                                            </DropdownMenu>
-                                                            <TooltipWrapper caption={`Create new item`}>
-                                                                <Button
-                                                                    type="button"
-                                                                    variant={'outline'}
-                                                                    onClick={() => handleSectionItemCreate(section)}
-                                                                >
-                                                                    <PlusIcon className="size-4" />
-                                                                    Item
-                                                                </Button>
-                                                            </TooltipWrapper>
                                                         </div>
                                                     </div>
                                                     <div className="rounded-sm border">
@@ -890,7 +892,11 @@ const Create = ({ inspectionCategories, inspectionFlows, inspectionFlowStages }:
                                                                     ) : (
                                                                         section.items.map((item) => (
                                                                             <TableRow key={item.id}>
-                                                                                <TableCell>{item.description}</TableCell>
+                                                                                <TableCell>
+                                                                                    <Label className="font-normal text-wrap">
+                                                                                        {item.description}
+                                                                                    </Label>
+                                                                                </TableCell>
                                                                                 <TableCell>{item.item_type.replaceAll('_', ' + ')}</TableCell>
                                                                                 <TableCell className="text-center">{item.seq}</TableCell>
                                                                                 <TableCell className="text-right">

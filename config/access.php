@@ -31,8 +31,8 @@ return [
         ['group_code' => 'dsh', 'parent_menu_code' => 'dashboard', 'code' => 'dashboard', 'name' => 'Dashboard', 'description' => 'dashboard', 'path' => '/dashboard', 'icon' => 'circle-gauge', 'visible' => true, 'children' => null],
 
         /* Inspection */
-        ['group_code' => 'ins', 'parent_menu_code' => 'ins-vehicle', 'code' => 'ins-vehicle', 'name' => 'Vehicles', 'description' => 'Inspection Vehicles', 'path' => '/inspections/vehicles', 'icon' => 'bus-front', 'visible' => true, 'children' => null],
-        ['group_code' => 'ins', 'parent_menu_code' => 'ins-monitor', 'code' => 'ins-monitor', 'name' => 'Monitor', 'description' => 'Inspection Monitor', 'path' => '/inspections/monitor', 'icon' => 'scan-search', 'visible' => true, 'children' => null],
+        ['group_code' => 'ins', 'parent_menu_code' => 'ins-vch-mnt', 'code' => 'ins-vch-mnt', 'name' => 'Monitor', 'description' => 'Inspection Monitor', 'path' => '/inspections/vehicles/monitor', 'icon' => 'scan-search', 'visible' => true, 'children' => null],
+        ['group_code' => 'ins', 'parent_menu_code' => 'ins-vch', 'code' => 'ins-vch', 'name' => 'Vehicles', 'description' => 'Inspection Vehicles', 'path' => '/inspections/vehicles', 'icon' => 'bus-front', 'visible' => true, 'children' => null],
 
         /* Laporan */
         ['group_code' => 'rpt', 'parent_menu_code' => 'rpt-list', 'code' => 'rpt-list', 'name' => 'Report List', 'description' => 'Report List', 'path' => '/reports', 'icon' => 'circle-small', 'visible' => true, 'children' => null],
@@ -68,8 +68,8 @@ return [
         ['code' => 'dashboard', 'name' => 'Menu Dashboard', 'permissions' => ['read']],
 
         /* Inspection */
-        ['code' => 'ins-vehicle', 'name' => 'Menu Inspection List', 'permissions' => ['read', 'create', 'edit', 'delete']],
-        ['code' => 'ins-monitor', 'name' => 'Menu Inspection Monitor', 'permissions' => ['read']],
+        ['code' => 'ins-vch-mnt', 'name' => 'Menu Inspection Monitor', 'permissions' => ['read']],
+        ['code' => 'ins-vch', 'name' => 'Menu Inspection List', 'permissions' => ['read', 'create', 'edit', 'delete']],
 
         /* Report */
         ['code' => 'rpt-list', 'name' => 'Menu Report List', 'permissions' => ['read']],

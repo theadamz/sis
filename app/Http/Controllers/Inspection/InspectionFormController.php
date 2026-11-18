@@ -547,7 +547,7 @@ class InspectionFormController extends Controller
             Session::flash('toast', [
                 'variant' => 'success',
                 'title' => 'Success',
-                'message' => "Data successfully created.",
+                'message' => "Data successfully saved.",
             ]);
 
             return back();
