@@ -49,3 +49,8 @@ export const generateRandomId = (): string => {
     const milisecond = new Date().getMilliseconds();
     return `${DateTime.now().toFormat('yyyyMMddHHmmss')}${milisecond.toString()}`;
 };
+
+export const capitalizeFirstLetter = (text: string) => {
+    if (text.trim() === '') return '';
+    return text[0].toUpperCase() + text.slice(1);
+};

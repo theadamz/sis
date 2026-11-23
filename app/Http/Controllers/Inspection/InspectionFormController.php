@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Inspection;
 use App\Data\Inspection\InspectionFormCreateData;
 use App\Data\Inspection\InspectionFormUpdateData;
 use App\Enums\CacheKey;
-use App\Enums\InspectionStage;
 use App\Enums\InspectionType;
 use App\Http\Controllers\Controller;
 use App\Models\Inspection\InspectionCategory;
@@ -31,21 +30,7 @@ use Inertia\Response as InertiaResponse;
 
 class InspectionFormController extends Controller
 {
-    private array $inspectionStages;
     private string $cacheStore = 'file';
-
-    public function __construct()
-    {
-        $this->inspectionStages = collect(InspectionStage::cases())->transform(function ($item) {
-            $label = $item->getName();
-            $item = (array) $item;
-
-            return [
-                ...$item,
-                'label' => $label
-            ];
-        })->all();
-    }
 
     private function getInspectionCategories()
     {
@@ -82,7 +67,6 @@ class InspectionFormController extends Controller
     public function index(): InertiaResponse
     {
         return Inertia::render("config/inspection/form/vehicle/index")->with([
-            'inspectionStages' => $this->inspectionStages,
             'inspectionCategories' => Inertia::defer(fn() => $this->getInspectionCategories()),
         ]);
     }

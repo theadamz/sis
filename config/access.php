@@ -20,7 +20,7 @@ return [
             ['group_code' => 'cfg', 'parent_menu_code' => 'cfg-ins', 'code' => 'cfg-ins-ctg', 'name' => 'Categories', 'description' => 'Config > Categories', 'path' => '/config/inspections/categories', 'icon' => 'grid-2x2', 'visible' => true, 'children' => null],
             ['group_code' => 'cfg', 'parent_menu_code' => 'cfg-ins', 'code' => 'cfg-ins-flw', 'name' => 'Flows', 'description' => 'Config > Flows', 'path' => '/config/inspections/flows', 'icon' => 'arrow-up-1-0', 'visible' => true, 'children' => null],
             ['group_code' => 'cfg', 'parent_menu_code' => 'cfg-ins', 'code' => 'cfg-ins-frm', 'name' => 'Forms', 'description' => 'Config > Inspections > Forms', 'path' => null, 'icon' => 'inspection-panel', 'visible' => true, 'children' => [
-                ['group_code' => 'cfg', 'parent_menu_code' => 'cfg-ins-frm', 'code' => 'cfg-ins-frm-vch', 'name' => 'Vehicles', 'description' => 'Config > Inspections > Forms > Vehicles', 'path' => '/config/inspections/forms/vehicles', 'icon' => 'car', 'visible' => true, 'children' => null],
+                ['group_code' => 'cfg', 'parent_menu_code' => 'cfg-ins-frm', 'code' => 'cfg-ins-frm-vch', 'name' => 'Vehicles', 'description' => 'Config > Inspections > Forms > Vehicles', 'path' => '/config/inspections/forms/vehicles', 'icon' => 'bus-front', 'visible' => true, 'children' => null],
                 ['group_code' => 'cfg', 'parent_menu_code' => 'cfg-ins-frm', 'code' => 'cfg-ins-frm-area', 'name' => 'Areas', 'description' => 'Config > Inspections > Forms > Areas', 'path' => '/config/inspections/forms/areas', 'icon' => 'house', 'visible' => true, 'children' => null],
             ]],
         ]],
@@ -31,8 +31,10 @@ return [
         ['group_code' => 'dsh', 'parent_menu_code' => 'dashboard', 'code' => 'dashboard', 'name' => 'Dashboard', 'description' => 'dashboard', 'path' => '/dashboard', 'icon' => 'circle-gauge', 'visible' => true, 'children' => null],
 
         /* Inspection */
-        ['group_code' => 'ins', 'parent_menu_code' => 'ins-vch-mnt', 'code' => 'ins-vch-mnt', 'name' => 'Monitor', 'description' => 'Inspection Monitor', 'path' => '/inspections/vehicles/monitor', 'icon' => 'scan-search', 'visible' => true, 'children' => null],
-        ['group_code' => 'ins', 'parent_menu_code' => 'ins-vch', 'code' => 'ins-vch', 'name' => 'Vehicles', 'description' => 'Inspection Vehicles', 'path' => '/inspections/vehicles', 'icon' => 'bus-front', 'visible' => true, 'children' => null],
+        ['group_code' => 'ins', 'parent_menu_code' => 'ins-vch-reg', 'code' => 'ins-vch-reg', 'name' => 'Registered Vehicles', 'description' => 'Registered Vehicles', 'path' => '/inspections/vehicles/registered-vehicles', 'icon' => 'book-text', 'visible' => true, 'children' => null],
+        ['group_code' => 'ins', 'parent_menu_code' => 'ins-vch-mnt', 'code' => 'ins-vch-mnt', 'name' => 'Monitor Vehicles', 'description' => 'Inspection Monitor Vehicles', 'path' => '/inspections/vehicles/monitor', 'icon' => 'scan-search', 'visible' => true, 'children' => null],
+        ['group_code' => 'ins', 'parent_menu_code' => 'ins-vch', 'code' => 'ins-vch', 'name' => 'Vehicle Inspections', 'description' => 'Vehicle Inspections', 'path' => '/inspections/vehicles', 'icon' => 'bus-front', 'visible' => true, 'children' => null],
+        ['group_code' => 'ins', 'parent_menu_code' => 'ins-area', 'code' => 'ins-area', 'name' => 'Area Inspections', 'description' => 'Area Inspections', 'path' => '/inspections/areas', 'icon' => 'map-pin-house', 'visible' => true, 'children' => null],
 
         /* Laporan */
         ['group_code' => 'rpt', 'parent_menu_code' => 'rpt-list', 'code' => 'rpt-list', 'name' => 'Report List', 'description' => 'Report List', 'path' => '/reports', 'icon' => 'circle-small', 'visible' => true, 'children' => null],
@@ -68,8 +70,10 @@ return [
         ['code' => 'dashboard', 'name' => 'Menu Dashboard', 'permissions' => ['read']],
 
         /* Inspection */
-        ['code' => 'ins-vch-mnt', 'name' => 'Menu Inspection Monitor', 'permissions' => ['read']],
-        ['code' => 'ins-vch', 'name' => 'Menu Inspection List', 'permissions' => ['read', 'create', 'edit', 'delete']],
+        ['code' => 'ins-vch-reg', 'name' => 'Menu Inspection - Registered Vehicles', 'permissions' => ['read', 'create', 'edit', 'delete']],
+        ['code' => 'ins-vch-mnt', 'name' => 'Menu Inspection - Monitor Vehicles', 'permissions' => ['read']],
+        ['code' => 'ins-vch', 'name' => 'Menu Inspection - Vehicles', 'permissions' => ['read', 'create', 'edit', 'delete']],
+        ['code' => 'ins-area', 'name' => 'Menu Inspection - Areas', 'permissions' => ['read', 'create', 'edit', 'delete']],
 
         /* Report */
         ['code' => 'rpt-list', 'name' => 'Menu Report List', 'permissions' => ['read']],

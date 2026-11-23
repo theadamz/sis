@@ -1,5 +1,5 @@
 {
-  "version": "3.0.0",
+  "version": "4.0.0",
   "darkMode": true,
   "gridEnabling": false,
   "currentViewName": null,
@@ -10,116 +10,128 @@
       {
         "name": "entities",
         "schemaName": "public",
-        "x": 0,
-        "y": 0
+        "x": 16,
+        "y": 16
       },
       {
         "name": "sites",
         "schemaName": "public",
-        "x": 376,
-        "y": 0
+        "x": 504,
+        "y": 16
       },
       {
         "name": "gates",
         "schemaName": "public",
-        "x": 800,
-        "y": 0
+        "x": 1072,
+        "y": 16
       },
       {
         "name": "users",
         "schemaName": "public",
-        "x": 1136,
-        "y": 0
+        "x": 1072,
+        "y": 248
       },
       {
         "name": "site_accesses",
         "schemaName": "public",
-        "x": 0,
-        "y": 240
+        "x": 1704,
+        "y": 72
       },
       {
         "name": "accesses",
         "schemaName": "public",
-        "x": 376,
-        "y": 304
+        "x": 1704,
+        "y": 280
       },
       {
         "name": "sign_in_histories",
         "schemaName": "public",
-        "x": 800,
-        "y": 240
+        "x": 1704,
+        "y": 552
       },
       {
         "name": "inspection_forms",
         "schemaName": "public",
-        "x": 800,
-        "y": 616
+        "x": 1704,
+        "y": 920
       },
       {
         "name": "vehicle_inspections",
         "schemaName": "public",
-        "x": 800,
-        "y": 888
+        "x": 2376,
+        "y": 456
       },
       {
         "name": "vehicle_inspection_item_checks",
         "schemaName": "public",
-        "x": 1136,
-        "y": 920
+        "x": 4104,
+        "y": 16
       },
       {
         "name": "vehicle_inspection_item_pictures",
         "schemaName": "public",
-        "x": 0,
-        "y": 904
-      },
-      {
-        "name": "inspection_logs",
-        "schemaName": "public",
-        "x": 376,
-        "y": 1032
+        "x": 2912,
+        "y": 248
       },
       {
         "name": "inspection_vehicle_forms",
         "schemaName": "public",
-        "x": 1136,
-        "y": 680
+        "x": 2376,
+        "y": 16
       },
       {
         "name": "inspection_vehicle_form_sections",
         "schemaName": "public",
-        "x": 0,
-        "y": 664
+        "x": 2912,
+        "y": 16
       },
       {
         "name": "inspection_vehicle_form_items",
         "schemaName": "public",
-        "x": 376,
-        "y": 792
+        "x": 3480,
+        "y": 16
       },
       {
         "name": "document_sequences",
         "schemaName": "public",
-        "x": 800,
-        "y": 1608
+        "x": 1072,
+        "y": 888
       },
       {
         "name": "inspection_categories",
         "schemaName": "public",
-        "x": 1136,
-        "y": 432
+        "x": 16,
+        "y": 248
       },
       {
         "name": "inspection_flows",
         "schemaName": "public",
-        "x": 0,
-        "y": 456
+        "x": 504,
+        "y": 312
       },
       {
         "name": "inspection_flow_stages",
         "schemaName": "public",
-        "x": 376,
-        "y": 584
+        "x": 1072,
+        "y": 680
+      },
+      {
+        "name": "inspection_documents",
+        "schemaName": "public",
+        "x": 1704,
+        "y": 1184
+      },
+      {
+        "name": "registered_vehicles",
+        "schemaName": "public",
+        "x": 16,
+        "y": 456
+      },
+      {
+        "name": "inspection_document_logs",
+        "schemaName": "public",
+        "x": 2376,
+        "y": 248
       }
     ],
     "tableGroupCollapseStates": [],
@@ -307,36 +319,6 @@
       },
       {
         "firstFieldNames": [
-          "inspection_id"
-        ],
-        "firstTableName": "inspection_logs",
-        "firstSchemaName": "public",
-        "firstRelation": "*",
-        "secondFieldNames": [
-          "id"
-        ],
-        "secondTableName": "vehicle_inspections",
-        "secondSchemaName": "public",
-        "secondRelation": "1",
-        "checkPoints": []
-      },
-      {
-        "firstFieldNames": [
-          "id"
-        ],
-        "firstTableName": "inspection_vehicle_forms",
-        "firstSchemaName": "public",
-        "firstRelation": "*",
-        "secondFieldNames": [
-          "id"
-        ],
-        "secondTableName": "inspection_forms",
-        "secondSchemaName": "public",
-        "secondRelation": "1",
-        "checkPoints": []
-      },
-      {
-        "firstFieldNames": [
           "inspection_vehicle_form_id"
         ],
         "firstTableName": "inspection_vehicle_form_sections",
@@ -397,21 +379,6 @@
       },
       {
         "firstFieldNames": [
-          "user_id"
-        ],
-        "firstTableName": "inspection_logs",
-        "firstSchemaName": "public",
-        "firstRelation": "*",
-        "secondFieldNames": [
-          "id"
-        ],
-        "secondTableName": "users",
-        "secondSchemaName": "public",
-        "secondRelation": "1",
-        "checkPoints": []
-      },
-      {
-        "firstFieldNames": [
           "site_id"
         ],
         "firstTableName": "document_sequences",
@@ -444,7 +411,7 @@
         "firstFieldNames": [
           "inspection_flow_id"
         ],
-        "firstTableName": "inspection_forms",
+        "firstTableName": "inspection_flow_stages",
         "firstSchemaName": "public",
         "firstRelation": "*",
         "secondFieldNames": [
@@ -457,9 +424,24 @@
       },
       {
         "firstFieldNames": [
+          "inspection_flow_stage_id"
+        ],
+        "firstTableName": "inspection_forms",
+        "firstSchemaName": "public",
+        "firstRelation": "*",
+        "secondFieldNames": [
+          "id"
+        ],
+        "secondTableName": "inspection_flow_stages",
+        "secondSchemaName": "public",
+        "secondRelation": "1",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
           "inspection_flow_id"
         ],
-        "firstTableName": "inspection_flow_stages",
+        "firstTableName": "inspection_documents",
         "firstSchemaName": "public",
         "firstRelation": "*",
         "secondFieldNames": [
@@ -469,8 +451,131 @@
         "secondSchemaName": "public",
         "secondRelation": "1",
         "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "inspection_document_id"
+        ],
+        "firstTableName": "vehicle_inspections",
+        "firstSchemaName": "public",
+        "firstRelation": "*",
+        "secondFieldNames": [
+          "id"
+        ],
+        "secondTableName": "inspection_documents",
+        "secondSchemaName": "public",
+        "secondRelation": "1",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "site_id"
+        ],
+        "firstTableName": "inspection_documents",
+        "firstSchemaName": "public",
+        "firstRelation": "*",
+        "secondFieldNames": [
+          "id"
+        ],
+        "secondTableName": "sites",
+        "secondSchemaName": "public",
+        "secondRelation": "1",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "current_inspection_flow_stage_id"
+        ],
+        "firstTableName": "inspection_documents",
+        "firstSchemaName": "public",
+        "firstRelation": "*",
+        "secondFieldNames": [
+          "id"
+        ],
+        "secondTableName": "inspection_flow_stages",
+        "secondSchemaName": "public",
+        "secondRelation": "1",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "reviewed_by"
+        ],
+        "firstTableName": "vehicle_inspections",
+        "firstSchemaName": "public",
+        "firstRelation": "*",
+        "secondFieldNames": [
+          "id"
+        ],
+        "secondTableName": "users",
+        "secondSchemaName": "public",
+        "secondRelation": "1",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "inspection_form_id"
+        ],
+        "firstTableName": "inspection_vehicle_forms",
+        "firstSchemaName": "public",
+        "firstRelation": "*",
+        "secondFieldNames": [
+          "id"
+        ],
+        "secondTableName": "inspection_forms",
+        "secondSchemaName": "public",
+        "secondRelation": "1",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "inspection_document_id"
+        ],
+        "firstTableName": "inspection_document_logs",
+        "firstSchemaName": "public",
+        "firstRelation": "*",
+        "secondFieldNames": [
+          "id"
+        ],
+        "secondTableName": "inspection_documents",
+        "secondSchemaName": "public",
+        "secondRelation": "1",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "user_id"
+        ],
+        "firstTableName": "inspection_document_logs",
+        "firstSchemaName": "public",
+        "firstRelation": "*",
+        "secondFieldNames": [
+          "id"
+        ],
+        "secondTableName": "users",
+        "secondSchemaName": "public",
+        "secondRelation": "1",
+        "checkPoints": []
+      },
+      {
+        "firstFieldNames": [
+          "registered_vehicle_id"
+        ],
+        "firstTableName": "vehicle_inspections",
+        "firstSchemaName": "public",
+        "firstRelation": "*",
+        "secondFieldNames": [
+          "id"
+        ],
+        "secondTableName": "registered_vehicles",
+        "secondSchemaName": "public",
+        "secondRelation": "1",
+        "checkPoints": []
       }
-    ]
+    ],
+    "elementPositions": [],
+    "groupCollapseStates": [],
+    "linkPaths": []
   },
   "views": {}
 }

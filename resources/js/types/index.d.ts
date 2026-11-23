@@ -1,7 +1,6 @@
 import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
 import { InspectionItemType } from './enum';
-
 export interface Auth {
     user: User;
 }
@@ -176,6 +175,28 @@ export interface InspectionFlow {
     stages: Array<InspectionFlowStage>;
 }
 
+export interface RegisteredVehicle {
+    id: string;
+    ownership: string;
+    reg_no: string;
+    owner_name?: string;
+    owner_address?: string;
+    paper_no?: string;
+    brand?: string;
+    type?: string;
+    category?: string;
+    model?: string;
+    production_year?: number;
+    power_capacity?: number;
+    chassis_no?: string;
+    engine_no?: string;
+    color?: string;
+    fuel_type?: string;
+    license_plat_color?: string;
+    registration_year?: number;
+    registered_for?: string;
+}
+
 /* enum */
 
 export interface InspectionType {
@@ -284,4 +305,50 @@ export interface UserDT {
     entity_name: string;
     is_active: boolean;
     last_login_at: Date;
+}
+
+export interface VehicleInspectionDT {
+    id: string;
+    inspection_date: Date;
+    inspection_form_id: string;
+    inspection_form_name: string;
+    inspected_by: string;
+    inspected_by_name: string;
+    gate_id: string;
+    gate_name: string;
+    container_no?: string;
+    seal_no?: string;
+    vehicle_reg_no: string;
+    vehicle_paper_no?: string;
+    driver_id_no: string;
+    arrival_time_at_fty?: Date;
+    depart_time_from_fty?: Date;
+    eta_to_dest?: Date;
+    ata_to_dest?: Date;
+    duration_start?: Date;
+    duration_end?: Date;
+    export_notified_by?: string;
+    remarks?: string;
+    inspection_started_at?: Date;
+    inspection_ended_at?: Date;
+    coordinate_start?: any;
+    coordinate_end?: any;
+    reviewed_by?: string;
+    reviewed_name?: string;
+    reviewed_at?: Date;
+    reviewed_comment?: string;
+}
+
+export interface RegisteredVehicleDT {
+    id: string;
+    ownership: string;
+    reg_no: string;
+    brand?: string;
+    type?: string;
+    category?: string;
+    model?: string;
+    chassis_no?: string;
+    engine_no?: string;
+    color?: string;
+    registered_for?: string;
 }

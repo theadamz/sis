@@ -15,7 +15,7 @@ return new class extends Migration
             $table->unsignedBigInteger('id')->primary();
             $table->unsignedBigInteger('vehicle_inspection_id')->index();
             $table->unsignedBigInteger('inspection_vehicle_form_item_id')->index();
-            $table->jsonb('result')->comment('{ is_passed: true/false, picture_file: "image.webp" }');
+            $table->jsonb('result')->comment('{ type: "SELECT", value: true/false, picture_file: "image.webp" }');
             $table->string('remarks', 100)->nullable();
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();

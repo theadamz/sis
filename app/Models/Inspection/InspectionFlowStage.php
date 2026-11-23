@@ -40,7 +40,7 @@ class InspectionFlowStage extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()->logAll()->setDescriptionForEvent(function (string $eventName) {
-            return "inspection flow " . $eventName;
+            return "inspection flow stage " . $eventName;
         });
     }
 

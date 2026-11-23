@@ -1,5 +1,5 @@
-import { ForwardedRef, forwardRef, ReactNode, useEffect, useImperativeHandle, useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './ui/dialog';
+import React, { ForwardedRef, forwardRef, ReactNode, useEffect, useImperativeHandle, useState } from 'react';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog';
 
 export interface DialogContainerRef {
     open: () => void;
@@ -9,16 +9,29 @@ export interface DialogContainerRef {
 interface DialogContainerProps {
     className?: string;
     children: React.ReactNode;
+    footer?: React.ReactNode;
     title: string;
     description?: string;
     open?: boolean;
     preventInteractionOutside?: boolean;
     onOpen?: () => void;
     onClose?: () => void;
+    showCloseButton?: boolean;
 }
 
 const DialogContainer = (
-    { className, children, title, description, open = false, preventInteractionOutside = true, onOpen, onClose }: DialogContainerProps,
+    {
+        className,
+        children,
+        footer,
+        title,
+        description,
+        open = false,
+        preventInteractionOutside = true,
+        showCloseButton = true,
+        onOpen,
+        onClose,
+    }: DialogContainerProps,
     ref: ForwardedRef<DialogContainerRef>,
 ): ReactNode => {
     /*** componenet state ***/
@@ -51,12 +64,14 @@ const DialogContainer = (
                 onInteractOutside={(e) => {
                     if (preventInteractionOutside) e.preventDefault();
                 }}
+                showCloseButton={showCloseButton}
             >
                 <DialogHeader>
                     <DialogTitle className="text-start">{title}</DialogTitle>
                     <DialogDescription className="text-start">{description}</DialogDescription>
                 </DialogHeader>
                 <div className="overflow-x-auto overflow-y-hidden">{children}</div>
+                {footer && <DialogFooter>{footer}</DialogFooter>}
             </DialogContent>
         </Dialog>
     );

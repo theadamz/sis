@@ -15,7 +15,7 @@ return new class extends Migration
         Schema::create('inspection_forms', function (Blueprint $table) {
             $table->unsignedBigInteger('id')->primary();
             $table->unsignedBigInteger('inspection_flow_stage_id')->index();
-            $table->string('type', 20)->default(InspectionType::VEHICLE)->index();
+            $table->string('inspection_type', 20)->default(InspectionType::VEHICLE)->index();
             $table->string('code', 50)->unique();
             $table->string('name', 100);
             $table->boolean('is_publish')->default(true);

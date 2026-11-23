@@ -31,7 +31,6 @@ import {
     type InspectionFormSection,
     type SharedData,
 } from '@/types';
-import { InspectionStage } from '@/types/enum';
 import { Deferred, Head, router, useForm } from '@inertiajs/react';
 import _ from 'lodash';
 import { ArrowLeftRight, CheckIcon, ChevronRight, EditIcon, Loader2, MenuIcon, PlusIcon, XIcon } from 'lucide-react';
@@ -74,7 +73,6 @@ type InspectionForm = {
     use_eta_dest: boolean;
     use_ata_dest: boolean;
     use_duration: boolean;
-    stage: InspectionStage;
     inspections: Inspection[];
 };
 
@@ -92,7 +90,6 @@ type InspectionData2Edit = {
     use_eta_dest: boolean;
     use_ata_dest: boolean;
     use_duration: boolean;
-    stage: InspectionStage;
     inspections: Inspection[];
 };
 
@@ -115,7 +112,6 @@ const Edit = ({ inspectionCategories, inspectionFlows, inspectionFlowStages, dat
         use_eta_dest: data2edit.use_eta_dest,
         use_ata_dest: data2edit.use_ata_dest,
         use_duration: data2edit.use_duration,
-        stage: data2edit.stage,
         inspections: data2edit.inspections,
     });
 

@@ -62,6 +62,7 @@ return [
         'forCode' => "/^[A-Za-z0-9-+=^]*$/",
         'forUsername' => "/^[A-Za-z0-9-+=^@.]*$/",
         'forTransType' => "/^[A-Za-z_{}#+=\/-]*$/",
+        'alphaNumberOnly' => "/^[A-Z0-9^]*$/",
     ],
     'data' => [
         'test' => [1, 2, 3],

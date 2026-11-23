@@ -1,0 +1,197 @@
+import { Button } from '@/components//ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Label } from '@/components/ui/label';
+import CaretColumn from '@/datatables/components/caret-column';
+import { sortHandler } from '@/lib/utils';
+import type { SharedData, VehicleInspectionDT } from '@/types';
+import { usePage } from '@inertiajs/react';
+import { ColumnDef } from '@tanstack/react-table';
+import { CopyIcon, EllipsisVerticalIcon, PencilIcon } from 'lucide-react';
+
+export const VehicleInspectionColumns: ColumnDef<VehicleInspectionDT, unknown>[] = [
+    {
+        id: 'checkbox',
+        meta: {
+            headerClassName: 'w-[40px]', // fixed width
+        },
+        header: ({ table }) => (
+            <Checkbox
+                checked={table.getIsAllPageRowsSelected() || (table.getIsSomePageRowsSelected() && 'indeterminate')}
+                onCheckedChange={(value) => {
+                    table.toggleAllPageRowsSelected(!!value);
+
+                    if (table.options.meta?.onHeaderChecked) table.options.meta.onHeaderChecked(!!value);
+                }}
+                aria-label="Select all"
+            />
+        ),
+        cell: ({ row, table }) => (
+            <Checkbox
+                checked={row.getIsSelected()}
+                onCheckedChange={(value) => {
+                    row.toggleSelected(!!value);
+
+                    if (table.options.meta?.onChecked) table.options.meta.onChecked(row.original, !!value);
+                }}
+                aria-label="Select row"
+            />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+    },
+    {
+        accessorKey: 'code',
+        meta: {
+            columnDisplayName: 'Code',
+            headerClassName: 'w-[250px]',
+        },
+        header: ({ column }) => {
+            return (
+                <Button type="button" variant="ghost" onClick={() => column.toggleSorting(sortHandler(column.getIsSorted()))} className="p-0">
+                    Inspection No.
+                    <CaretColumn sort={column.getIsSorted()} />
+                </Button>
+            );
+        },
+    },
+    {
+        accessorKey: 'name',
+        meta: {
+            columnDisplayName: 'Name',
+        },
+        header: ({ column }) => {
+            return (
+                <Button type="button" variant="ghost" onClick={() => column.toggleSorting(sortHandler(column.getIsSorted()))} className="p-0">
+                    Name
+                    <CaretColumn sort={column.getIsSorted()} />
+                </Button>
+            );
+        },
+    },
+    {
+        accessorKey: 'use_eta_dest',
+        meta: {
+            headerClassName: 'w-[40px] text-center',
+            columnDisplayName: 'ETA Dest.', // Column display name
+            columnDisplay: true, // hide column after init
+        },
+        header: () => <Label>ETA Dest.</Label>,
+        cell: ({ row }) => (
+            <div className="flex w-full justify-center">
+                <Badge variant={row.getValue('use_eta_dest') ? 'info' : 'outline'}>{row.getValue('use_eta_dest') ? 'Yes' : 'No'}</Badge>
+            </div>
+        ),
+    },
+    {
+        accessorKey: 'use_ata_dest',
+        enableResizing: true,
+        meta: {
+            headerClassName: 'w-[40px] text-center',
+            columnDisplayName: 'ATA Dest.', // Column display name
+            columnDisplay: true, // hide column after init
+        },
+        header: () => <Label>ATA Dest.</Label>,
+        cell: ({ row }) => (
+            <div className="flex w-full justify-center">
+                <Badge variant={row.getValue('use_ata_dest') ? 'info' : 'outline'}>{row.getValue('use_ata_dest') ? 'Yes' : 'No'}</Badge>
+            </div>
+        ),
+    },
+    {
+        accessorKey: 'use_duration',
+        enableResizing: true,
+        meta: {
+            headerClassName: 'w-[40px] text-center',
+            columnDisplayName: 'Duration', // Column display name
+            columnDisplay: true, // hide column after init
+        },
+        header: () => <Label>Duration</Label>,
+        cell: ({ row }) => (
+            <div className="flex w-full justify-center">
+                <Badge variant={row.getValue('use_duration') ? 'info' : 'outline'}>{row.getValue('use_duration') ? 'Yes' : 'No'}</Badge>
+            </div>
+        ),
+    },
+    {
+        accessorKey: 'total_sections',
+        enableResizing: true,
+        meta: {
+            headerClassName: 'w-[40px] text-center',
+            columnDisplayName: 'Sections', // Column display name
+            columnDisplay: true, // hide column after init
+        },
+        header: () => <Label>Sections</Label>,
+        cell: ({ row }) => <Label className="flex justify-center">{row.getValue('total_sections')}</Label>,
+    },
+    {
+        accessorKey: 'total_items',
+        enableResizing: true,
+        meta: {
+            headerClassName: 'w-[40px] text-center',
+            columnDisplayName: 'Items', // Column display name
+            columnDisplay: true, // hide column after init
+        },
+        header: () => <Label>Items</Label>,
+        cell: ({ row }) => <Label className="flex justify-center">{row.getValue('total_items')}</Label>,
+    },
+    {
+        accessorKey: 'is_publish',
+        enableResizing: true,
+        meta: {
+            headerClassName: 'w-[40px] text-center',
+            columnDisplayName: 'Publish', // Column display name
+            columnDisplay: true, // hide column after init
+        },
+        header: () => {
+            return <Label>Publish</Label>;
+        },
+        cell: ({ row }) => <Badge variant={row.getValue('is_publish') ? 'outline' : 'warning'}>{row.getValue('is_publish') ? 'Yes' : 'No'}</Badge>,
+    },
+    {
+        id: 'actions',
+        enableHiding: false,
+        meta: {
+            headerClassName: 'w-[40px]', // fixed width
+        },
+        cell: ({ row, table }) => {
+            const { permissions } = usePage<SharedData>().props.access;
+            const item = row.original;
+
+            return (
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button type="button" variant="ghost" className="size-8 p-0">
+                            <span className="sr-only">Open actions</span>
+                            <EllipsisVerticalIcon className="size-4" />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        {permissions.edit && (
+                            <DropdownMenuItem onClick={() => table.options.meta?.onEdit && table.options.meta.onEdit(item as any)}>
+                                <PencilIcon /> Edit
+                            </DropdownMenuItem>
+                        )}
+                        {permissions.create && (
+                            <DropdownMenuItem
+                                onClick={() => table.options.meta?.onCustomEvent && table.options.meta.onCustomEvent(item as any, 'duplicate')}
+                            >
+                                <CopyIcon /> Dulicate
+                            </DropdownMenuItem>
+                        )}
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            );
+        },
+    },
+];

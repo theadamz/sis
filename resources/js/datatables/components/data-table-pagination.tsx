@@ -50,6 +50,7 @@ type DataTableProps<TData, TValue> = {
     onEdit?: (data: any) => void;
     onRowsSelected?: (data: any[]) => void;
     onDeleteClicked?: (data: any[]) => void;
+    onCustomEvent?: (data: any, event: string) => void;
 };
 
 type QueryFilter = {
@@ -77,6 +78,7 @@ const DataTablePagination = <TData, TValue>(
         onEdit,
         onRowsSelected,
         onDeleteClicked,
+        onCustomEvent,
     }: DataTableProps<TData, TValue>,
     ref: ForwardedRef<DataTableRef>,
 ) => {
@@ -118,6 +120,9 @@ const DataTablePagination = <TData, TValue>(
         meta: {
             onEdit: (data: any) => {
                 if (onEdit) onEdit(data);
+            },
+            onCustomEvent: (data: any, event: string) => {
+                if (onCustomEvent) onCustomEvent(data, event);
             },
             onChecked: (row: any, isChecked: boolean) => {
                 if (isChecked) {
