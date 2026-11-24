@@ -412,7 +412,7 @@ namespace App\Models\Inspection{
  * @property \Illuminate\Support\Carbon|null $eta_to_dest Estimation time to destination harbour / airport
  * @property \Illuminate\Support\Carbon|null $ata_to_dest Actual time arrived at destination harbour / airport
  * @property string|null $export_notified_by Notified to Export Departure by (name)
- * @property string|null $remarks
+ * @property string|null $remark
  * @property string $stage CHECKED_IN/LOADING/CHECKED_OUT
  * @property int|null $created_by
  * @property int|null $updated_by
@@ -440,7 +440,7 @@ namespace App\Models\Inspection{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereInspectionDate($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereInspectionFormId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereInspectionNo($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereRemarks($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereRemark($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereSealNo($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereStage($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspection whereUpdatedAt($value)
@@ -457,7 +457,7 @@ namespace App\Models\Inspection{
  * @property int $vehicle_inspection_id
  * @property int $inspection_vehicle_form_item_id
  * @property string $result { is_passed: true/false, picture_file: "image.webp" }
- * @property string|null $remarks
+ * @property string|null $remark
  * @property int|null $created_by
  * @property int|null $updated_by
  * @property \Illuminate\Support\Carbon|null $created_at
@@ -471,7 +471,7 @@ namespace App\Models\Inspection{
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck whereCreatedBy($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck whereInspectionVehicleFormItemId($value)
- * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck whereRemarks($value)
+ * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck whereRemark($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck whereResult($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|VehicleInspectionItemCheck whereUpdatedBy($value)

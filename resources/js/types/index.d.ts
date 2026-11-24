@@ -128,6 +128,15 @@ export interface UserAccess {
     is_allowed: boolean;
 }
 
+export interface InspectonForm {
+    id: string;
+    inspection_flow_stage_id: string;
+    inspection_type: string;
+    code: string;
+    name: string;
+    is_publish: string;
+}
+
 export interface InspectionFormSection {
     id: string;
     inspection_vehicle_form_id: string;
@@ -223,6 +232,14 @@ export interface UserOption {
     username: string;
     name: string;
     email: string;
+}
+
+export interface InspectionFormOption {
+    id: string;
+    code: string;
+    name: string;
+    stage_flow_name: string;
+    order: number;
 }
 
 /* Datatable */
@@ -328,7 +345,7 @@ export interface VehicleInspectionDT {
     duration_start?: Date;
     duration_end?: Date;
     export_notified_by?: string;
-    remarks?: string;
+    remark?: string;
     inspection_started_at?: Date;
     inspection_ended_at?: Date;
     coordinate_start?: any;

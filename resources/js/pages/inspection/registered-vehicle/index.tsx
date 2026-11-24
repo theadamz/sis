@@ -45,7 +45,6 @@ const Index = ({ vehicleOwnerships, datatable, rec, action = null }: IndexProps)
     const { access } = usePage<SharedData>().props;
 
     /*** state ***/
-    const [id, setId] = useState<string | null>(null);
     const [queryStrings, setQueryStrings] = useState<{ [field: string]: any } | undefined>(undefined);
 
     /*** references ***/
@@ -133,7 +132,7 @@ const Index = ({ vehicleOwnerships, datatable, rec, action = null }: IndexProps)
             {/* form */}
             {(access.permissions.create || access.permissions.edit) && (
                 <DialogContainer
-                    title={`${action === ActionForm.edit ? 'Edit Registered Vechile' : 'Register Vehicle'}`}
+                    title={`${action === ActionForm.edit ? 'Edit Registered Vechile' : action === ActionForm.duplicate ? 'Duplicate Registered Vehicle' : 'Register Vehicle'}`}
                     ref={inputForm}
                     className="min-w-3xl"
                     open={Object.values(ActionForm).includes(action as ActionForm)}

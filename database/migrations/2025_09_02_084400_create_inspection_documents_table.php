@@ -19,7 +19,7 @@ return new class extends Migration
             $table->date('inspection_date')->index();
             $table->unsignedBigInteger('inspection_flow_id')->index();
             $table->unsignedBigInteger('current_inspection_flow_stage_id')->index();
-            $table->string('status', 20)->index();
+            $table->string('status', 20)->index()->comment('DRAFT,POSTED,DISCARDED,REVIEWED');
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();

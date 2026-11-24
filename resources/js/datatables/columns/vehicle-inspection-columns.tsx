@@ -1,5 +1,4 @@
 import { Button } from '@/components//ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
     DropdownMenu,
@@ -49,9 +48,9 @@ export const VehicleInspectionColumns: ColumnDef<VehicleInspectionDT, unknown>[]
         enableHiding: false,
     },
     {
-        accessorKey: 'code',
+        accessorKey: 'inspection_no',
         meta: {
-            columnDisplayName: 'Code',
+            columnDisplayName: 'Inspection No.',
             headerClassName: 'w-[250px]',
         },
         header: ({ column }) => {
@@ -64,97 +63,40 @@ export const VehicleInspectionColumns: ColumnDef<VehicleInspectionDT, unknown>[]
         },
     },
     {
-        accessorKey: 'name',
+        accessorKey: 'inspection_date',
         meta: {
-            columnDisplayName: 'Name',
+            columnDisplayName: 'Inspection Date',
         },
         header: ({ column }) => {
             return (
                 <Button type="button" variant="ghost" onClick={() => column.toggleSorting(sortHandler(column.getIsSorted()))} className="p-0">
-                    Name
+                    Inspection Date
                     <CaretColumn sort={column.getIsSorted()} />
                 </Button>
             );
         },
     },
     {
-        accessorKey: 'use_eta_dest',
-        meta: {
-            headerClassName: 'w-[40px] text-center',
-            columnDisplayName: 'ETA Dest.', // Column display name
-            columnDisplay: true, // hide column after init
-        },
-        header: () => <Label>ETA Dest.</Label>,
-        cell: ({ row }) => (
-            <div className="flex w-full justify-center">
-                <Badge variant={row.getValue('use_eta_dest') ? 'info' : 'outline'}>{row.getValue('use_eta_dest') ? 'Yes' : 'No'}</Badge>
-            </div>
-        ),
-    },
-    {
-        accessorKey: 'use_ata_dest',
+        accessorKey: 'status',
         enableResizing: true,
         meta: {
             headerClassName: 'w-[40px] text-center',
-            columnDisplayName: 'ATA Dest.', // Column display name
+            columnDisplayName: 'Status', // Column display name
             columnDisplay: true, // hide column after init
         },
-        header: () => <Label>ATA Dest.</Label>,
-        cell: ({ row }) => (
-            <div className="flex w-full justify-center">
-                <Badge variant={row.getValue('use_ata_dest') ? 'info' : 'outline'}>{row.getValue('use_ata_dest') ? 'Yes' : 'No'}</Badge>
-            </div>
-        ),
+        header: () => <Label>Status</Label>,
+        cell: ({ row }) => <Label className="flex justify-center">Checked In</Label>,
     },
     {
-        accessorKey: 'use_duration',
+        accessorKey: 'Current Stage',
         enableResizing: true,
         meta: {
             headerClassName: 'w-[40px] text-center',
-            columnDisplayName: 'Duration', // Column display name
+            columnDisplayName: 'Current Stage', // Column display name
             columnDisplay: true, // hide column after init
         },
-        header: () => <Label>Duration</Label>,
-        cell: ({ row }) => (
-            <div className="flex w-full justify-center">
-                <Badge variant={row.getValue('use_duration') ? 'info' : 'outline'}>{row.getValue('use_duration') ? 'Yes' : 'No'}</Badge>
-            </div>
-        ),
-    },
-    {
-        accessorKey: 'total_sections',
-        enableResizing: true,
-        meta: {
-            headerClassName: 'w-[40px] text-center',
-            columnDisplayName: 'Sections', // Column display name
-            columnDisplay: true, // hide column after init
-        },
-        header: () => <Label>Sections</Label>,
-        cell: ({ row }) => <Label className="flex justify-center">{row.getValue('total_sections')}</Label>,
-    },
-    {
-        accessorKey: 'total_items',
-        enableResizing: true,
-        meta: {
-            headerClassName: 'w-[40px] text-center',
-            columnDisplayName: 'Items', // Column display name
-            columnDisplay: true, // hide column after init
-        },
-        header: () => <Label>Items</Label>,
-        cell: ({ row }) => <Label className="flex justify-center">{row.getValue('total_items')}</Label>,
-    },
-    {
-        accessorKey: 'is_publish',
-        enableResizing: true,
-        meta: {
-            headerClassName: 'w-[40px] text-center',
-            columnDisplayName: 'Publish', // Column display name
-            columnDisplay: true, // hide column after init
-        },
-        header: () => {
-            return <Label>Publish</Label>;
-        },
-        cell: ({ row }) => <Badge variant={row.getValue('is_publish') ? 'outline' : 'warning'}>{row.getValue('is_publish') ? 'Yes' : 'No'}</Badge>,
+        header: () => <Label>Current Stage</Label>,
+        cell: ({ row }) => <Label className="flex justify-center">Checked In</Label>,
     },
     {
         id: 'actions',

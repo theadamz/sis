@@ -278,8 +278,9 @@ Ref: inspection_vehicle_form_items.inspection_vehicle_form_section_id > inspecti
 
 Table registered_vehicles {
     id bigint [primary key, not null]
+    site_id bigint [not null]
     ownership varchar(50) [not null, note: "internal,employee,vendor,forwarder/ekspeditur"]
-    reg_no varchar(50) [unique, not null, note: "Vehicle registration number"]
+    reg_no varchar(50) [not null, note: "Vehicle registration number"]
     owner_name varchar(255)
     owner_address varchar(255)
     paper_no varchar(50) [note: "Vehicle registration number paper"]
@@ -298,10 +299,12 @@ Table registered_vehicles {
     registered_for varchar(255) [note: "employee name or PIC for the vehicle"]
 
     indexes {
+        site_id
         ownership
         reg_no
         chassis_no
         engine_no
+        (site_id, reg_no) [unique]
     }
 
 }
@@ -314,7 +317,7 @@ Table inspection_documents {
     inspection_date date [not null]
     inspection_flow_id bigint [not null]
     current_inspection_flow_stage_id bigint [not null]
-    status varchar(20) [not null, default: 'DRAFT', note: 'DRAFT,POSTED,DISCARDED']
+    status varchar(20) [not null, default: 'DRAFT', note: 'DRAFT,POSTED,DISCARDED,REVIEWED']
 
     indexes {
         site_id
@@ -365,7 +368,7 @@ Table vehicle_inspections {
     duration_start timestamp [note: "With flag use duration"]
     duration_end timestamp [note: "With flag use duration"]
     export_notified_by varchar(100) [note: "Notified to Export Departure by (name)"]
-    remarks varchar(255)
+    remark varchar(255)
     inspection_started_at timestamp
     inspection_ended_at timestamp
     coordinate_start jsonb
@@ -407,7 +410,7 @@ Table vehicle_inspection_item_checks {
     vehicle_inspection_id bigint [not null]
     inspection_vehicle_form_item_id bigint [not null]
     result jsonb [not null, note: '{ type: "SELECT", value: true/false, picture_file: "image.webp" }']
-    remarks varchar(100)
+    remark varchar(100)
 
     indexes {
         vehicle_inspection_id

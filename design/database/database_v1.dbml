@@ -228,7 +228,7 @@ Table vehicle_inspections {
     eta_to_dest timestamp [note: "Estimation time to destination harbour / airport"]
     ata_to_dest timestamp [note: "Actual time arrived at destination harbour / airport"]
     export_notified_by varchar(100) [note: "Notified to Export Departure by"]
-    remarks varchar(255)
+    remark varchar(255)
     stage varchar(20) [not null, default: 'CHECKED_IN', note: "CHECKED_IN/LOADING/CHECKED_OUT"]
 
     indexes {
@@ -257,7 +257,7 @@ Table vehicle_inspection_item_checks {
     inspection_id uuid [not null]
     inspection_form_item_id uuid [not null]
     check json [not null, note: "ok/no/filename.jpg"]
-    remarks varchar(100)
+    remark varchar(100)
 
     indexes {
         inspection_id

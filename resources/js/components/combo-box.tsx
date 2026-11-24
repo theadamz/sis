@@ -55,7 +55,7 @@ const ComboBox = ({
                         <ChevronsUpDown className="h-3 w-3 shrink-0 opacity-50" />
                     </Button>
                 </PopoverTrigger>
-                <PopoverContent className={cn('w-[var(--radix-popover-trigger-width)] p-0', className)}>
+                <PopoverContent className={cn('w-(--radix-popover-trigger-width) p-0', className)}>
                     <Command
                         filter={(value: string, search: string) => {
                             if (filterItemKey === 'value') {

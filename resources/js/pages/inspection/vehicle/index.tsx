@@ -1,27 +1,30 @@
 import { confirmDialog } from '@/components/confirm-dialog';
+import DialogContainer from '@/components/dialog-container';
 import { DialogSheetRef } from '@/components/dialog-sheet';
 import { errorDialog } from '@/components/error-dialog';
 import { loadingDialog } from '@/components/loading-dialog';
 import Select from '@/components/select';
+import { Spinner } from '@/components/spinner';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { VehicleInspectionColumns } from '@/datatables/columns/vehicle-inspection-columns';
 import DataTablePagination from '@/datatables/components/data-table-pagination';
 import { DataTablePaginationAjaxRef } from '@/datatables/components/data-table-pagination-ajax';
 import { refactorErrorMessage } from '@/lib/refactorMessages';
-import type { BreadcrumbItem, InspectionFormDT, SharedData, VehicleInspectionDT } from '@/types';
+import type { BreadcrumbItem, InspectionCategory, InspectionFormDT, InspectionFormOption, SharedData, VehicleInspectionDT } from '@/types';
 import { IDataTablePagination } from '@/types/datatables';
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Deferred, Head, router, usePage } from '@inertiajs/react';
 import { PlusIcon, XIcon } from 'lucide-react';
 import { JSX, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import SelectInspectionForm from './select-inspection-form';
 
 const breadcrumbsData: BreadcrumbItem[] = [
     {
         title: 'Inspection',
     },
     {
-        title: 'Vehicles',
+        title: 'Vehicle Inspection',
         href: route('inspection.vehicle.index'),
     },
 ];
@@ -32,9 +35,11 @@ interface IEntityDataTablePagination extends Omit<IDataTablePagination<VehicleIn
 
 interface IndexProps {
     datatable: IEntityDataTablePagination;
+    inspectionCategories: Array<InspectionCategory>;
+    inspectionForms?: Array<InspectionFormOption>;
 }
 
-const Index = ({ datatable }: IndexProps): JSX.Element => {
+const Index = ({ datatable, inspectionCategories, inspectionForms = [] }: IndexProps): JSX.Element => {
     /*** inertia js ***/
     const { access } = usePage<SharedData>().props;
 
@@ -43,6 +48,7 @@ const Index = ({ datatable }: IndexProps): JSX.Element => {
 
     /*** references ***/
     const dataTable = useRef<DataTablePaginationAjaxRef>(null);
+    const selectInpsectionForm = useRef<DialogSheetRef>(null);
     const editForm = useRef<DialogSheetRef>(null);
 
     /*** effect ***/
@@ -112,9 +118,26 @@ const Index = ({ datatable }: IndexProps): JSX.Element => {
         router.visit(route('config.inspection.form.vehicle.edit', { id: data.id }));
     };
 
+    const handleCreate = () => {
+        selectInpsectionForm.current?.open();
+    };
+
     return (
         <>
             <Head title="Vehicle Inspections" />
+
+            {/* select form */}
+            {access.permissions.create && (
+                <DialogContainer title="Select Form Inspection" ref={selectInpsectionForm}>
+                    <Deferred data={['inspectionCategories']} fallback={<Spinner />}>
+                        <SelectInspectionForm
+                            inspectionCategories={inspectionCategories}
+                            inspectionForms={inspectionForms}
+                            onFormClosed={() => selectInpsectionForm.current?.close()}
+                        />
+                    </Deferred>
+                </DialogContainer>
+            )}
 
             {/* main content */}
             <section className="mx-auto w-full p-4">
@@ -163,11 +186,9 @@ const Index = ({ datatable }: IndexProps): JSX.Element => {
                     </div>
                     {/* actions */}
                     {access.permissions.create && (
-                        <Button type="button" variant={'outline'} asChild>
-                            <Link href={route('config.inspection.form.vehicle.create')}>
-                                <PlusIcon />
-                                <Label className="hidden md:flex">Create</Label>
-                            </Link>
+                        <Button type="button" variant={'outline'} onClick={handleCreate}>
+                            <PlusIcon />
+                            <Label className="hidden md:flex">Create</Label>
                         </Button>
                     )}
                 </div>

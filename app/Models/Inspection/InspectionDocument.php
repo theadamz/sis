@@ -62,8 +62,8 @@ class InspectionDocument extends Model
         return $this->belongsTo(InspectionFlow::class);
     }
 
-    public function inspection_flow_current(): BelongsTo
+    public function inspection_flow_stage_current(): BelongsTo
     {
-        return $this->belongsTo(InspectionFlow::class, 'current_inspection_flow_stage_id', 'id');
+        return $this->belongsTo(InspectionFlowStage::class, 'current_inspection_flow_stage_id', 'id');
     }
 }

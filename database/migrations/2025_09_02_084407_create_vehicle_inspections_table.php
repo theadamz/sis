@@ -33,7 +33,7 @@ return new class extends Migration
             $table->timestamp('duration_start')->nullable()->comment('with flag use duration');
             $table->timestamp('duration_end')->nullable()->comment('with flag use duration');
             $table->string('export_notified_by', 100)->nullable()->comment("Notified to Export Departure by (name)");
-            $table->string('remarks')->nullable();
+            $table->string('remark')->nullable();
             $table->timestamp('inspection_started_at')->nullable();
             $table->timestamp('inspection_ended_at')->nullable();
             $table->jsonb('coordinate_start')->nullable();
